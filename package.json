@@ -1,13 +1,14 @@
 {
   "name": "backlog-sprinter",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
-    "build": "NODENV=production webpack; cd dist; zip ../backlog-sprinter.zip -r *",
+    "build": "NODENV=production webpack; cd dist; zip ../backlog-sprinter.zip -r *; yarn secret",
     "once": "webpack",
     "watch": "webpack --watch",
     "wsl": "DST_DIR=$(echo $PATH | grep -o '/mnt/c/Users/[a-zA-Z]*' | head -n 1)/dev/bnn/backlog-sprinter/dist yarn watch",
-    "test": "jest"
+    "test": "jest",
+    "secret": "cp public/manifest.json ../backlog-sprinter-secret/public; cp src/backlog-api-keys.ts ../backlog-sprinter-secret/src"
   },
   "eslintConfig": {
     "env": {
