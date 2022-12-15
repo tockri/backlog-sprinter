@@ -1,0 +1,6 @@
+/node_modules
+/src/backlog-api-keys.ts
+/src/backlog-api-keys-dev.ts
+/dist
+/backlog-sprinter.zip
+/public/manifest.json

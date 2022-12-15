@@ -1,0 +1,5 @@
+// Get from Backlog developers page
+export const BacklogApiKeys = {
+  clientId: "",
+  clientSecret: ""
+}
