@@ -35,8 +35,10 @@ const renderApp = () => {
   }
 }
 
+const getButtonPlace = () => document.querySelector("h3#filter\\.milestone")
+
 const makePortalButton = () => {
-  const milestoneH3 = document.querySelector("h3#filter\\.milestone")
+  const milestoneH3 = getButtonPlace()
   const fieldDiv = milestoneH3?.nextElementSibling
   if (fieldDiv && !fieldDiv.classList.contains("bsp_milestone-field")) {
     fieldDiv.classList.add("bsp_milestone-field")
@@ -59,6 +61,6 @@ const initialize = () => {
   makePortalButton()
 }
 
-const isReady = (): boolean => !!document.querySelector("#filter\\.milestone")
+const isReady = (): boolean => !!getButtonPlace()
 
 Waiter.watchInfinitly(isReady, initialize)
