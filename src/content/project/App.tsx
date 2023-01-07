@@ -1,10 +1,29 @@
-import React from "react";
-import { PBFormInfo } from "./types";
+import React, { useEffect } from "react"
+import { MessageBroker } from "../../util/MessageBroker"
+import { PBFormInfo } from "./types"
 
 type ProjectAppProps = {
-  info: PBFormInfo
+  broker: MessageBroker<PBFormInfo>
+}
+
+type State = {
+  formInfo: PBFormInfo | null
 }
 
 export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
-  return <div>Project {props.info.lang} {props.info.projectKey}</div>
+  const { broker } = props
+  const [state, setState] = React.useState<State>({ formInfo: null })
+  const { formInfo } = state
+  useEffect(() => {
+    broker.subscribe("Project", (formInfo) => setState((curr) => ({ ...curr, formInfo })))
+  }, [broker])
+  if (formInfo) {
+    return (
+      <div>
+        Project {formInfo.lang} {formInfo.projectKey}
+      </div>
+    )
+  } else {
+    return <></>
+  }
 }
