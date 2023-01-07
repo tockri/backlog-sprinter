@@ -16,6 +16,9 @@ export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
   const { formInfo } = state
   useEffect(() => {
     broker.subscribe("Project", (formInfo) => setState((curr) => ({ ...curr, formInfo })))
+    return () => {
+      broker.unsubscribe("Project")
+    }
   }, [broker])
   if (formInfo) {
     return (

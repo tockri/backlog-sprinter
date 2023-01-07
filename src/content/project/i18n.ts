@@ -1,9 +1,9 @@
 const ja = {
-  formTitle: "マイルストーンを追加する"
+  buttonLabel: "スプリント開発"
 }
 
 const en: typeof ja = {
-  formTitle: "Create a new milestone"
+  buttonLabel: "Sprint Development"
 }
 
 const resources = { ja, en }
