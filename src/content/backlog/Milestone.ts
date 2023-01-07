@@ -1,5 +1,5 @@
+import { DateUtil } from "../../util/DateUtil"
 import { BackgroundClient } from "../BackgroundClient"
-import { DateUtil } from "../util/DateUtil"
 import { Version } from "./ProjectInfo"
 
 export type MilestoneInput = {

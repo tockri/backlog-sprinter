@@ -1,9 +1,9 @@
 import React from "react"
 import ReactDomClient from "react-dom/client"
-import ReactDomServer from "react-dom/server"
+import { MessageBroker } from "../util/MessageBroker"
 import { BoardApp, FormInfo, Lang } from "./board/App"
+import { jsxToElement } from "./ui/JSXUtil"
 import { Waiter } from "./ui/Waiter"
-import { MessageBroker } from "./util/MessageBroker"
 
 const broker = new MessageBroker<FormInfo>()
 
@@ -18,12 +18,6 @@ const makeFormInfo = (): FormInfo => {
     selectedMilestoneId,
     lang
   }
-}
-
-function jsxToElement<T extends HTMLElement = HTMLElement>(jsx: JSX.Element) {
-  const wrapper = document.createElement("DIV")
-  wrapper.innerHTML = ReactDomServer.renderToStaticMarkup(jsx)
-  return wrapper.firstChild as T
 }
 
 const renderApp = () => {

@@ -22,7 +22,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
             onClick={onCloseEvent}
           ></button>
         </div>
-        <div className="modal__content">{children}</div>
+        <div className="bsp-modal-content">{children}</div>
       </div>
     </div>
   )

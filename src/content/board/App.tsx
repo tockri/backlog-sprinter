@@ -1,13 +1,13 @@
 import React, { useEffect } from "react"
 import { ProjectInfo, ProjectInfoData } from "../backlog/ProjectInfo"
 
+import { MessageBroker } from "../../util/MessageBroker"
 import { Modal } from "../ui/Modal"
-import { MessageBroker } from "../util/MessageBroker"
 import { i18n, UserLang as i18nLang } from "./i18n"
 import { MilestoneForm } from "./milestoneForm/Form"
 import * as types from "./types"
 
-export type FormInfo = types.FormInfo
+export type FormInfo = types.MilestoneFormInfo
 export type Lang = i18nLang
 
 type BoardProps = {

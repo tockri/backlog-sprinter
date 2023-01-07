@@ -10,6 +10,7 @@ module.exports = {
   mode: process.env.NODE_ENV ? "productions" : "development",
   entry: {
     board: path.join(srcDir, "content/board.tsx"),
+    project: path.join(srcDir, "content/project.tsx"),
     background: path.join(srcDir, "background/index.ts")
   },
   output: {

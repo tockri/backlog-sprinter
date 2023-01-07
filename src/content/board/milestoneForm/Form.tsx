@@ -1,14 +1,14 @@
 import React, { useEffect } from "react"
+import { DateUtil } from "../../../util/DateUtil"
 import { ProjectInfoData } from "../../backlog/ProjectInfo"
-import { DateUtil } from "../../util/DateUtil"
 import { i18n } from "../i18n"
-import { FormInfo } from "../types"
+import { MilestoneFormInfo } from "../types"
 import { Actions } from "./Actions"
 import { ReducerFunc, Reducers, ViewState } from "./Reducers"
 import { StorageSystem } from "./Storage"
 
 type MilestoneFormProps = {
-  formInfo: FormInfo
+  formInfo: MilestoneFormInfo
   projectInfo: ProjectInfoData
   onSuccess: (newMilestoneId: number) => void
 }
@@ -49,7 +49,7 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
   }
 
   return (
-    <div>
+    <div className="modal__content">
       <div className="form-element__item">
         <label className="form-element__label" htmlFor={id("startDate")}>
           {t.period}
