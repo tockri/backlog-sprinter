@@ -14,7 +14,7 @@ export type IssueData = {
 }
 
 const searchUnclosed = async (projectInfo: ProjectInfoData, milestoneId: number): Promise<ReadonlyArray<IssueData>> => {
-  return await BackgroundClient.apiGet<IssueData[]>("/api/v2/issues", [
+  return await BackgroundClient.blgApiGet<IssueData[]>("/api/v2/issues", [
     {
       "projectId[]": "" + projectInfo.project.id,
       "milestoneId[]": "" + milestoneId
@@ -33,7 +33,7 @@ const bulkChangeMilestone = async (
   for (let i = 0; i < issues.length; i++) {
     const issue = issues[i]
     callback && callback(issue)
-    await BackgroundClient.apiPatch(`/api/v2/issues/${issue.id}`, {
+    await BackgroundClient.blgApiPatch(`/api/v2/issues/${issue.id}`, {
       "milestoneId[]": "" + milestoneId
     })
   }

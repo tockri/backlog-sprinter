@@ -11,7 +11,7 @@ export type MilestoneInput = {
 }
 
 const create = async (input: MilestoneInput): Promise<number> => {
-  const created = await BackgroundClient.apiPost<Version>(`/api/v2/projects/${input.projectId}/versions`, {
+  const created = await BackgroundClient.blgApiPost<Version>(`/api/v2/projects/${input.projectId}/versions`, {
     name: input.name,
     startDate: DateUtil.dateString(input.startDate),
     releaseDueDate: DateUtil.dateString(input.endDate),
@@ -21,7 +21,7 @@ const create = async (input: MilestoneInput): Promise<number> => {
 }
 
 const archive = async (projectId: number, milestone: Version) => {
-  await BackgroundClient.apiPatch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
+  await BackgroundClient.blgApiPatch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
     name: milestone.name,
     archived: "true"
   })

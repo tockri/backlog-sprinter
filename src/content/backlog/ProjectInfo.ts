@@ -27,9 +27,9 @@ export type ProjectInfoData = {
 }
 
 const get = async (projectKey: string): Promise<ProjectInfoData> => {
-  const project = await BackgroundClient.apiGet<Project>(`/api/v2/projects/${projectKey}`)
-  const versionsP = BackgroundClient.apiGet<Version[]>(`/api/v2/projects/${projectKey}/versions`)
-  const statusesP = BackgroundClient.apiGet<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
+  const project = await BackgroundClient.blgApiGet<Project>(`/api/v2/projects/${projectKey}`)
+  const versionsP = BackgroundClient.blgApiGet<Version[]>(`/api/v2/projects/${projectKey}/versions`)
+  const statusesP = BackgroundClient.blgApiGet<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
   const [versions, statuses] = await Promise.all([versionsP, statusesP])
   return {
     project,
