@@ -1,5 +1,5 @@
 import { BackgroundClient } from "../BackgroundClient"
-import { ProjectInfoData, Version } from "./ProjectInfo"
+import { MilestonesData, Version } from "./ProjectInfo"
 
 export type Status = {
   readonly id: number
@@ -13,7 +13,7 @@ export type IssueData = {
   readonly milestone: ReadonlyArray<Version>
 }
 
-const searchUnclosed = async (projectInfo: ProjectInfoData, milestoneId: number): Promise<ReadonlyArray<IssueData>> => {
+const searchUnclosed = async (projectInfo: MilestonesData, milestoneId: number): Promise<ReadonlyArray<IssueData>> => {
   return await BackgroundClient.blgApiGet<IssueData[]>("/api/v2/issues", [
     {
       "projectId[]": "" + projectInfo.project.id,

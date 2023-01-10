@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { DateUtil } from "../../../util/DateUtil"
-import { ProjectInfoData } from "../../backlog/ProjectInfo"
+import { MilestonesData } from "../../backlog/ProjectInfo"
 import { i18n } from "../i18n"
 import { MilestoneFormInfo } from "../types"
 import { Actions } from "./Actions"
@@ -9,7 +9,7 @@ import { StorageSystem } from "./Storage"
 
 type MilestoneFormProps = {
   formInfo: MilestoneFormInfo
-  projectInfo: ProjectInfoData
+  projectInfo: MilestonesData
   onSuccess: (newMilestoneId: number) => void
 }
 

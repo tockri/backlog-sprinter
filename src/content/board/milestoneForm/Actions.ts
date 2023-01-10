@@ -1,6 +1,6 @@
 import { Issue, IssueCallback } from "../../backlog/Issue"
 import { Milestone, MilestoneInput } from "../../backlog/Milestone"
-import { ProjectInfoData } from "../../backlog/ProjectInfo"
+import { MilestonesData } from "../../backlog/ProjectInfo"
 import { ViewState } from "./Reducers"
 
 type SubmitResult = {
@@ -10,7 +10,7 @@ type SubmitResult = {
 
 const submitForm = async (
   state: ViewState,
-  projectInfo: ProjectInfoData,
+  projectInfo: MilestonesData,
   callback?: IssueCallback
 ): Promise<SubmitResult> => {
   const milestoneInput: MilestoneInput = {

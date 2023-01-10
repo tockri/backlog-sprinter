@@ -1,5 +1,5 @@
 import { DateUtil } from "../../../util/DateUtil"
-import { ProjectInfoData, Version } from "../../backlog/ProjectInfo"
+import { MilestonesData, Version } from "../../backlog/ProjectInfo"
 
 export type PartialViewState = {
   sprintDays: number
@@ -117,7 +117,7 @@ const reduceTitle: ReducerFunc = (state, action) => {
 }
 
 const checkTitleUnique =
-  (projectInfo: ProjectInfoData): ReducerFunc =>
+  (projectInfo: MilestonesData): ReducerFunc =>
   (state) => {
     if (projectInfo.versions.find((v) => v.name === state.title)) {
       return {
@@ -144,12 +144,12 @@ const compose =
     return accState
   }
 
-const reduceState = (projectInfo: ProjectInfoData): ReducerFunc =>
+const reduceState = (projectInfo: MilestonesData): ReducerFunc =>
   compose(baseReducer, reduceStartDate, reduceEndDate, reduceTitle, checkTitleUnique(projectInfo))
 
 const makeInitialState = (
   selectedMilestoneId: number,
-  projectInfo: ProjectInfoData,
+  projectInfo: MilestonesData,
   loaded: PartialViewState
 ): ViewState => {
   const startDate = DateUtil.beginningOfDay(new Date())

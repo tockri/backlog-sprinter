@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { ProjectInfo, ProjectInfoData } from "../backlog/ProjectInfo"
+import { MilestonesData, ProjectInfo } from "../backlog/ProjectInfo"
 
 import { MessageBroker } from "../../util/MessageBroker"
 import { Modal } from "../ui/Modal"
@@ -22,7 +22,7 @@ const reloadOnMilestoneId = (milestoneId: number) => {
 
 type State = {
   formInfo: FormInfo | null
-  projectInfo: ProjectInfoData | null
+  projectInfo: MilestonesData | null
 }
 
 export const BoardApp: React.FC<BoardProps> = (props) => {
@@ -31,7 +31,7 @@ export const BoardApp: React.FC<BoardProps> = (props) => {
   useEffect(() => {
     broker.subscribe("Board", async (formInfo) => {
       if (!state.projectInfo) {
-        const projectInfo = await ProjectInfo.get(formInfo.projectKey)
+        const projectInfo = await ProjectInfo.getMilestones(formInfo.projectKey)
         setState({
           formInfo,
           projectInfo
