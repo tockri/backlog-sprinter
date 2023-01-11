@@ -2,9 +2,8 @@ import React from "react"
 import ReactDomClient from "react-dom/client"
 import { RecoilRoot } from "recoil"
 import { MessageBroker } from "../util/MessageBroker"
-import { ProjectApp } from "./project/App"
-import { i18n, UserLang } from "./project/i18n"
-import { PBFormInfo } from "./project/types"
+import { ProjectApp } from "./project/app/View"
+import { i18n, PBFormInfo, UserLang } from "./project/types"
 import { jsxToElement } from "./ui/JSXUtil"
 
 const broker = new MessageBroker<PBFormInfo>()

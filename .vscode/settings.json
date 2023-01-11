@@ -3,5 +3,6 @@
   "python.terminal.activateEnvironment": false,
   "editor.formatOnSave": false,
   "prettier.prettierPath": "node_modules/prettier",
-  "prettier.configPath": "./package.json"
+  "prettier.configPath": "./package.json",
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

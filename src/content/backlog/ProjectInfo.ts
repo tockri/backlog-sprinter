@@ -1,3 +1,4 @@
+import { ParamsType } from "../../background-interface"
 import { BackgroundClient } from "../BackgroundClient"
 
 export type Project = {
@@ -127,7 +128,33 @@ const getCustomFields = async (projectKey: string): Promise<CustomFieldsData> =>
   }
 }
 
+export type CustomFieldInput = {
+  typeId: CustomFieldTypes
+  name: string
+  applicableIssueTypes: ReadonlyArray<number>
+  description: string
+  required: boolean
+  initialValue?: number
+}
+
+const createCustomField = async (projectKey: string, input: CustomFieldInput): Promise<CustomField> => {
+  const postData: ParamsType = [
+    {
+      typeId: `${input.typeId}`,
+      name: input.name,
+      description: input.description,
+      required: input.required ? "true" : "false"
+    } as Record<string, string>
+  ]
+    .concat(input.applicableIssueTypes.map((i) => ({ "applicableIssueTypes[]": `${i}` })))
+    .concat(
+      input.initialValue !== undefined ? [{ initialValue: `${input.initialValue}` } as Record<string, string>] : []
+    )
+  return await BackgroundClient.blgApiPost<CustomField>(`/api/v2/projects/${projectKey}/customFields`, postData)
+}
+
 export const ProjectInfo = {
   getMilestones,
-  getCustomFields
+  getCustomFields,
+  createCustomField
 }

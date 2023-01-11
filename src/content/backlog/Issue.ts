@@ -1,5 +1,5 @@
 import { BackgroundClient } from "../BackgroundClient"
-import { MilestonesData, Version } from "./ProjectInfo"
+import { CustomNumberField, Project, Version } from "./ProjectInfo"
 
 export type Status = {
   readonly id: number
@@ -13,13 +13,33 @@ export type IssueData = {
   readonly milestone: ReadonlyArray<Version>
 }
 
-const searchUnclosed = async (projectInfo: MilestonesData, milestoneId: number): Promise<ReadonlyArray<IssueData>> => {
+const searchUnclosedInMilestone = async (
+  project: Project,
+  statuses: ReadonlyArray<Status>,
+  milestoneId: number
+): Promise<ReadonlyArray<IssueData>> => {
   return await BackgroundClient.blgApiGet<IssueData[]>("/api/v2/issues", [
     {
-      "projectId[]": "" + projectInfo.project.id,
+      "projectId[]": "" + project.id,
       "milestoneId[]": "" + milestoneId
     },
-    ...projectInfo.statuses.filter((s) => s.id !== 4).map((s) => ({ "statusId[]": "" + s.id }))
+    ...statuses.filter((s) => s.id !== 4).map((s) => ({ "statusId[]": "" + s.id }))
+  ])
+}
+
+const searchUnclosedInIssueType = async (
+  project: Project,
+  statuses: ReadonlyArray<Status>,
+  issueTypeId: number,
+  sortField: CustomNumberField
+): Promise<ReadonlyArray<IssueData>> => {
+  return await BackgroundClient.blgApiGet<IssueData[]>("/api/v2/issues", [
+    {
+      "projectId[]": "" + project.id,
+      "issueTypeId[]": "" + issueTypeId,
+      sort: `customField_${sortField.id}`
+    },
+    ...statuses.filter((s) => s.id !== 4).map((s) => ({ "statusId[]": "" + s.id }))
   ])
 }
 
@@ -40,6 +60,7 @@ const bulkChangeMilestone = async (
 }
 
 export const Issue = {
-  searchUnclosed,
+  searchUnclosedInMilestone,
+  searchUnclosedInIssueType,
   bulkChangeMilestone
 }

@@ -16,13 +16,28 @@ export const composeReducers =
     return state
   }
 
-export type Dispatcher<A extends Action> = (a: A) => void
+export type Dispatcher<T, A extends Action> = (a: A | A[], callback?: (updated: T) => void) => void
+
+const isArray = <A extends Action>(a: A | A[]): a is A[] =>
+  typeof (a as Record<string, unknown>)["indexOf"] === "function"
 
 export const useRecoilReducer = <T, A extends Action>(
   rs: RecoilState<T>,
   reducer: RecoilReducer<T, A>
-): [T, Dispatcher<A>] => {
+): [T, Dispatcher<T, A>] => {
   const [state, setState] = useRecoilState(rs)
-  const dispatch = (a: A) => setState((curr) => reducer(curr, a))
+  const dispatch: Dispatcher<T, A> = (a, callback) => {
+    const actions: A[] = isArray(a) ? a : [a]
+    setState((curr) => {
+      let state = curr
+      actions.forEach((action) => {
+        state = reducer(state, action)
+      })
+      if (callback) {
+        callback(state)
+      }
+      return state
+    })
+  }
   return [state, dispatch]
 }

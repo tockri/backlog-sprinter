@@ -1,10 +1,13 @@
 import React, { useEffect } from "react"
-import { MessageBroker } from "../../util/MessageBroker"
-import { Modal } from "../ui/Modal"
-import { TabPanel } from "../ui/TabPanel"
-import { i18n } from "./i18n"
-import { useProjectModel } from "./model"
-import { PBFormInfo } from "./types"
+import { MessageBroker } from "../../../util/MessageBroker"
+import { Modal } from "../../ui/Modal"
+import { TabPanel } from "../../ui/TabPanel"
+import { i18n } from "../common/i18n"
+import { useProjectAppViewModel } from "./ViewModel"
+
+import { ProjectProductBacklog } from "../productBacklog/View"
+import { ProjectSettings } from "../settings/View"
+import { PBFormInfo } from "../types"
 
 type ProjectAppProps = {
   broker: MessageBroker<PBFormInfo>
@@ -12,27 +15,24 @@ type ProjectAppProps = {
 
 export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
   const { broker } = props
-  const vm = useProjectModel()
+  const vm = useProjectAppViewModel()
   useEffect(() => {
-    console.log({ vm })
     broker.subscribe("Project", async (formInfo) => {
-      console.log({ formInfo }, "broker fired")
-      vm.start(formInfo)
+      await vm.start(formInfo)
     })
     return () => {
       broker.unsubscribe("Project")
     }
   }, [broker, vm])
-  const { formInfo, projectInfo } = vm.state
-  if (formInfo && projectInfo) {
-    const t = i18n(formInfo.lang)
+  if (vm.isReady) {
+    const t = i18n(vm.lang)
     return (
-      <Modal onCloseEvent={vm.clear} size="large" title={t.formTitle}>
+      <Modal onClose={vm.clear} size="large" title={t.formTitle}>
         <TabPanel
           tabs={[
             {
               label: "プロダクトバックログ",
-              component: () => <div className="modal__content">ばっくろぐ</div>
+              component: () => <ProjectProductBacklog />
             },
             {
               label: "ベロシティ",
@@ -40,10 +40,10 @@ export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
             },
             {
               label: "設定",
-              component: () => <div className="modal__content">せってい</div>
+              component: () => <ProjectSettings />
             }
           ]}
-          selectedIndex={vm.state.selectedTab}
+          selectedIndex={vm.selectedTab}
           onTabClicked={vm.selectTab}
         />
       </Modal>

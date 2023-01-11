@@ -24,7 +24,11 @@ const submitForm = async (
     const createdMilestoneId = await Milestone.create(milestoneInput)
     if (state.selectedMilestone) {
       if (state.moveUnclosed) {
-        const unclosed = await Issue.searchUnclosed(projectInfo, state.selectedMilestone.id)
+        const unclosed = await Issue.searchUnclosedInMilestone(
+          projectInfo.project,
+          projectInfo.statuses,
+          state.selectedMilestone.id
+        )
         await Issue.bulkChangeMilestone(unclosed, createdMilestoneId, callback)
       }
       if (state.archiveCurrent) {

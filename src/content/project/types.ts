@@ -1,6 +1,8 @@
-import { UserLang } from "./i18n"
+import { UserLang } from "./common/i18n"
 
 export type PBFormInfo = {
-  projectKey: string
-  lang: UserLang
+  readonly projectKey: string
+  readonly lang: UserLang
 }
+
+export { i18n, UserLang } from "./common/i18n"

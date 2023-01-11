@@ -49,7 +49,7 @@ export const BoardApp: React.FC<BoardProps> = (props) => {
     const t = i18n(state.formInfo.lang)
     return (
       <Modal
-        onCloseEvent={() => setState((s) => ({ ...s, formInfo: null }))}
+        onClose={() => setState((s) => ({ ...s, formInfo: null }))}
         size="medium"
         title={t.formTitle}
         additionalClass={state.formInfo?.selectedMilestoneId > 0 ? "bsp-milestone-large-form" : undefined}
