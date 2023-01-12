@@ -1,15 +1,17 @@
+import React from "react"
 import { Dispatcher, useRecoilReducer } from "../../../util/RecoilReducer"
 import { Issue, IssueData } from "../../backlog/Issue"
 import { Version } from "../../backlog/ProjectInfo"
 import { stateSelector } from "../common/atom"
 import { AppState } from "../common/types"
-import { GroupedList, ProductBacklogAction, ProductBacklogLoaded, productBacklogReducer } from "./Reducer"
+import { NestedList } from "./NestedList"
+import { ProductBacklogAction, ProductBacklogLoaded, productBacklogReducer } from "./Reducer"
 
 type DispatchType = Dispatcher<AppState, ProductBacklogAction>
 type AsyncVMFunc = (dispatch: DispatchType, state: AppState) => () => Promise<void>
 
-export type PBIListState = GroupedList<Version, IssueData>
-export type PBISubList = PBIListState["groups"][number]
+export type PBIListState = NestedList.List<Version, IssueData>
+export type PBISubList = PBIListState["subLists"][number]
 
 const load: AsyncVMFunc = (dispatch, state) => async () => {
   const { projectInfo, orderCustomField, settings, productBacklogItems: productBacklogs } = state
@@ -21,36 +23,35 @@ const load: AsyncVMFunc = (dispatch, state) => async () => {
 }
 
 const backlogTable = (state: AppState) => (): PBIListState => {
-  const table = new Map<number, { id: string; head: Version | null; items: IssueData[] }>()
-  state.productBacklogItems?.forEach((item) => {
-    const milestone = item.milestone.find((m) => m.startDate && m.releaseDueDate) || null
-    const colId = milestone?.id || 0
-    if (!table.has(colId)) {
-      table.set(colId, { id: "" + (milestone?.id || 0), head: milestone, items: [] })
+  if (state.productBacklogItems) {
+    const itemToHead = (item: IssueData): Version | null =>
+      item.milestone.find((m) => m.startDate && m.releaseDueDate) || null
+    const headId = (head: Version): string => "" + head.id
+    const sortKey = (head: Version | null): number =>
+      head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE
+    return NestedList.nest(state.productBacklogItems, { itemToHead, headId, sortKey })
+  } else {
+    return {
+      subLists: []
     }
-    table.get(colId)?.items.push(item)
-  })
-  const groups = Array.from(table.values()).sort((c1, c2) => {
-    const getTime = (d?: string | null): number => (d ? new Date(d).getTime() : Number.MAX_VALUE)
-    const t1 = getTime(c1.head?.releaseDueDate)
-    const t2 = getTime(c2.head?.releaseDueDate)
-    console.log({ t1, c1, t2, c2 })
-    return t1 - t2
-  })
-  return { groups }
+  }
 }
 
 export type ProjectProductBacklogViewModel = {
   readonly loaded: boolean
-  readonly load: () => Promise<void>
   readonly backlogTable: () => PBIListState
 }
 
 export const useProjectProductBacklogViewModel = (): ProjectProductBacklogViewModel => {
   const [state, dispatch] = useRecoilReducer(stateSelector, productBacklogReducer)
+  const startLoad = load(dispatch, state)
+  React.useEffect(() => {
+    if (state.productBacklogItems) {
+      startLoad()
+    }
+  }, [state.productBacklogItems, startLoad])
   return {
     loaded: !!state.productBacklogItems,
-    load: load(dispatch, state),
     backlogTable: backlogTable(state)
   }
 }

@@ -18,7 +18,7 @@ export const PBIList: React.FC<PBIListProps> = (props) => {
       }}
     >
       <Board>
-        {table.groups.map((column) => (
+        {table.subLists.map((column) => (
           <Column column={column} key={column.head?.id || 0} />
         ))}
       </Board>

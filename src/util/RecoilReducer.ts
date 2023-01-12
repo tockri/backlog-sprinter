@@ -15,13 +15,8 @@ export type RecoilReducer<T, A extends Action> = (curr: T, a: A) => T
 
 export const composeReducers =
   <T, A extends Action>(...reducers: RecoilReducer<T, A>[]): RecoilReducer<T, A> =>
-  (curr, a) => {
-    let state: T = curr
-    reducers.forEach((reducer) => {
-      state = reducer(state, a)
-    })
-    return state
-  }
+  (curr, a) =>
+    reducers.reduce((state, reducer) => reducer(state, a), curr)
 
 export type Dispatcher<T, A extends Action> = (a: A | A[], callback?: (updated: T) => void) => void
 
@@ -40,14 +35,11 @@ export const useRecoilReducer = <T, A extends Action>(
       reset()
     } else {
       setState((curr) => {
-        let state = curr
-        actions.forEach((action) => {
-          state = reducer(state, action)
-        })
+        const reduced = actions.reduce((state, action) => reducer(state, action), curr)
         if (callback) {
-          callback(state)
+          callback(reduced)
         }
-        return state
+        return reduced
       })
     }
   }

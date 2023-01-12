@@ -1,7 +1,6 @@
 const path = require("path")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
-const PrettierPlugin = require("prettier-webpack-plugin")
-const ESLintPlugin = require('eslint-webpack-plugin')
+const ESLintPlugin = require("eslint-webpack-plugin")
 
 const srcDir = path.join(__dirname, "src")
 const dstDir = process.env.DST_DIR || path.join(__dirname, "dist")
@@ -33,7 +32,6 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [{ from: ".", to: ".", context: "public" }]
     }),
-    new PrettierPlugin(),
     new ESLintPlugin({
       extensions: ["ts", "tsx"]
     })
