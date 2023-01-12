@@ -1,9 +1,10 @@
-import { ParamsType } from "../../background-interface"
-import { BackgroundClient } from "../BackgroundClient"
+import { BackgroundClient, ParamsType } from "../../background/BackgroundClient"
+import { DateUtil } from "../../util/DateUtil"
 
-export type Project = {
+export type Status = {
   readonly id: number
   readonly name: string
+  readonly color: string
 }
 
 export type Version = {
@@ -16,7 +17,7 @@ export type Version = {
   readonly displayOrder: number
 }
 
-export type Status = {
+export type Project = {
   readonly id: number
   readonly name: string
 }
@@ -153,8 +154,35 @@ const createCustomField = async (projectKey: string, input: CustomFieldInput): P
   return await BackgroundClient.blgApiPost<CustomField>(`/api/v2/projects/${projectKey}/customFields`, postData)
 }
 
+export type MilestoneInput = {
+  readonly projectId: number
+  readonly name: string
+  readonly startDate: Date | null
+  readonly endDate: Date | null
+  readonly description: string
+}
+
+const createMilestone = async (input: MilestoneInput): Promise<number> => {
+  const created = await BackgroundClient.blgApiPost<Version>(`/api/v2/projects/${input.projectId}/versions`, {
+    name: input.name,
+    startDate: DateUtil.dateString(input.startDate),
+    releaseDueDate: DateUtil.dateString(input.endDate),
+    description: input.description
+  })
+  return created.id
+}
+
+const archiveMilestone = async (projectId: number, milestone: Version) => {
+  await BackgroundClient.blgApiPatch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
+    name: milestone.name,
+    archived: "true"
+  })
+}
+
 export const ProjectInfo = {
   getMilestones,
   getCustomFields,
-  createCustomField
+  createCustomField,
+  createMilestone,
+  archiveMilestone
 }

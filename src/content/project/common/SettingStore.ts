@@ -2,13 +2,14 @@
 // Data in localStorage
 // ======================================
 
-import { AppSettings, defaultSettings } from "./types"
+import { ObjectUtil } from "../../../util/ObjectUtil"
+import { AppSettings } from "./types"
 
 const keyPrefix = "project.app.settings."
 
 const load = (projectKey: string): AppSettings => {
   const value = localStorage.getItem(keyPrefix + projectKey)
-  return value ? purify(JSON.parse(value) as AppSettings) : defaultSettings()
+  return value ? purify(JSON.parse(value) as AppSettings) : { pbiIssueTypeId: null }
 }
 
 const save = (projectKey: string, settings: AppSettings) => {
@@ -16,9 +17,9 @@ const save = (projectKey: string, settings: AppSettings) => {
 }
 
 const purify = (t: AppSettings): AppSettings => {
-  return {
-    pbiIssueTypeId: t.pbiIssueTypeId || null
-  }
+  return ObjectUtil.purify(t, {
+    pbiIssueTypeId: null
+  })
 }
 
 export const SettingStore = {

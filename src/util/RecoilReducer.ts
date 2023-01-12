@@ -1,7 +1,14 @@
-import { RecoilState, useRecoilState } from "recoil"
+import { RecoilState, useRecoilState, useResetRecoilState } from "recoil"
 
 export type Action = {
-  id: string
+  readonly id: string
+}
+
+export type ResetAction = Action & {
+  readonly id: "reset"
+}
+export const Reset: ResetAction = {
+  id: "reset"
 }
 
 export type RecoilReducer<T, A extends Action> = (curr: T, a: A) => T
@@ -26,18 +33,23 @@ export const useRecoilReducer = <T, A extends Action>(
   reducer: RecoilReducer<T, A>
 ): [T, Dispatcher<T, A>] => {
   const [state, setState] = useRecoilState(rs)
+  const reset = useResetRecoilState(rs)
   const dispatch: Dispatcher<T, A> = (a, callback) => {
     const actions: A[] = isArray(a) ? a : [a]
-    setState((curr) => {
-      let state = curr
-      actions.forEach((action) => {
-        state = reducer(state, action)
+    if (actions.find((a) => a.id === Reset.id)) {
+      reset()
+    } else {
+      setState((curr) => {
+        let state = curr
+        actions.forEach((action) => {
+          state = reducer(state, action)
+        })
+        if (callback) {
+          callback(state)
+        }
+        return state
       })
-      if (callback) {
-        callback(state)
-      }
-      return state
-    })
+    }
   }
   return [state, dispatch]
 }

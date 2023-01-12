@@ -52,7 +52,7 @@ export const BoardApp: React.FC<BoardProps> = (props) => {
         onClose={() => setState((s) => ({ ...s, formInfo: null }))}
         size="medium"
         title={t.formTitle}
-        additionalClass={state.formInfo?.selectedMilestoneId > 0 ? "bsp-milestone-large-form" : undefined}
+        height={state.formInfo?.selectedMilestoneId > 0 ? 450 : undefined}
       >
         <MilestoneForm formInfo={state.formInfo} projectInfo={state.projectInfo} onSuccess={reloadOnMilestoneId} />
       </Modal>

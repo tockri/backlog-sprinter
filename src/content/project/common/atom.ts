@@ -1,12 +1,25 @@
 import * as Recoil from "recoil"
+import { ObjectUtil } from "../../../util/ObjectUtil"
 import { CustomNumberField, isNumberField } from "../../backlog/ProjectInfo"
-import { AppState, defaultAppState } from "./types"
+import { AppSettings, AppState, Tabs } from "./types"
 
 type AppStateAtom = Omit<AppState, "orderCustomField">
 
+const defaultSettings: AppSettings = {
+  pbiIssueTypeId: null
+}
+
+const defaultAtomValue: AppStateAtom = {
+  formInfo: null,
+  projectInfo: null,
+  productBacklogItems: null,
+  selectedTab: Tabs.Backlog,
+  settings: defaultSettings
+}
+
 const stateAtom = Recoil.atom<AppStateAtom>({
   key: "project.common.stateAtom",
-  default: defaultAppState()
+  default: defaultAtomValue
 })
 
 export const stateSelector = Recoil.selector<AppState>({
@@ -22,7 +35,7 @@ export const stateSelector = Recoil.selector<AppState>({
     if (newValue instanceof Recoil.DefaultValue) {
       reset(stateAtom)
     } else {
-      set(stateAtom, newValue)
+      set(stateAtom, ObjectUtil.purify(newValue, defaultAtomValue))
     }
   }
 })

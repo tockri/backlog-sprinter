@@ -1,26 +1,15 @@
 import React from "react"
+import { Loading } from "../../ui/Loading"
+import { PBIList } from "./PBIList"
 import { useProjectProductBacklogViewModel } from "./ViewModel"
 
 export const ProjectProductBacklog: React.FC = () => {
   const vm = useProjectProductBacklogViewModel()
-  const backlogItems = vm.backlogItems
-  console.log("backlogItems", backlogItems)
+  const backlogTable = vm.backlogTable()
   React.useEffect(() => {
-    if (!backlogItems) {
+    if (!vm.loaded) {
       vm.load()
     }
-  }, [vm, backlogItems])
-  if (backlogItems) {
-    return (
-      <div>
-        {backlogItems.map((bi) => (
-          <div key={bi.id}>
-            {bi.issueKey} : {bi.summary}
-          </div>
-        ))}
-      </div>
-    )
-  } else {
-    return <>loading...</>
-  }
+  }, [vm])
+  return vm.loaded ? <PBIList table={backlogTable} /> : <Loading />
 }

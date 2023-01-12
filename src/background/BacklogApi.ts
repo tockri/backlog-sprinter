@@ -1,5 +1,5 @@
-import { ParamsType } from "../background-interface"
-import { BacklogApiKeys } from "../backlog-api-keys"
+import { ParamsType } from "./BackgroundClient"
+import { BacklogApiKeys } from "./backlog-api-keys"
 import { BacklogOAuth, BacklogOAuthConfig, TokenInfo } from "./BacklogOAuth"
 
 const accessTokenStorageKey = (hostname: string) => `access-token-${hostname}`

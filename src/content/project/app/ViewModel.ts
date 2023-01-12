@@ -1,10 +1,10 @@
-import { Dispatcher, useRecoilReducer } from "../../../util/RecoilReducer"
+import { Dispatcher, Reset, useRecoilReducer } from "../../../util/RecoilReducer"
 import { ProjectInfo } from "../../backlog/ProjectInfo"
 import { stateSelector } from "../common/atom"
 import { SettingStore } from "../common/SettingStore"
 import { AppState, Tabs } from "../common/types"
 import { PBFormInfo, UserLang } from "../types"
-import { AppAction, appReducer, Clear, ProjectInfoLoaded, SettingsLoaded, TabSelected } from "./Reducer"
+import { AppAction, appReducer, ProjectInfoLoaded, SettingsLoaded, TabSelected } from "./Reducer"
 
 type DispatchType = Dispatcher<AppState, AppAction>
 type AsyncVMFunc1<T> = (dispatch: DispatchType, state: AppState) => (arg: T) => Promise<void>
@@ -21,7 +21,7 @@ const start: AsyncVMFunc1<PBFormInfo> = (dispatch, state) => async (formInfo) =>
 }
 
 const clear: VMFunc0 = (dispatch) => () => {
-  dispatch(Clear())
+  dispatch(Reset)
 }
 
 const selectTab: VMFunc1<number> = (dispatch) => (tab) => {

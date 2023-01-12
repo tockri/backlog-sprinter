@@ -27,7 +27,7 @@ export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
   if (vm.isReady) {
     const t = i18n(vm.lang)
     return (
-      <Modal onClose={vm.clear} size="large" title={t.formTitle}>
+      <Modal onClose={vm.clear} size="large" title={t.formTitle} height="calc(100vh - 200px)">
         <TabPanel
           tabs={[
             {
@@ -49,10 +49,6 @@ export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
       </Modal>
     )
   } else {
-    return (
-      <>
-        <span className="loading--circle -small"></span>
-      </>
-    )
+    return <></>
   }
 }

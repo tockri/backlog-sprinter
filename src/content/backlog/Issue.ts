@@ -1,9 +1,5 @@
-import { BackgroundClient } from "../BackgroundClient"
-import { CustomNumberField, Project, Version } from "./ProjectInfo"
-
-export type Status = {
-  readonly id: number
-}
+import { BackgroundClient } from "../../background/BackgroundClient"
+import { CustomNumberField, Project, Status, Version } from "./ProjectInfo"
 
 export type IssueData = {
   readonly id: number
@@ -21,7 +17,8 @@ const searchUnclosedInMilestone = async (
   return await BackgroundClient.blgApiGet<IssueData[]>("/api/v2/issues", [
     {
       "projectId[]": "" + project.id,
-      "milestoneId[]": "" + milestoneId
+      "milestoneId[]": "" + milestoneId,
+      count: "100"
     },
     ...statuses.filter((s) => s.id !== 4).map((s) => ({ "statusId[]": "" + s.id }))
   ])
@@ -37,7 +34,8 @@ const searchUnclosedInIssueType = async (
     {
       "projectId[]": "" + project.id,
       "issueTypeId[]": "" + issueTypeId,
-      sort: `customField_${sortField.id}`
+      sort: `customField_${sortField.id}`,
+      count: "100"
     },
     ...statuses.filter((s) => s.id !== 4).map((s) => ({ "statusId[]": "" + s.id }))
   ])

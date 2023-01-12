@@ -1,4 +1,4 @@
-import { BackgroundMessage, BlgApiMethod } from "../background-interface"
+import { BackgroundMessage, BlgApiMethod } from "./BackgroundClient"
 import { BacklogApi } from "./BacklogApi"
 
 chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, callback) => {

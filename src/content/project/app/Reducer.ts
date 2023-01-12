@@ -1,15 +1,7 @@
-import { Action, composeReducers, RecoilReducer } from "../../../util/RecoilReducer"
+import { Action, composeReducers, RecoilReducer, ResetAction } from "../../../util/RecoilReducer"
 import { CustomFieldsData } from "../../backlog/ProjectInfo"
-import { AppSettings, AppState, defaultAppState, No, NoAction, Tabs } from "../common/types"
+import { AppSettings, AppState, No, NoAction, Tabs } from "../common/types"
 import { PBFormInfo } from "../types"
-
-type ClearAction = Action & {
-  readonly id: "Clear"
-}
-
-export const Clear = (): ClearAction => ({
-  id: "Clear"
-})
 
 type SettingsLoadedAction = Action & {
   readonly id: "SettingsLoadedAction"
@@ -50,11 +42,7 @@ export const TabSelected = (index: number): TabSelectedAction | NoAction => {
   }
 }
 
-export type AppAction = NoAction | ClearAction | TabSelectedAction | SettingsLoadedAction | ProjectInfoLoadedAction
-
-const clear: RecoilReducer<AppState, AppAction> = (curr, action) => {
-  return action.id === "Clear" ? defaultAppState() : curr
-}
+export type AppAction = NoAction | TabSelectedAction | SettingsLoadedAction | ProjectInfoLoadedAction | ResetAction
 
 const projectInfoLoaded: RecoilReducer<AppState, AppAction> = (curr, action) => {
   return action.id === "ProjectInfoLoaded"
@@ -86,4 +74,4 @@ const selectTab: RecoilReducer<AppState, AppAction> = (curr, action) => {
   }
 }
 
-export const appReducer = composeReducers(projectInfoLoaded, settingsLoaded, selectTab, clear)
+export const appReducer = composeReducers(projectInfoLoaded, settingsLoaded, selectTab)

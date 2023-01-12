@@ -7,10 +7,6 @@ export type AppSettings = {
   readonly pbiIssueTypeId: number | null
 }
 
-export const defaultSettings = (): AppSettings => ({
-  pbiIssueTypeId: null
-})
-
 export enum Tabs {
   Backlog = 0,
   Velocity = 1,
@@ -25,15 +21,6 @@ export type AppState = {
   readonly selectedTab: Tabs
   readonly settings: AppSettings
 }
-
-export const defaultAppState = (): AppState => ({
-  formInfo: null,
-  projectInfo: null,
-  productBacklogItems: null,
-  orderCustomField: null,
-  selectedTab: Tabs.Backlog,
-  settings: defaultSettings()
-})
 
 export type NoAction = Action & {
   id: "No"

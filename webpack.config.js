@@ -7,7 +7,7 @@ const srcDir = path.join(__dirname, "src")
 const dstDir = process.env.DST_DIR || path.join(__dirname, "dist")
 
 module.exports = {
-  mode: process.env.NODE_ENV ? "productions" : "development",
+  mode: process.env.NODE_ENV ? "production" : "development",
   entry: {
     board: path.join(srcDir, "content/board.tsx"),
     project: path.join(srcDir, "content/project.tsx"),
