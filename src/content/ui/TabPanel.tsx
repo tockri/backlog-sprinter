@@ -13,39 +13,36 @@ export type TabPanelProps = {
   readonly onTabClicked?: (tab: number) => void
 }
 
-const Panel = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  width: 100%;
-  height: 100%;
-`
+const Panel = styled.div({
+  display: "flex",
+  width: "100%",
+  height: "100%"
+})
 
-const TabBar = styled.nav`
-  display: block;
-  width: 20em;
-  background-color: #f0f0f0;
-  margin: 0;
-  padding: 0;
-`
+const TabBar = styled.nav({
+  display: "flex",
+  flexDirection: "column",
+  width: "20em",
+  backgroundColor: "#f0f0f0",
+  margin: 0,
+  padding: 0
+})
 
-const Tab = styled.button`
-  display: block;
-  width: 100%;
-  padding: 1em 2em;
-  margin-bottom: 1px;
-  border: 0 none;
-  background-color: transparent;
-  &.selected {
-    background-color: white;
+const Tab = styled.button({
+  padding: "1em 2em",
+  marginBottom: 1,
+  border: "0 none",
+  backgroundColor: "transparent",
+  "&.selected": {
+    backgroundColor: "white"
   }
-`
+})
 
-const Body = styled.div`
-  width: calc(100% - 20em);
-  padding: 20px;
-  overflow: hidden;
-`
+const Body = styled.div({
+  flexGrow: 1,
+  padding: 24,
+  overflow: "auto"
+})
 
 export const TabPanel: React.FC<TabPanelProps> = (props) => {
   const { tabs, initialIndex, selectedIndex, onTabClicked } = props

@@ -1,72 +1,108 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
+import { DateUtil } from "../../../util/DateUtil"
 import { IssueData } from "../../backlog/Issue"
-import { PBIListState, PBISubList } from "./ViewModel"
+import { Version } from "../../backlog/ProjectInfo"
+import { NestedList, NestedListData } from "./NestedList"
+
+export type PBIListData = NestedListData<Version, IssueData>
 
 export type PBIListProps = {
-  readonly table: PBIListState
+  readonly items: ReadonlyArray<IssueData>
+}
+
+const nest = (items: ReadonlyArray<IssueData>): PBIListData => {
+  return NestedList.nest<Version, IssueData>(items, {
+    itemToHead: (item) => item.milestone.find((m) => m.startDate && m.releaseDueDate) || null,
+    headId: (head) => (head ? "" + head.id : "--"),
+    sortKey: (head) => (head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE)
+  })
 }
 
 export const PBIList: React.FC<PBIListProps> = (props) => {
-  const { table } = props
+  const { items } = props
+  const [nList, dispatch] = React.useReducer(NestedList.reducer<Version, IssueData>, nest(items))
 
   return (
     <DragDropContext
       onDragEnd={(result, provided) => {
-        console.log({ result, provided })
+        const { source, destination } = result
+        if (source && destination) {
+          const src: [string, number] = [source.droppableId, source.index]
+          const dst: [string, number] = [destination.droppableId, destination.index]
+          dispatch(NestedList.Move(src, dst))
+          provided.announce("moved.")
+        }
       }}
     >
-      <Board>
-        {table.subLists.map((column) => (
-          <Column column={column} key={column.head?.id || 0} />
-        ))}
-      </Board>
+      {nList.subLists.map((column) => (
+        <PBISubList column={column} key={column.head?.id || 0} />
+      ))}
     </DragDropContext>
   )
 }
 
-const Board = styled.div`
-  overflow: auto;
-`
+type PBISubList = PBIListData["subLists"][number]
 
 type ColumnProps = {
   readonly column: PBISubList
 }
 
-const Column: React.FC<ColumnProps> = (props) => {
+const PBISubList: React.FC<ColumnProps> = (props) => {
   const { column } = props
+  const milestone = column.head
+  const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
   return (
-    <Lane>
-      <LaneTitle>🏁{column.head?.name || "(No milestone)"}</LaneTitle>
-      <Droppable droppableId={`${column.head?.id || 0}`}>
+    <SL>
+      <SLTitle>
+        <MilestoneName>🏁{milestone?.name || "(No milestone)"}</MilestoneName>
+        <ReleaseDate>{releaseDate}</ReleaseDate>
+      </SLTitle>
+      <Droppable droppableId={column.id}>
         {(provided) => (
-          <div ref={provided.innerRef} {...provided.droppableProps}>
+          <SLBody ref={provided.innerRef} {...provided.droppableProps}>
             {column.items.map((item, index) => (
-              <PBI item={item} key={item.id} index={index} />
+              <PBIItem item={item} key={item.id} index={index} />
             ))}
             {provided.placeholder}
-          </div>
+          </SLBody>
         )}
       </Droppable>
-    </Lane>
+    </SL>
   )
 }
 
-const Lane = styled.div`
-  margin-bottom: 8px;
-`
+const SL = styled.div({
+  position: "relative",
+  marginBottom: 8,
+  paddingTop: 20
+})
 
-const LaneTitle = styled.div`
-  font-weight: bold;
-`
+const SLTitle = styled.div({
+  position: "absolute",
+  top: 0
+})
+
+const MilestoneName = styled.span({
+  fontWeight: "bold"
+})
+
+const ReleaseDate = styled.span({
+  display: "inline-block",
+  marginLeft: "2em"
+})
+
+const SLBody = styled.div({
+  minHeight: 50
+})
 
 type PBIProps = {
   readonly item: IssueData
   readonly index: number
 }
 
-const PBI: React.FC<PBIProps> = (props) => {
+const PBIItem: React.FC<PBIProps> = (props) => {
   const { item, index } = props
   return (
     <Draggable draggableId={`${item.id}`} index={index}>
@@ -90,41 +126,38 @@ const PBI: React.FC<PBIProps> = (props) => {
   )
 }
 
-const Cell = styled.div`
-  padding: 4px;
-  border: 1px solid #d0d0d0;
-  border-radius: 2px;
-  color: #404040;
-  margin: 4px;
-  background-color: #ffffff;
-  left: auto !important;
-  top: auto !important;
-`
+const Cell = styled.div({
+  position: "relative",
+  padding: 4,
+  border: "1px solid #d0d0d0",
+  borderRadius: 2,
+  color: "#404040",
+  margin: "4px 0",
+  backgroundColor: "#ffffff",
+  left: "auto !important",
+  top: "auto !important"
+})
 
-const CellHeader = styled.div`
-  display: flex;
-`
+const CellHeader = styled.div({ display: "flex" })
 
-const IssueKey = styled.div`
-  display: inline-block;
-  margin-right: 1em;
-`
+const IssueKey = styled.div({
+  display: "inline-block",
+  marginRight: "1em"
+})
 
-const StatusView = styled.div`
-  display: inlinne-block;
-  margin-left: 1em;
-`
+const StatusView = styled.div({
+  display: "inline-block",
+  marginLeft: "1em"
+})
 
-const StatusIcon = styled.div`
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  border-radius: 0.5em;
-  margin-right: 0.5em;
-  position: relative;
-  top: 1px;
-`
+const StatusIcon = styled.div({
+  display: "inline-block",
+  width: "1em",
+  height: "1em",
+  borderRadius: "0.5em",
+  marginRight: "0.5em",
+  position: "relative",
+  top: 1
+})
 
-const Summary = styled.div`
-  overflow: hidden;
-`
+const Summary = styled.div({ overflow: "hidden" })

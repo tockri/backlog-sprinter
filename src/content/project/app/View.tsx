@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { MessageBroker } from "../../../util/MessageBroker"
 import { Modal } from "../../ui/Modal"
 import { TabPanel } from "../../ui/TabPanel"
@@ -16,14 +16,17 @@ type ProjectAppProps = {
 export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
   const { broker } = props
   const vm = useProjectAppViewModel()
-  useEffect(() => {
-    broker.subscribe("Project", async (formInfo) => {
-      await vm.start(formInfo)
-    })
+  React.useEffect(() => {
+    if (!vm.isReady) {
+      broker.subscribe("Project", (formInfo) => {
+        vm.start(formInfo)
+      })
+    }
     return () => {
       broker.unsubscribe("Project")
     }
-  }, [broker, vm])
+  }, [vm, broker])
+
   if (vm.isReady) {
     const t = i18n(vm.lang)
     return (

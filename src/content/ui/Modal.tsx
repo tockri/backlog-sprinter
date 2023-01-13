@@ -15,7 +15,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
   return (
     <Wrapper>
       <div className="modal-membrane" onClick={onClose}></div>
-      <div className={`modal modal--default bsp-modal -${size} is_visible`} style={modalStyle}>
+      <div className={`modal modal--default -${size} is_visible`} style={modalStyle}>
         <div className="modal__header">
           <h1 className="modal__title">{title}</h1>
           <button
@@ -42,6 +42,6 @@ const Wrapper = styled.div`
   align-items: center;
 `
 
-const Content = styled.div`
-  height: calc(100% - 36px);
-`
+const Content = styled.div({
+  height: "calc(100% - 36px)"
+})

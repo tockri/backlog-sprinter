@@ -7,11 +7,10 @@ import { PBFormInfo, UserLang } from "../types"
 import { AppAction, appReducer, ProjectInfoLoaded, SettingsLoaded, TabSelected } from "./Reducer"
 
 type DispatchType = Dispatcher<AppState, AppAction>
-type AsyncVMFunc1<T> = (dispatch: DispatchType, state: AppState) => (arg: T) => Promise<void>
 type VMFunc0 = (dispatch: DispatchType) => () => void
 type VMFunc1<T> = (dispatch: DispatchType) => (arg: T) => void
 
-const start: AsyncVMFunc1<PBFormInfo> = (dispatch, state) => async (formInfo) => {
+const start = (dispatch: DispatchType, state: AppState) => async (formInfo: PBFormInfo) => {
   if (!state.formInfo && !state.projectInfo) {
     const projectInfo = await ProjectInfo.getCustomFields(formInfo.projectKey)
     const settings = SettingStore.load(formInfo.projectKey)
@@ -39,6 +38,7 @@ export type ProjectAppViewModel = {
 
 export const useProjectAppViewModel = (): ProjectAppViewModel => {
   const [state, dispatch] = useRecoilReducer(stateSelector, appReducer)
+
   return {
     isReady: !!(state.formInfo && state.projectInfo),
     lang: state.formInfo?.lang || "en",

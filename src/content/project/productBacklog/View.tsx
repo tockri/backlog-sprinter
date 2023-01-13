@@ -5,5 +5,5 @@ import { useProjectProductBacklogViewModel } from "./ViewModel"
 
 export const ProjectProductBacklog: React.FC = () => {
   const vm = useProjectProductBacklogViewModel()
-  return vm.loaded ? <PBIList table={vm.backlogTable()} /> : <Loading />
+  return vm.items ? <PBIList items={vm.items} /> : <Loading />
 }
