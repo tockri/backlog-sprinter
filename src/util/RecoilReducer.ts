@@ -24,8 +24,8 @@ const isArray = <A extends Action>(a: A | A[]): a is A[] =>
   typeof (a as Record<string, unknown>)["indexOf"] === "function"
 
 export const useRecoilReducer = <T, A extends Action>(
-  rs: RecoilState<T>,
-  reducer: RecoilReducer<T, A>
+  reducer: RecoilReducer<T, A>,
+  rs: RecoilState<T>
 ): [T, Dispatcher<T, A>] => {
   const [state, setState] = useRecoilState(rs)
   const reset = useResetRecoilState(rs)

@@ -7,9 +7,10 @@ type TestHead = {
 }
 type TestItem = {
   readonly itemId: string
+  readonly order: number
 }
 const heads: ReadonlyArray<TestHead> = new Array(3).fill("").map((_, i) => ({ headId: `h${i}` }))
-const items: ReadonlyArray<TestItem> = new Array(10).fill("").map((_, i) => ({ itemId: `i${i}` }))
+const items: ReadonlyArray<TestItem> = new Array(10).fill("").map((_, i) => ({ itemId: `i${i}`, order: 0 }))
 type TestState = NestedListData<TestHead, TestItem>
 
 test("NestedList.move moves an item from a subList to another", () => {
@@ -189,26 +190,26 @@ test("NestedList.nest makes a NestedList from an Array", () => {
     subLists: [
       {
         id: "h0",
-        head: { headId: "h0" },
+        head: heads[0],
         items: [
-          { head: { headId: "h0" }, item: { itemId: "i0" } },
-          { head: { headId: "h0" }, item: { itemId: "i3" } }
+          { head: heads[0], item: items[0] },
+          { head: heads[0], item: items[3] }
         ]
       },
       {
         id: "h1",
-        head: { headId: "h1" },
+        head: heads[1],
         items: [
-          { head: { headId: "h1" }, item: { itemId: "i1" } },
-          { head: { headId: "h1" }, item: { itemId: "i4" } }
+          { head: heads[1], item: items[1] },
+          { head: heads[1], item: items[4] }
         ]
       },
       {
         id: "",
         head: null,
         items: [
-          { head: null, item: { itemId: "i2" } },
-          { head: null, item: { itemId: "i5" } }
+          { head: null, item: items[2] },
+          { head: null, item: items[5] }
         ]
       }
     ]

@@ -8,6 +8,7 @@ import { useProjectAppViewModel } from "./ViewModel"
 import { ProjectProductBacklog } from "../productBacklog/View"
 import { ProjectSettings } from "../settings/View"
 import { PBFormInfo } from "../types"
+import { VelocityView } from "../velocity"
 
 type ProjectAppProps = {
   broker: MessageBroker<PBFormInfo>
@@ -39,7 +40,7 @@ export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
             },
             {
               label: "ベロシティ",
-              component: () => <div className="modal__content">べろしてぃ</div>
+              component: () => <VelocityView />
             },
             {
               label: "設定",

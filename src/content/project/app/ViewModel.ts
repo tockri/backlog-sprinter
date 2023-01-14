@@ -37,7 +37,7 @@ export type ProjectAppViewModel = {
 }
 
 export const useProjectAppViewModel = (): ProjectAppViewModel => {
-  const [state, dispatch] = useRecoilReducer(stateSelector, appReducer)
+  const [state, dispatch] = useRecoilReducer(appReducer, stateSelector)
 
   return {
     isReady: !!(state.formInfo && state.projectInfo),

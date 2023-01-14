@@ -21,7 +21,7 @@ export type ProjectProductBacklogViewModel = {
 }
 
 export const useProjectProductBacklogViewModel = (): ProjectProductBacklogViewModel => {
-  const [state, dispatch] = useRecoilReducer(stateSelector, productBacklogReducer)
+  const [state, dispatch] = useRecoilReducer(productBacklogReducer, stateSelector)
   React.useEffect(() => {
     if (!state.productBacklogItems) {
       load(dispatch, state)

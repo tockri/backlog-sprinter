@@ -46,7 +46,7 @@ export type ProjectSettingsViewModel = {
 }
 
 export const useProjectSettingsViewModel = (): ProjectSettingsViewModel => {
-  const [state, dispatch] = useRecoilReducer(stateSelector, settingsReducer)
+  const [state, dispatch] = useRecoilReducer(settingsReducer, stateSelector)
   return {
     settings: state.settings,
     issueTypes: state.projectInfo?.issueTypes || [],

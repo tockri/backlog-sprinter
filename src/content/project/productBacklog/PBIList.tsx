@@ -1,10 +1,9 @@
 import styled from "@emotion/styled"
 import React from "react"
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
 import { DateUtil } from "../../../util/DateUtil"
 import { IssueData } from "../../backlog/Issue"
 import { Version } from "../../backlog/ProjectInfo"
-import { NestedList, NestedListData } from "./NestedList"
+import { NestedList, NestedListAction, NestedListData } from "./NestedList"
 
 export type PBIListData = NestedListData<Version, IssueData>
 
@@ -22,24 +21,18 @@ const nest = (items: ReadonlyArray<IssueData>): PBIListData => {
 
 export const PBIList: React.FC<PBIListProps> = (props) => {
   const { items } = props
-  const [nList, dispatch] = React.useReducer(NestedList.reducer<Version, IssueData>, nest(items))
+  const [nList, dispatch] = React.useReducer(
+    (data: PBIListData, action: NestedListAction) => NestedList.reducer(data, action),
+    nest(items)
+  )
+  console.log(dispatch)
 
   return (
-    <DragDropContext
-      onDragEnd={(result, provided) => {
-        const { source, destination } = result
-        if (source && destination) {
-          const src: [string, number] = [source.droppableId, source.index]
-          const dst: [string, number] = [destination.droppableId, destination.index]
-          dispatch(NestedList.Move(src, dst))
-          provided.announce("moved.")
-        }
-      }}
-    >
+    <>
       {nList.subLists.map((column) => (
         <PBISubList column={column} key={column.head?.id || 0} />
       ))}
-    </DragDropContext>
+    </>
   )
 }
 
@@ -51,6 +44,7 @@ type ColumnProps = {
 
 const PBISubList: React.FC<ColumnProps> = (props) => {
   const { column } = props
+
   const milestone = column.head
   const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
   return (
@@ -59,16 +53,11 @@ const PBISubList: React.FC<ColumnProps> = (props) => {
         <MilestoneName>🏁{milestone?.name || "(No milestone)"}</MilestoneName>
         <ReleaseDate>{releaseDate}</ReleaseDate>
       </SLTitle>
-      <Droppable droppableId={column.id}>
-        {(provided) => (
-          <SLBody ref={provided.innerRef} {...provided.droppableProps}>
-            {column.items.map((item, index) => (
-              <PBIItem item={item} key={item.id} index={index} />
-            ))}
-            {provided.placeholder}
-          </SLBody>
-        )}
-      </Droppable>
+      <SLBody>
+        {column.items.map((item, index) => (
+          <PBIItem item={item} key={item.id} index={index} milestone={milestone} />
+        ))}
+      </SLBody>
     </SL>
   )
 }
@@ -94,48 +83,48 @@ const ReleaseDate = styled.span({
 })
 
 const SLBody = styled.div({
-  minHeight: 50
+  minHeight: 300
 })
 
-type PBIProps = {
+type DragItem = {
   readonly item: IssueData
+  readonly milestone: Version | null
   readonly index: number
 }
 
+type PBIProps = DragItem
+
+type DragInfo = {
+  dragging: boolean
+}
+
 const PBIItem: React.FC<PBIProps> = (props) => {
-  const { item, index } = props
+  const { item } = props
   return (
-    <Draggable draggableId={`${item.id}`} index={index}>
-      {(provided) => (
-        <Cell className="bsp-pbi" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-          <CellHeader>
-            <IssueKey>
-              <a href={`/view/${item.issueKey}`} target="_blank" rel="noreferrer">
-                {item.issueKey}
-              </a>
-            </IssueKey>
-            <StatusView>
-              <StatusIcon style={{ backgroundColor: item.status.color }} />
-              {item.status.name}
-            </StatusView>
-          </CellHeader>
-          <Summary>{item.summary}</Summary>
-        </Cell>
-      )}
-    </Draggable>
+    <Cell>
+      <CellHeader>
+        <IssueKey>
+          <a href={`/view/${item.issueKey}`} target="_blank" rel="noreferrer">
+            {item.issueKey}
+          </a>
+        </IssueKey>
+        <StatusView>
+          <StatusIcon style={{ backgroundColor: item.status.color }} />
+          {item.status.name}
+        </StatusView>
+      </CellHeader>
+      <Summary>!!!{item.summary}</Summary>
+    </Cell>
   )
 }
 
 const Cell = styled.div({
-  position: "relative",
   padding: 4,
   border: "1px solid #d0d0d0",
   borderRadius: 2,
   color: "#404040",
   margin: "4px 0",
-  backgroundColor: "#ffffff",
-  left: "auto !important",
-  top: "auto !important"
+  backgroundColor: "#ffffff"
 })
 
 const CellHeader = styled.div({ display: "flex" })
