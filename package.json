@@ -9,7 +9,9 @@
     "wsl": "DST_DIR=$(echo $PATH | grep -o '/mnt/c/Users/[a-zA-Z]*' | head -n 1)/dev/bnn/backlog-sprinter/dist yarn watch",
     "test": "jest",
     "secret": "cp public/manifest.json ../backlog-sprinter-secret/; cp src/background/backlog-api-keys.ts ../backlog-sprinter-secret/",
-    "import-secret": "cp ../backlog-sprinter-secret/manifest.json public/manifest.json; cp ../backlog-sprinter-secret/backlog-api-keys.ts src/background/backlog-api-keys.ts"
+    "import-secret": "cp ../backlog-sprinter-secret/manifest.json public/manifest.json; cp ../backlog-sprinter-secret/backlog-api-keys.ts src/background/backlog-api-keys.ts",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "eslintConfig": {
     "env": {
@@ -54,11 +56,22 @@
     "@emotion/styled": "^11.10.5",
     "immutability-helper": "^3.1.1",
     "react": "^18.2.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "recoil": "^0.7.6",
     "typescript": "^4.9.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@storybook/addon-actions": "^6.5.15",
+    "@storybook/addon-essentials": "^6.5.15",
+    "@storybook/addon-interactions": "^6.5.15",
+    "@storybook/addon-links": "^6.5.15",
+    "@storybook/builder-webpack5": "^6.5.15",
+    "@storybook/manager-webpack5": "^6.5.15",
+    "@storybook/react": "^6.5.15",
+    "@storybook/testing-library": "^0.0.13",
     "@types/chrome": "^0.0.200",
     "@types/copy-webpack-plugin": "^8.0.1",
     "@types/jest": "^28.1.7",
@@ -69,6 +82,7 @@
     "@types/webpack": "^5.28.0",
     "@typescript-eslint/eslint-plugin": "^5.45.1",
     "@typescript-eslint/parser": "^5.45.1",
+    "babel-loader": "^8.3.0",
     "copy-webpack-plugin": "^10.0.0",
     "eslint": "^8.3.0",
     "eslint-config-prettier": "^8.3.0",

@@ -1,76 +1,135 @@
-import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+import styled from "@emotion/styled"
 import React from "react"
+import { DndProvider, useDrag, useDrop } from "react-dnd"
+import { HTML5Backend } from "react-dnd-html5-backend"
+import { NestedList, NestedListAction } from "../productBacklog/NestedList"
 
-const origData = {
-  groups: [
-    {
-      id: "g1",
-      items: [
-        { id: "i1", name: "item 1" },
-        { id: "i2", name: "item 2" },
-        { id: "i3", name: "item 3" }
-      ]
-    },
-    {
-      id: "g2",
-      items: [
-        { id: "i4", name: "item 4" },
-        { id: "i5", name: "item 5" }
-      ]
-    }
-  ]
+type TestHead = {
+  readonly id: string
 }
-const ids = origData.groups.reduce((acc, group) => acc.concat(group.items.map((i) => i.id)), [] as string[])
+type TestItem = {
+  readonly id: string
+  readonly head: TestHead
+  readonly order: number
+}
+
+const heads: ReadonlyArray<TestHead> = new Array(3).fill("").map((_, i) => ({ id: `h${i}` }))
+const items: ReadonlyArray<TestItem> = new Array(10).fill("").map((_, i) => ({
+  id: `i${i}`,
+  head: heads[Math.floor(i / 4)],
+  order: 0
+}))
+
+const origData = NestedList.nest<TestHead, TestItem>(items, {
+  headId: (head) => head?.id || "-",
+  itemToHead: (item) => item.head,
+  sortKey: (head) => (head ? parseInt(head.id.substring(1)) : Number.MAX_VALUE)
+})
+
+type Data = typeof origData
+type Group = Data["subLists"][number]
+type Item = Group["items"][number]
+
+const reducer = (data: Data, action: NestedListAction): Data => NestedList.reducer(data, action)
 
 export const VelocityView: React.FC = () => {
-  const [items, setItems] = React.useState(origData)
-  const sensors = useSensors(useSensor(PointerSensor))
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={(e) => {
-        const { active, over } = e
-        if (over && active.id !== over.id) {
-          console.log("dragEnd", { active, over })
-          // setItems((prev) => {
-          //   active.data.current
-          //   const oldIndex = prev.indexOf(active.id as number)
-          //   const newIndex = prev.indexOf(over.id as number)
+  const [data, dispatch] = React.useReducer(reducer, origData)
+  console.log(data)
 
-          //   return arrayMove(prev, oldIndex, newIndex)
-          // })
-        }
-      }}
-    >
-      <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-        {items.groups.map((g) => (
-          <div key={g.id}>
-            <div style={{ backgroundColor: "#c0c0c0", color: "white" }}>[group {g.id}]</div>
-            {g.items.map((i) => (
-              <SortableItem key={i.id} id={i.id} name={i.name} />
-            ))}
-          </div>
-        ))}
-      </SortableContext>
-    </DndContext>
+  return (
+    <DndProvider backend={HTML5Backend}>
+      {data.subLists.map((sl) => (
+        <GroupView group={sl} key={sl.id} dispatch={dispatch} />
+      ))}
+    </DndProvider>
   )
 }
 
-const SortableItem: React.FC<{ id: string; name: string }> = (props) => {
-  const { attributes, listeners, setNodeRef, transition, transform } = useSortable({ id: props.id })
+const SubList = styled.div({
+  minHeight: 20,
+  backgroundColor: "#e0e0e0",
+  padding: 30,
+  marginBottom: 10
+})
 
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    border: "1px solid gray",
-    padding: 8
-  }
+const GroupView: React.FC<{ group: Group; dispatch: React.Dispatch<NestedListAction> }> = (props) => {
+  const { group, dispatch } = props
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      sortable: {props.name} ({props.id})
-    </div>
+    <SubList>
+      <DropPoint groupId={group.id} index={0} dispatch={dispatch} />
+      {group.items.map((item, index) => (
+        <div key={index}>
+          <ItemView item={item} groupId={group.id} index={index} />
+          <DropPoint groupId={group.id} index={index + 1} dispatch={dispatch} />
+        </div>
+      ))}
+    </SubList>
+  )
+}
+
+const DropPointView = styled.div({
+  height: 15,
+  "&.hover": {
+    backgroundColor: "#ffe0e0",
+    height: 30
+  }
+})
+
+const DropPoint: React.FC<{ groupId: string; index: number; dispatch: React.Dispatch<NestedListAction> }> = (props) => {
+  const { groupId, index, dispatch } = props
+  const [, drop] = useDrop<DragItem>({
+    accept: "test",
+    drop: (item) => {
+      const src: [string, number] = [item.groupId, item.index]
+      const dst: [string, number] = [groupId, index]
+      setHover(false)
+      dispatch(NestedList.Move(src, dst))
+    }
+  })
+  const [hover, setHover] = React.useState(false)
+  return (
+    <DropPointView
+      ref={drop}
+      className={hover ? "hover" : ""}
+      onDragEnter={() => {
+        setHover(true)
+      }}
+      onDragLeave={() => {
+        setHover(false)
+      }}
+    />
+  )
+}
+
+const ListItem = styled.div({
+  margin: 0,
+  backgroundColor: "#eecccc",
+  padding: 8,
+  ".dragging": {
+    opacity: 0.5
+  }
+})
+
+type DragItem = {
+  item: Item
+  groupId: string
+  index: number
+}
+
+const ItemView: React.FC<{ item: Item; groupId: string; index: number }> = (props) => {
+  const { item, groupId, index } = props
+  const [collected, drag] = useDrag<DragItem, unknown, { dragging: boolean }>({
+    type: "test",
+    item: { item, groupId, index },
+    collect: (monitor) => {
+      return {
+        dragging: monitor.isDragging()
+      }
+    }
+  })
+  return (
+    <ListItem ref={drag} id={`listitem-${item.id}`}>
+      {item.order} | {item.id}
+    </ListItem>
   )
 }
