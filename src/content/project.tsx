@@ -1,5 +1,5 @@
 import React from "react"
-import ReactDomClient from "react-dom/client"
+import { createRoot } from "react-dom/client"
 import { RecoilRoot } from "recoil"
 import { MessageBroker } from "../util/MessageBroker"
 import { ProjectApp } from "./project/app/View"
@@ -26,7 +26,13 @@ const renderApp = () => {
   if (!document.querySelector(".bsp-project-root")) {
     const rootElem = jsxToElement(<div className="bsp-project-root" />)
     document.body.append(rootElem)
-    const reactRoot = ReactDomClient.createRoot(rootElem)
+    // ReactDOM.render(
+    //   <RecoilRoot>
+    //     <ProjectApp broker={broker} />
+    //   </RecoilRoot>,
+    //   rootElem
+    // )
+    const reactRoot = createRoot(rootElem)
     reactRoot.render(
       <RecoilRoot>
         <ProjectApp broker={broker} />

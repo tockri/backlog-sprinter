@@ -10,6 +10,12 @@ const backlogOAuth2Config = (hostname: string): BacklogOAuthConfig => ({
   redirectUri: chrome.identity.getRedirectURL("backlog-api")
 })
 
+const getApiKey = (hostname: string): string | null => {
+  const m = hostname.match(/^([^.]+)\.backlog\.(jp|com)$/)
+  const spaceKey = m ? m[1] : ""
+  return BacklogApiKeys.apiKeys[spaceKey] || null
+}
+
 const getAccessToken = async (hostname: string, renew?: boolean): Promise<string> => {
   const strKey = accessTokenStorageKey(hostname)
   if (renew) {
@@ -64,6 +70,25 @@ const send = async <T extends object>(
   method: "GET" | "POST" | "PATCH" | "DELETE",
   body?: URLSearchParams
 ): Promise<T> => {
+  const sendByApiKey = async (apiKey: string): Promise<Success<T> | Error> => {
+    url.searchParams.append("apiKey", apiKey)
+    const resp = await fetch(url.href, {
+      method,
+      body
+    })
+    if (resp.status === 200) {
+      return {
+        success: true,
+        data: (await resp.json()) as T
+      }
+    } else {
+      return {
+        success: false,
+        errorData: await resp.json()
+      }
+    }
+  }
+
   const sendInner = async (accessToken: string, retryCounter: number): Promise<Success<T> | Error> => {
     const resp = await fetch(url.href, {
       method,
@@ -90,8 +115,8 @@ const send = async <T extends object>(
       errorData: await resp.json()
     }
   }
-
-  const result = await sendInner(await getAccessToken(url.hostname), 2)
+  const apiKey = getApiKey(url.hostname)
+  const result = apiKey ? await sendByApiKey(apiKey) : await sendInner(await getAccessToken(url.hostname), 2)
   if (result.success) {
     return result.data
   } else {

@@ -58,33 +58,36 @@ type Action = MoveAction
 
 const moved = <H, T>(prev: List<H, T>, action: Action): List<H, T> => {
   if (action.id === "Move") {
-    if (action.source.subListId === action.destination.subListId) {
-      const subListId = action.source.subListId
+    const src = action.source
+    const dst = action.destination
+    if (src.subListId === dst.subListId) {
+      const subListId = src.subListId
       const subList = prev.subLists.find((sl) => sl.id === subListId)
       if (subList) {
         const items = Array.from(subList.items)
-        const target = items.splice(action.source.index, 1)
-        items.splice(action.destination.index, 0, ...target)
+        const target = items.splice(src.index, 1)
+        const dstIndex = dst.index < src.index ? dst.index : dst.index - 1
+        items.splice(dstIndex, 0, ...target)
         return {
           subLists: prev.subLists.map((sl) => (sl.id === subListId ? { ...sl, items: items } : sl))
         }
       }
     } else {
-      const srcSub = prev.subLists.find((g) => g.id === action.source.subListId)
-      const dstSub = prev.subLists.find((g) => g.id === action.destination.subListId)
+      const srcSub = prev.subLists.find((g) => g.id === src.subListId)
+      const dstSub = prev.subLists.find((g) => g.id === dst.subListId)
       if (srcSub && dstSub) {
         const srcItems = Array.from(srcSub.items)
-        const target = srcItems.splice(action.source.index, 1)
+        const target = srcItems.splice(src.index, 1)
         const dstItems = Array.from(dstSub.items)
-        dstItems.splice(action.destination.index, 0, ...target)
+        dstItems.splice(dst.index, 0, ...target)
         return {
           subLists: prev.subLists.map((sl) =>
-            sl.id === action.source.subListId
+            sl.id === src.subListId
               ? {
                   ...sl,
                   items: srcItems
                 }
-              : sl.id === action.destination.subListId
+              : sl.id === dst.subListId
               ? {
                   ...sl,
                   items: dstItems

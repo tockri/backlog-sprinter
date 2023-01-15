@@ -1,5 +1,8 @@
+import { Global } from "@emotion/react"
 import styled from "@emotion/styled"
-import React from "react"
+import React, { useEffect } from "react"
+import { DndProvider, useDrag } from "react-dnd"
+import { HTML5Backend } from "react-dnd-html5-backend"
 import { DateUtil } from "../../../util/DateUtil"
 import { IssueData } from "../../backlog/Issue"
 import { Version } from "../../backlog/ProjectInfo"
@@ -7,8 +10,44 @@ import { NestedList, NestedListAction, NestedListData } from "./NestedList"
 
 export type PBIListData = NestedListData<Version, IssueData>
 
+type DropPoint = {
+  subListId: string
+  index: number
+}
+
+type DragContext = {
+  hoverPoint: DropPoint | null
+  dragging: DropPoint | null
+}
+const dragContext = React.createContext<DragContext>({ hoverPoint: null, dragging: null })
+
 export type PBIListProps = {
   readonly items: ReadonlyArray<IssueData>
+}
+
+export const PBIList: React.FC<PBIListProps> = (props) => {
+  const { items } = props
+  const [nList, dispatch] = React.useReducer(
+    (data: PBIListData, action: NestedListAction) => NestedList.reducer(data, action),
+    nest(items)
+  )
+
+  return (
+    <DndProvider backend={HTML5Backend} options={{ enableMouseEvents: true }}>
+      <Global
+        styles={{
+          "body.dragging, body.dragging *": {
+            cursor: "default !important"
+          }
+        }}
+      />
+      <dragContext.Provider value={{ hoverPoint: null, dragging: null }}>
+        {nList.subLists.map((sl) => (
+          <PBISubList subList={sl} dispatch={dispatch} key={sl.id} />
+        ))}
+      </dragContext.Provider>
+    </DndProvider>
+  )
 }
 
 const nest = (items: ReadonlyArray<IssueData>): PBIListData => {
@@ -19,33 +58,16 @@ const nest = (items: ReadonlyArray<IssueData>): PBIListData => {
   })
 }
 
-export const PBIList: React.FC<PBIListProps> = (props) => {
-  const { items } = props
-  const [nList, dispatch] = React.useReducer(
-    (data: PBIListData, action: NestedListAction) => NestedList.reducer(data, action),
-    nest(items)
-  )
-  console.log(dispatch)
-
-  return (
-    <>
-      {nList.subLists.map((column) => (
-        <PBISubList column={column} key={column.head?.id || 0} />
-      ))}
-    </>
-  )
-}
-
 type PBISubList = PBIListData["subLists"][number]
 
-type ColumnProps = {
-  readonly column: PBISubList
+type PBISubListProps = {
+  readonly subList: PBISubList
+  readonly dispatch: React.Dispatch<NestedListAction>
 }
 
-const PBISubList: React.FC<ColumnProps> = (props) => {
-  const { column } = props
-
-  const milestone = column.head
+const PBISubList: React.FC<PBISubListProps> = (props) => {
+  const { subList, dispatch } = props
+  const milestone = subList.head
   const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
   return (
     <SL>
@@ -54,23 +76,24 @@ const PBISubList: React.FC<ColumnProps> = (props) => {
         <ReleaseDate>{releaseDate}</ReleaseDate>
       </SLTitle>
       <SLBody>
-        {column.items.map((item, index) => (
-          <PBIItem item={item} key={item.id} index={index} milestone={milestone} />
+        {subList.items.map((issue, index) => (
+          <DropPoint key={issue.id} index={index} subListId={subList.id}>
+            <PBItem issue={issue} index={index} subListId={subList.id} dispatch={dispatch} />
+          </DropPoint>
         ))}
+        <DropPoint index={subList.items.length} subListId={subList.id} />
       </SLBody>
     </SL>
   )
 }
 
 const SL = styled.div({
-  position: "relative",
   marginBottom: 8,
-  paddingTop: 20
+  paddingTop: 4
 })
 
 const SLTitle = styled.div({
-  position: "absolute",
-  top: 0
+  paddingBottom: 4
 })
 
 const MilestoneName = styled.span({
@@ -83,37 +106,121 @@ const ReleaseDate = styled.span({
 })
 
 const SLBody = styled.div({
-  minHeight: 300
+  padding: 0
 })
 
-type DragItem = {
-  readonly item: IssueData
-  readonly milestone: Version | null
-  readonly index: number
+type DropPointProps = {
+  subListId: string
+  index: number
+  children?: React.ReactNode
 }
 
-type PBIProps = DragItem
-
-type DragInfo = {
-  dragging: boolean
-}
-
-const PBIItem: React.FC<PBIProps> = (props) => {
-  const { item } = props
+const DropPoint: React.FC<DropPointProps> = (props) => {
+  const { subListId, index, children } = props
+  const context = React.useContext(dragContext)
+  const timer = React.useRef<number>(0)
+  const [hover, setHover] = React.useState(false)
+  const canOver = () => {
+    const { dragging } = context
+    if (dragging) {
+      if (dragging.subListId === subListId) {
+        const diff = index - dragging.index
+        if (diff === 0 || diff === 1) {
+          return false
+        }
+      }
+      return true
+    } else {
+      return false
+    }
+  }
+  const onEnter = () => {
+    if (canOver()) {
+      setHover(true)
+      window.clearTimeout(timer.current)
+      context.hoverPoint = {
+        subListId,
+        index
+      }
+    }
+  }
+  const onLeave = () => {
+    timer.current = window.setTimeout(() => {
+      if (context.hoverPoint?.subListId === subListId && context.hoverPoint?.index === index) {
+        context.hoverPoint = null
+      }
+      setHover(false)
+      timer.current = 0
+    }, 50)
+  }
+  const over = context.hoverPoint?.subListId === subListId && context.hoverPoint?.index === index && hover
   return (
-    <Cell>
+    <DropPointView className={over ? "hover" : ""} onDragEnter={onEnter} onDragOver={onEnter} onDragLeave={onLeave}>
+      {children}
+    </DropPointView>
+  )
+}
+
+const DropPointView = styled.div({
+  minHeight: 20,
+  transition: "padding 0.2s ease",
+  "&.hover": {
+    minHeight: 50,
+    paddingTop: 8
+  }
+})
+
+type PBItemProps = {
+  subListId: string
+  index: number
+  issue: IssueData
+  dispatch: React.Dispatch<NestedListAction>
+}
+
+const PBItem: React.FC<PBItemProps> = (props) => {
+  const { issue, subListId, index, dispatch } = props
+  const context = React.useContext(dragContext)
+  const [, drag] = useDrag<{ subListId: string }>({
+    type: "PBItem",
+    item: props
+  })
+  useEffect(() => {
+    console.log("issue", issue)
+  }, [])
+  return (
+    <Cell
+      ref={drag}
+      onDragStart={() => {
+        // console.log("cursor", document.body.style.getPropertyValue("cursor"))
+        context.dragging = {
+          subListId,
+          index
+        }
+      }}
+      onDragEnd={() => {
+        const hp = context.hoverPoint
+        if (hp) {
+          if (context.dragging?.subListId === subListId && context.dragging.index === index) {
+            context.dragging = null
+            context.hoverPoint = null
+          }
+          console.log(`item ${subListId}[${index}] dropped on ${hp.subListId}[${hp.index}]`)
+          dispatch(NestedList.Move([subListId, index], [hp.subListId, hp.index]))
+        }
+      }}
+    >
       <CellHeader>
         <IssueKey>
-          <a href={`/view/${item.issueKey}`} target="_blank" rel="noreferrer">
-            {item.issueKey}
+          <a href={`/view/${issue.issueKey}`} target="_blank" rel="noreferrer">
+            {issue.issueKey}
           </a>
         </IssueKey>
         <StatusView>
-          <StatusIcon style={{ backgroundColor: item.status.color }} />
-          {item.status.name}
+          <StatusIcon style={{ backgroundColor: issue.status.color }} />
+          {issue.status.name}
         </StatusView>
       </CellHeader>
-      <Summary>!!!{item.summary}</Summary>
+      <Summary>{issue.summary}</Summary>
     </Cell>
   )
 }

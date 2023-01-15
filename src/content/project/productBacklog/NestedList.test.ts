@@ -154,7 +154,7 @@ test("NestedList.move moves an item in a subList to the end", () => {
       }
     ]
   }
-  const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 3])
+  const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 4])
   expect<TestState>(R.moved(prev, action)).toStrictEqual<TestState>({
     subLists: [
       {

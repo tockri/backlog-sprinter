@@ -1,7 +1,5 @@
 import styled from "@emotion/styled"
 import React from "react"
-import { DndProvider, useDrag, useDrop } from "react-dnd"
-import { HTML5Backend } from "react-dnd-html5-backend"
 import { NestedList, NestedListAction } from "../productBacklog/NestedList"
 
 type TestHead = {
@@ -34,14 +32,13 @@ const reducer = (data: Data, action: NestedListAction): Data => NestedList.reduc
 
 export const VelocityView: React.FC = () => {
   const [data, dispatch] = React.useReducer(reducer, origData)
-  console.log(data)
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <div>
       {data.subLists.map((sl) => (
         <GroupView group={sl} key={sl.id} dispatch={dispatch} />
       ))}
-    </DndProvider>
+    </div>
   )
 }
 
@@ -67,29 +64,20 @@ const GroupView: React.FC<{ group: Group; dispatch: React.Dispatch<NestedListAct
   )
 }
 
-const DropPointView = styled.div({
-  height: 15,
-  "&.hover": {
-    backgroundColor: "#ffe0e0",
-    height: 30
-  }
-})
-
 const DropPoint: React.FC<{ groupId: string; index: number; dispatch: React.Dispatch<NestedListAction> }> = (props) => {
   const { groupId, index, dispatch } = props
-  const [, drop] = useDrop<DragItem>({
-    accept: "test",
-    drop: (item) => {
-      const src: [string, number] = [item.groupId, item.index]
-      const dst: [string, number] = [groupId, index]
-      setHover(false)
-      dispatch(NestedList.Move(src, dst))
-    }
-  })
+  // const [, drop] = useDrop<DragItem>({
+  //   accept: "test",
+  //   drop: (item) => {
+  //     const src: [string, number] = [item.groupId, item.index]
+  //     const dst: [string, number] = [groupId, index]
+  //     setHover(false)
+  //     dispatch(NestedList.Move(src, dst))
+  //   }
+  // })
   const [hover, setHover] = React.useState(false)
   return (
     <DropPointView
-      ref={drop}
       className={hover ? "hover" : ""}
       onDragEnter={() => {
         setHover(true)
@@ -100,6 +88,14 @@ const DropPoint: React.FC<{ groupId: string; index: number; dispatch: React.Disp
     />
   )
 }
+
+const DropPointView = styled.div({
+  height: 15,
+  "&.hover": {
+    backgroundColor: "#ffe0e0",
+    height: 30
+  }
+})
 
 const ListItem = styled.div({
   margin: 0,
@@ -118,18 +114,66 @@ type DragItem = {
 
 const ItemView: React.FC<{ item: Item; groupId: string; index: number }> = (props) => {
   const { item, groupId, index } = props
-  const [collected, drag] = useDrag<DragItem, unknown, { dragging: boolean }>({
-    type: "test",
-    item: { item, groupId, index },
-    collect: (monitor) => {
-      return {
-        dragging: monitor.isDragging()
-      }
-    }
-  })
+  // const [, drag] = useDrag<DragItem, unknown, { dragging: boolean }>({
+  //   type: "test",
+  //   item: { item, groupId, index },
+  //   collect: (monitor) => {
+  //     return {
+  //       dragging: monitor.isDragging()
+  //     }
+  //   }
+  // })
   return (
-    <ListItem ref={drag} id={`listitem-${item.id}`}>
+    <ListItem id={`listitem-${item.id}`}>
       {item.order} | {item.id}
     </ListItem>
   )
+}
+
+export const DndTestView: React.FC = () => {
+  return (
+    <div style={{ position: "relative" }}>
+      <DndTestDropPoint />
+      <DndTestDraggable id={1} />
+      <DndTestDraggable id={2} />
+      <DndTestDraggable id={3} />
+      <DndTestDraggable id={4} />
+    </div>
+  )
+}
+
+const DndTestDropPoint: React.FC = () => {
+  // const [, drop] = useDrop<{ id: number }>({
+  //   accept: "test",
+  //   drop: (item) => {
+  //     addDropped((curr) => [...curr, item.id])
+  //   }
+  // })
+  const [droppedItems, addDropped] = React.useState<number[]>([])
+  const Pane = styled.div({
+    height: 60,
+    backgroundColor: "#ffccdd"
+  })
+  return (
+    <Pane>
+      drop here
+      {droppedItems.join(",")}
+    </Pane>
+  )
+}
+
+const DndTestDraggable: React.FC<{ id: number }> = (props) => {
+  // const [, drag] = useDrag({
+  //   type: "test",
+  //   item: props
+  // })
+  const Pane = styled.div({
+    display: "inline-block",
+    width: 100,
+    height: 40,
+    backgroundColor: "#ccddff"
+  })
+  const ref = React.useRef<HTMLDivElement>(null)
+
+  return <Pane ref={ref}>drag me ({props.id})</Pane>
 }
