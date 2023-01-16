@@ -22,13 +22,13 @@ export type Project = {
   readonly name: string
 }
 
-export type MilestonesData = {
+export type ProjectInfoWithMilestones = {
   readonly project: Project
   readonly versions: ReadonlyArray<Version>
   readonly statuses: ReadonlyArray<Status>
 }
 
-const getMilestones = async (projectKey: string): Promise<MilestonesData> => {
+const getMilestones = async (projectKey: string): Promise<ProjectInfoWithMilestones> => {
   const project = await BackgroundClient.blgApiGet<Project>(`/api/v2/projects/${projectKey}`)
   const versionsP = BackgroundClient.blgApiGet<Version[]>(`/api/v2/projects/${projectKey}/versions`)
   const statusesP = BackgroundClient.blgApiGet<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
@@ -106,14 +106,14 @@ export const isListField = (cf: CustomField): cf is CustomListField =>
   cf.typeId in
   [CustomFieldTypes.SingleSelect, CustomFieldTypes.MultiSelect, CustomFieldTypes.Radio, CustomFieldTypes.Checkbox]
 
-export type CustomFieldsData = {
+export type ProjectInfoWithCustomFields = {
   readonly project: Project
   readonly issueTypes: ReadonlyArray<IssueType>
   readonly customFields: ReadonlyArray<CustomField>
   readonly statuses: ReadonlyArray<Status>
 }
 
-const getCustomFields = async (projectKey: string): Promise<CustomFieldsData> => {
+const getCustomFields = async (projectKey: string): Promise<ProjectInfoWithCustomFields> => {
   const project = await BackgroundClient.blgApiGet<Project>(`/api/v2/projects/${projectKey}`)
   const customFieldsP = BackgroundClient.blgApiGet<ReadonlyArray<CustomField>>(
     `/api/v2/projects/${projectKey}/customFields`

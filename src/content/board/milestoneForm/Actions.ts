@@ -1,5 +1,5 @@
-import { Issue, IssueCallback } from "../../backlog/Issue"
-import { MilestoneInput, MilestonesData, ProjectInfo } from "../../backlog/ProjectInfo"
+import { Issue, IssueData } from "../../backlog/Issue"
+import { MilestoneInput, ProjectInfo, ProjectInfoWithMilestones } from "../../backlog/ProjectInfo"
 import { ViewState } from "./Reducers"
 
 type SubmitResult = {
@@ -9,8 +9,8 @@ type SubmitResult = {
 
 const submitForm = async (
   state: ViewState,
-  projectInfo: MilestonesData,
-  callback?: IssueCallback
+  projectInfo: ProjectInfoWithMilestones,
+  callback?: (issue: IssueData) => void
 ): Promise<SubmitResult> => {
   const milestoneInput: MilestoneInput = {
     projectId: projectInfo.project.id,
@@ -28,7 +28,16 @@ const submitForm = async (
           projectInfo.statuses,
           state.selectedMilestone.id
         )
-        await Issue.bulkChangeMilestone(unclosed, createdMilestoneId, callback)
+        await Issue.bulkChangeMilestone(
+          unclosed.map((i) => i.id),
+          createdMilestoneId,
+          (id) => {
+            const issue = unclosed.find((issue) => issue.id === id)
+            if (callback && issue) {
+              callback(issue)
+            }
+          }
+        )
       }
       if (state.archiveCurrent) {
         await ProjectInfo.archiveMilestone(projectInfo.project.id, state.selectedMilestone)

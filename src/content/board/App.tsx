@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { MilestonesData, ProjectInfo } from "../backlog/ProjectInfo"
+import { ProjectInfo, ProjectInfoWithMilestones } from "../backlog/ProjectInfo"
 
 import { MessageBroker } from "../../util/MessageBroker"
 import { Modal } from "../ui/Modal"
@@ -22,7 +22,7 @@ const reloadOnMilestoneId = (milestoneId: number) => {
 
 type State = {
   formInfo: FormInfo | null
-  projectInfo: MilestonesData | null
+  projectInfo: ProjectInfoWithMilestones | null
 }
 
 export const BoardApp: React.FC<BoardProps> = (props) => {

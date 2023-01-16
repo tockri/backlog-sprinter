@@ -1,8 +1,7 @@
 import { Story } from "@storybook/react"
 import React from "react"
-import { IssueData } from "../content/backlog/Issue"
 import { Version } from "../content/backlog/ProjectInfo"
-import { PBIList } from "../content/project/productBacklog/PBIList"
+import { IssueDataWithOrder, PBIList } from "../content/project/productBacklog/PBIList"
 import { DndTestView } from "../content/project/velocity"
 import { Modal } from "../content/ui/Modal"
 import { TabPanel } from "../content/ui/TabPanel"
@@ -17,14 +16,17 @@ const fakeVersion = (id: number): Version => ({
   displayOrder: id
 })
 const versions: ReadonlyArray<Version> = [1, 2, 3].map(fakeVersion)
-const fakeIssue = (id: number, versionId: number): IssueData => ({
+const fakeIssue = (id: number, versionId: number): IssueDataWithOrder => ({
   id,
   issueKey: `FAKE-${id}`,
   summary: `Issue ${id}`,
   status: { id: 1, name: "Open", color: "#ff0000" },
-  milestone: versionId ? [versions[versionId - 1]] : []
+  milestone: versionId ? [versions[versionId - 1]] : [],
+  customFields: [],
+  order: null
 })
-const productBacklog: ReadonlyArray<IssueData> = [
+
+const productBacklog: ReadonlyArray<IssueDataWithOrder> = [
   [1, 1],
   [2, 1],
   [3, 1],

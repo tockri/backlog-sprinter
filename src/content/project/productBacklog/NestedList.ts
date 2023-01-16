@@ -8,24 +8,23 @@ type List<H, T> = {
   readonly subLists: ReadonlyArray<SubList<H, T>>
 }
 
-const nest = <H, T>(
-  list: ReadonlyArray<T>,
-  callbacks: {
-    itemToHead: (item: T) => H | null
-    headId: (head: H | null) => string
-    sortKey: (head: H | null) => number
-  }
-): List<H, T> => {
+export type NestMethods<H, T> = {
+  itemToHead: (item: T) => H | null
+  headId: (head: H | null) => string
+  sortKey: (head: H | null) => number
+}
+
+const nest = <H, T>(list: ReadonlyArray<T>, methods: NestMethods<H, T>): List<H, T> => {
   const store = new Map<string, { id: string; head: H | null; items: T[] }>()
   list.forEach((item) => {
-    const head = callbacks.itemToHead(item)
-    const id = callbacks.headId(head)
+    const head = methods.itemToHead(item)
+    const id = methods.headId(head)
     if (!store.has(id)) {
       store.set(id, { id, head, items: [] })
     }
     store.get(id)?.items.push(item)
   })
-  const subLists = Array.from(store.values()).sort((c1, c2) => callbacks.sortKey(c1.head) - callbacks.sortKey(c2.head))
+  const subLists = Array.from(store.values()).sort((c1, c2) => methods.sortKey(c1.head) - methods.sortKey(c2.head))
   return { subLists }
 }
 
@@ -34,7 +33,7 @@ type NLLocation = {
   readonly index: number
 }
 
-type MoveAction = {
+export type MoveAction = {
   readonly id: "Move"
   readonly source: NLLocation
   readonly destination: NLLocation

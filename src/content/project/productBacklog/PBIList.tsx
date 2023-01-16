@@ -1,14 +1,17 @@
 import { Global } from "@emotion/react"
 import styled from "@emotion/styled"
-import React, { useEffect } from "react"
+import React from "react"
 import { DndProvider, useDrag } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 import { DateUtil } from "../../../util/DateUtil"
 import { IssueData } from "../../backlog/Issue"
 import { Version } from "../../backlog/ProjectInfo"
-import { NestedList, NestedListAction, NestedListData } from "./NestedList"
+import { NestedList, NestedListAction, NestedListData, NestMethods } from "./NestedList"
+import { PBIListEventBuilder } from "./PBIListEventBuilder"
+import { PBIListChangeEvent } from "./ViewModel"
 
-export type PBIListData = NestedListData<Version, IssueData>
+export type IssueDataWithOrder = IssueData & { order: number | null }
+export type PBIListData = NestedListData<Version, IssueDataWithOrder>
 
 type DropPoint = {
   subListId: string
@@ -22,15 +25,19 @@ type DragContext = {
 const dragContext = React.createContext<DragContext>({ hoverPoint: null, dragging: null })
 
 export type PBIListProps = {
-  readonly items: ReadonlyArray<IssueData>
+  readonly items: ReadonlyArray<IssueDataWithOrder>
+  readonly onChange?: (events: ReadonlyArray<PBIListChangeEvent>) => void
 }
 
 export const PBIList: React.FC<PBIListProps> = (props) => {
-  const { items } = props
-  const [nList, dispatch] = React.useReducer(
-    (data: PBIListData, action: NestedListAction) => NestedList.reducer(data, action),
-    nest(items)
-  )
+  const { items, onChange } = props
+  const combinedReducer = (data: PBIListData, action: NestedListAction) => {
+    const updated = NestedList.reducer(data, action)
+    const events = PBIListEventBuilder.build(updated, action, nestMethods)
+    onChange && onChange(events)
+    return updated
+  }
+  const [nList, dispatch] = React.useReducer(combinedReducer, nest(items))
 
   return (
     <DndProvider backend={HTML5Backend} options={{ enableMouseEvents: true }}>
@@ -50,12 +57,14 @@ export const PBIList: React.FC<PBIListProps> = (props) => {
   )
 }
 
-const nest = (items: ReadonlyArray<IssueData>): PBIListData => {
-  return NestedList.nest<Version, IssueData>(items, {
-    itemToHead: (item) => item.milestone.find((m) => m.startDate && m.releaseDueDate) || null,
-    headId: (head) => (head ? "" + head.id : "--"),
-    sortKey: (head) => (head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE)
-  })
+const nestMethods: NestMethods<Version, IssueDataWithOrder> = {
+  itemToHead: (item) => item.milestone.find((m) => m.startDate && m.releaseDueDate) || null,
+  headId: (head) => (head ? "" + head.id : "--"),
+  sortKey: (head) => (head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE)
+}
+
+const nest = (items: ReadonlyArray<IssueDataWithOrder>): PBIListData => {
+  return NestedList.nest<Version, IssueDataWithOrder>(items, nestMethods)
 }
 
 type PBISubList = PBIListData["subLists"][number]
@@ -184,14 +193,13 @@ const PBItem: React.FC<PBItemProps> = (props) => {
     type: "PBItem",
     item: props
   })
-  useEffect(() => {
-    console.log("issue", issue)
-  }, [])
+  // useEffect(() => {
+  //   console.log("issue", issue)
+  // }, [])
   return (
     <Cell
       ref={drag}
       onDragStart={() => {
-        // console.log("cursor", document.body.style.getPropertyValue("cursor"))
         context.dragging = {
           subListId,
           index
@@ -204,7 +212,6 @@ const PBItem: React.FC<PBItemProps> = (props) => {
             context.dragging = null
             context.hoverPoint = null
           }
-          console.log(`item ${subListId}[${index}] dropped on ${hp.subListId}[${hp.index}]`)
           dispatch(NestedList.Move([subListId, index], [hp.subListId, hp.index]))
         }
       }}

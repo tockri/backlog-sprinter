@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import React, { useEffect } from "react"
 import { DateUtil } from "../../../util/DateUtil"
-import { MilestonesData } from "../../backlog/ProjectInfo"
+import { ProjectInfoWithMilestones } from "../../backlog/ProjectInfo"
 import { i18n } from "../i18n"
 import { MilestoneFormInfo } from "../types"
 import { Actions } from "./Actions"
@@ -10,7 +10,7 @@ import { StorageSystem } from "./Storage"
 
 type MilestoneFormProps = {
   formInfo: MilestoneFormInfo
-  projectInfo: MilestonesData
+  projectInfo: ProjectInfoWithMilestones
   onSuccess: (newMilestoneId: number) => void
 }
 

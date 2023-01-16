@@ -1,6 +1,6 @@
 import { Action } from "../../../util/RecoilReducer"
 import { IssueData } from "../../backlog/Issue"
-import { CustomFieldsData, CustomNumberField } from "../../backlog/ProjectInfo"
+import { CustomNumberField, ProjectInfoWithCustomFields } from "../../backlog/ProjectInfo"
 import { PBFormInfo } from "../types"
 
 export type AppSettings = {
@@ -15,7 +15,7 @@ export enum Tabs {
 
 export type AppState = {
   readonly formInfo: PBFormInfo | null
-  readonly projectInfo: CustomFieldsData | null
+  readonly projectInfo: ProjectInfoWithCustomFields | null
   readonly productBacklogItems: ReadonlyArray<IssueData> | null
   readonly orderCustomField: CustomNumberField | null
   readonly selectedTab: Tabs

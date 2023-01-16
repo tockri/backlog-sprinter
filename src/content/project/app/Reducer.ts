@@ -1,5 +1,5 @@
 import { Action, composeReducers, RecoilReducer, ResetAction } from "../../../util/RecoilReducer"
-import { CustomFieldsData } from "../../backlog/ProjectInfo"
+import { ProjectInfoWithCustomFields } from "../../backlog/ProjectInfo"
 import { AppSettings, AppState, No, NoAction, Tabs } from "../common/types"
 import { PBFormInfo } from "../types"
 
@@ -16,10 +16,13 @@ export const SettingsLoaded = (settings: AppSettings): SettingsLoadedAction => (
 type ProjectInfoLoadedAction = Action & {
   readonly id: "ProjectInfoLoaded"
   readonly formInfo: PBFormInfo
-  readonly projectInfo: CustomFieldsData
+  readonly projectInfo: ProjectInfoWithCustomFields
 }
 
-export const ProjectInfoLoaded = (formInfo: PBFormInfo, projectInfo: CustomFieldsData): ProjectInfoLoadedAction => ({
+export const ProjectInfoLoaded = (
+  formInfo: PBFormInfo,
+  projectInfo: ProjectInfoWithCustomFields
+): ProjectInfoLoadedAction => ({
   id: "ProjectInfoLoaded",
   formInfo,
   projectInfo
