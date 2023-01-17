@@ -26,22 +26,31 @@ const moved = (
   const events = new EventStore()
   const subList = pbiList.subLists.find((sl) => sl.id === action.destination.subListId)
   if (subList) {
+    const index = action.destination.index
     type Work = {
-      issueId: number
-      order: number | null
+      readonly issueId: number
+      order: number
       event: PBIListChangeEvent | null
     }
     const works = subList.items.map(
       (item): Work => ({
         issueId: item.id,
-        order: item.order,
+        order: item.order || 0,
         event: null
       })
     )
-    const tgt = subList.items[action.destination.index]
-    const ev = events.eventOf(tgt.id)
-    ev.milestoneId = subList.head?.id
-    ev.order = 700
+    const tgt = works[index]
+    tgt.event = events.eventOf(tgt.issueId)
+    tgt.event.milestoneId = subList.head?.id
+
+    for (let left = index - 1; left >= 0; left--) {
+      const l = works[left]
+      if (l.order < works[left + 1].order - 2) {
+        break
+      } else {
+        l.order = works[left + 1].order - 100
+      }
+    }
   }
   return events.values()
 }
