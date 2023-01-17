@@ -9,8 +9,8 @@ export type AppSettings = {
 
 export enum Tabs {
   Backlog = 0,
-  Velocity = 1,
-  Settings = 2
+  //  Velocity = 1,
+  Settings = 1
 }
 
 export type AppState = {

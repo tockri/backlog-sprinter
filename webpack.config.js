@@ -6,7 +6,7 @@ const srcDir = path.join(__dirname, "src")
 const dstDir = process.env.DST_DIR || path.join(__dirname, "dist")
 
 module.exports = {
-  mode: process.env.NODE_ENV ? "production" : "development",
+  mode: process.env.NODE_ENV === "production" ? "production" : "development",
   entry: {
     board: path.join(srcDir, "content/board.tsx"),
     project: path.join(srcDir, "content/project.tsx"),
@@ -36,7 +36,7 @@ module.exports = {
       extensions: ["ts", "tsx"]
     })
   ],
-  devtool: "inline-source-map",
+  devtool: process.env.NODE_ENV === "development" ? "inline-source-map" : false,
   watchOptions: {
     ignored: /node_modules/
   }

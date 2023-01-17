@@ -1,11 +1,11 @@
 import { ParamsType } from "./BackgroundClient"
-import { BacklogApiKeys } from "./backlog-api-keys"
+import { BacklogApiKeys, BacklogOAuthKeys } from "./backlog-api-keys"
 import { BacklogOAuth, BacklogOAuthConfig, TokenInfo } from "./BacklogOAuth"
 
 const accessTokenStorageKey = (hostname: string) => `access-token-${hostname}`
 
 const backlogOAuth2Config = (hostname: string): BacklogOAuthConfig => ({
-  ...BacklogApiKeys,
+  ...BacklogOAuthKeys,
   hostname,
   redirectUri: chrome.identity.getRedirectURL("backlog-api")
 })
@@ -13,7 +13,7 @@ const backlogOAuth2Config = (hostname: string): BacklogOAuthConfig => ({
 const getApiKey = (hostname: string): string | null => {
   const m = hostname.match(/^([^.]+)\.backlog\.(jp|com)$/)
   const spaceKey = m ? m[1] : ""
-  return BacklogApiKeys.apiKeys[spaceKey] || null
+  return BacklogApiKeys[spaceKey] || null
 }
 
 const getAccessToken = async (hostname: string, renew?: boolean): Promise<string> => {

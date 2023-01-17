@@ -33,9 +33,15 @@ const applyChanges =
       const chunked = ArrayUtil.chunk(events, 5)
       const updated: IssueData[] = []
       for (const chunk of chunked) {
+        console.log("events chunk", chunk)
         const issues = await Promise.all(
           chunk.map((ev) =>
-            Issue.changeMilestoneAndCustomFieldValue(ev.issueId, ev.milestoneId || null, ev.order || null, customField)
+            Issue.changeMilestoneAndCustomFieldValue(
+              ev.issueId,
+              ev.milestoneId !== undefined ? ev.milestoneId : null,
+              ev.order || null,
+              customField
+            )
           )
         )
         updated.push(...issues)
