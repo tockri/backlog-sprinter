@@ -38,6 +38,10 @@ const moved = (
         event: null
       })
     )
+    const tgt = subList.items[action.destination.index]
+    const ev = events.eventOf(tgt.id)
+    ev.milestoneId = subList.head?.id
+    ev.order = 700
   }
   return events.values()
 }

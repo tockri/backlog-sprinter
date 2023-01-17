@@ -25,8 +25,10 @@ const fakeIssue = (id: number, versionId: number): IssueDataWithOrder => ({
   customFields: [],
   order: null
 })
+const makeFakeBacklog = (...data: ReadonlyArray<[id: number, vIdx: number]>): ReadonlyArray<IssueDataWithOrder> =>
+  data.map(([id, vIdx]) => fakeIssue(id, vIdx))
 
-const productBacklog: ReadonlyArray<IssueDataWithOrder> = [
+const productBacklog = makeFakeBacklog(
   [1, 1],
   [2, 1],
   [3, 1],
@@ -38,7 +40,7 @@ const productBacklog: ReadonlyArray<IssueDataWithOrder> = [
   [9, 2],
   [10, 0],
   [11, 0]
-].map(([id, vIdx]) => fakeIssue(id, vIdx))
+)
 
 const TestView: React.FC = () => {
   return <PBIList items={productBacklog} />

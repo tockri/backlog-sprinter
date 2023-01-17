@@ -10,7 +10,7 @@ import { NestedList, NestedListAction, NestedListData, NestMethods } from "./Nes
 import { PBIListEventBuilder } from "./PBIListEventBuilder"
 import { PBIListChangeEvent } from "./ViewModel"
 
-export type IssueDataWithOrder = IssueData & { order: number | null }
+export type IssueDataWithOrder = IssueData & { readonly order: number | null }
 export type PBIListData = NestedListData<Version, IssueDataWithOrder>
 
 type DropPoint = {
