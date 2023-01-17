@@ -9,6 +9,13 @@ const chunk = <T>(arr: ReadonlyArray<T>, size: number): ReadonlyArray<ReadonlyAr
   return ret
 }
 
+const toRecord = <S extends string | number, T>(arr: ReadonlyArray<T>, toKey: (item: T) => S): Record<S, T> =>
+  arr.reduce((rec, item) => {
+    rec[toKey(item)] = item
+    return rec
+  }, {} as Record<S, T>)
+
 export const ArrayUtil = {
-  chunk
+  chunk,
+  toRecord
 }

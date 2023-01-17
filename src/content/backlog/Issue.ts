@@ -72,8 +72,8 @@ const changeMilestoneAndCustomFieldValue = async (
   customField: CustomNumberField
 ): Promise<IssueData> => {
   const params: Record<string, string> = {}
-  if (milestoneId) {
-    params["milestoneId[]"] = "" + milestoneId
+  if (milestoneId !== null) {
+    params["milestoneId[]"] = milestoneId ? String(milestoneId) : ""
   }
   if (customFieldValue) {
     params[`customField_${customField.id}`] = "" + customFieldValue

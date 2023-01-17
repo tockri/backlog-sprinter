@@ -1,3 +1,4 @@
+import { ArrayUtil } from "../../../util/ArrayUtil"
 import { Action, composeReducers, RecoilReducer } from "../../../util/RecoilReducer"
 import { IssueData } from "../../backlog/Issue"
 import { AppState, NoAction } from "../common/types"
@@ -34,17 +35,11 @@ const productBacklogLoaded: RecoilReducer<AppState, ProductBacklogAction> = (cur
 }
 
 const productBacklogChanged: RecoilReducer<AppState, ProductBacklogAction> = (curr, action) => {
-  if (action.id === "ProductBacklogChanged" && curr.productBacklogItems) {
-    const changeMap = new Map(action.updatedIssues.map((issue) => [issue.id, issue]))
+  if (action.id === "ProductBacklogChanged" && curr.productBacklogItems && curr.orderCustomField) {
+    const changes = ArrayUtil.toRecord(action.updatedIssues, (issue) => issue.id)
     return {
       ...curr,
-      productBacklogItems: curr.productBacklogItems.map((curIssue) => {
-        if (changeMap.has(curIssue.id)) {
-          return changeMap.get(curIssue.id) as IssueData
-        } else {
-          return curIssue
-        }
-      })
+      productBacklogItems: curr.productBacklogItems.map((curIssue) => changes[curIssue.id] || curIssue)
     }
   } else {
     return curr

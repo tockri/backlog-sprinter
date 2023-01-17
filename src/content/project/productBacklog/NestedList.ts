@@ -10,8 +10,9 @@ type List<H, T> = {
 
 export type NestMethods<H, T> = {
   itemToHead: (item: T) => H | null
+  itemSortKey: (item: T) => number
   headId: (head: H | null) => string
-  sortKey: (head: H | null) => number
+  headSortKey: (head: H | null) => number
 }
 
 const nest = <H, T>(list: ReadonlyArray<T>, methods: NestMethods<H, T>): List<H, T> => {
@@ -24,7 +25,10 @@ const nest = <H, T>(list: ReadonlyArray<T>, methods: NestMethods<H, T>): List<H,
     }
     store.get(id)?.items.push(item)
   })
-  const subLists = Array.from(store.values()).sort((c1, c2) => methods.sortKey(c1.head) - methods.sortKey(c2.head))
+  const subLists = Array.from(store.values()).sort(
+    (c1, c2) => methods.headSortKey(c1.head) - methods.headSortKey(c2.head)
+  )
+  subLists.forEach((sl) => sl.items.sort((i1, i2) => methods.itemSortKey(i1) - methods.itemSortKey(i2)))
   return { subLists }
 }
 

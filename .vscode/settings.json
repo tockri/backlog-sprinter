@@ -4,5 +4,6 @@
   "editor.formatOnSave": true,
   "prettier.prettierPath": "node_modules/prettier",
   "prettier.configPath": "./package.json",
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "jest.autoRun": "on-save"
 }

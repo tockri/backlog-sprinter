@@ -6,7 +6,7 @@ import { HTML5Backend } from "react-dnd-html5-backend"
 import { DateUtil } from "../../../util/DateUtil"
 import { IssueData } from "../../backlog/Issue"
 import { Version } from "../../backlog/ProjectInfo"
-import { NestedList, NestedListAction, NestedListData, NestMethods } from "./NestedList"
+import { NestedList, NestedListAction, NestedListData } from "./NestedList"
 import { PBIListEventBuilder } from "./PBIListEventBuilder"
 import { PBIListChangeEvent } from "./ViewModel"
 
@@ -33,7 +33,7 @@ export const PBIList: React.FC<PBIListProps> = (props) => {
   const { items, onChange } = props
   const combinedReducer = (data: PBIListData, action: NestedListAction) => {
     const updated = NestedList.reducer(data, action)
-    const events = PBIListEventBuilder.build(updated, action, nestMethods)
+    const events = PBIListEventBuilder.build(updated, action)
     onChange && onChange(events)
     return updated
   }
@@ -57,14 +57,13 @@ export const PBIList: React.FC<PBIListProps> = (props) => {
   )
 }
 
-const nestMethods: NestMethods<Version, IssueDataWithOrder> = {
-  itemToHead: (item) => item.milestone.find((m) => m.startDate && m.releaseDueDate) || null,
-  headId: (head) => (head ? "" + head.id : "--"),
-  sortKey: (head) => (head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE)
-}
-
 const nest = (items: ReadonlyArray<IssueDataWithOrder>): PBIListData => {
-  return NestedList.nest<Version, IssueDataWithOrder>(items, nestMethods)
+  return NestedList.nest<Version, IssueDataWithOrder>(items, {
+    itemToHead: (item) => item.milestone.find((m) => m.startDate && m.releaseDueDate) || null,
+    itemSortKey: (item) => item.order || 0,
+    headId: (head) => (head ? "" + head.id : "--"),
+    headSortKey: (head) => (head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE)
+  })
 }
 
 type PBISubList = PBIListData["subLists"][number]

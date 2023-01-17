@@ -4,76 +4,13 @@ import { IssueDataWithOrder, PBIListData } from "./PBIList"
 import { PBIListEventBuilder } from "./PBIListEventBuilder"
 import { PBIListChangeEvent } from "./ViewModel"
 
-test("Builder.move makes events", () => {
-  const issues = makeFakeBacklog(
-    [1, 1, 100],
-    [2, 1, 200],
-    [3, 1, 300],
-    [4, 1, 400],
-    [5, 2, 800],
-    [6, 2, 900],
-    [7, 0, 1000],
-    [8, 0, 1100]
-  )
-  const nested = NestedList.nest(
-    Object.values(issues).sort((i1, i2) => (i1.order || 0) - (i2.order || 0)),
-    pbiNestMethods
-  )
-  expect(nested).toStrictEqual<PBIListData>({
-    subLists: [
-      {
-        id: "1",
-        head: versions[1],
-        items: [issues[1], issues[2], issues[3], issues[4]]
-      },
-      {
-        id: "2",
-        head: versions[2],
-        items: [issues[5], issues[6]]
-      },
-      {
-        id: "--",
-        head: null,
-        items: [issues[7], issues[8]]
-      }
-    ]
-  })
-
-  const action = NestedList.Move(["1", 2], ["2", 0])
-  const updated = NestedList.reducer(nested, action)
-  expect(updated).toStrictEqual<PBIListData>({
-    subLists: [
-      {
-        id: "1",
-        head: versions[1],
-        items: [issues[1], issues[2], issues[4]]
-      },
-      {
-        id: "2",
-        head: versions[2],
-        items: [issues[3], issues[5], issues[6]]
-      },
-      {
-        id: "--",
-        head: null,
-        items: [issues[7], issues[8]]
-      }
-    ]
-  })
-  const events = PBIListEventBuilder.build(updated, action, pbiNestMethods)
-  expect(events).toStrictEqual<PBIListChangeEvent[]>([
-    {
-      issueId: 3,
-      milestoneId: 2,
-      order: 700
-    }
-  ])
-})
+// -------------------- preparation --------------------------
 
 const pbiNestMethods: NestMethods<Version, IssueDataWithOrder> = {
   itemToHead: (item) => item.milestone.find((m) => m.startDate && m.releaseDueDate) || null,
+  itemSortKey: (item) => item.order || 0,
   headId: (head) => (head ? "" + head.id : "--"),
-  sortKey: (head) => (head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE)
+  headSortKey: (head) => (head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE)
 }
 const fakeVersion = (id: number): Version => ({
   id,
@@ -104,3 +41,192 @@ const makeFakeBacklog = (
     acc[id] = fakeIssue(id, versionId, order)
     return acc
   }, {} as Record<number, IssueDataWithOrder>)
+const issues = makeFakeBacklog(
+  [1, 1, 100],
+  [2, 1, 200],
+  [3, 1, 300],
+  [4, 1, 400],
+  [5, 2, 800],
+  [6, 2, 900],
+  [7, 3, null],
+  [8, 3, null],
+  [9, 3, null],
+  [10, 3, null],
+  [11, 0, null],
+  [12, 0, 50],
+  [13, 0, 51],
+  [14, 0, 52]
+)
+const nested = NestedList.nest(Object.values(issues), pbiNestMethods)
+
+// ------------------- /preparation --------------------------
+test("preparations are correct", () => {
+  expect(nested).toStrictEqual<PBIListData>({
+    subLists: [
+      {
+        id: "1",
+        head: versions[1],
+        items: [issues[1], issues[2], issues[3], issues[4]]
+      },
+      {
+        id: "2",
+        head: versions[2],
+        items: [issues[5], issues[6]]
+      },
+      {
+        id: "3",
+        head: versions[3],
+        items: [issues[7], issues[8], issues[9], issues[10]]
+      },
+      {
+        id: "--",
+        head: null,
+        items: [issues[11], issues[12], issues[13], issues[14]]
+      }
+    ]
+  })
+
+  const action = NestedList.Move(["1", 2], ["2", 0])
+  const updated = NestedList.reducer(nested, action)
+  expect(updated).toStrictEqual<PBIListData>({
+    subLists: [
+      {
+        id: "1",
+        head: versions[1],
+        items: [issues[1], issues[2], issues[4]]
+      },
+      {
+        id: "2",
+        head: versions[2],
+        items: [issues[3], issues[5], issues[6]]
+      },
+      {
+        id: "3",
+        head: versions[3],
+        items: [issues[7], issues[8], issues[9], issues[10]]
+      },
+      {
+        id: "--",
+        head: null,
+        items: [issues[11], issues[12], issues[13], issues[14]]
+      }
+    ]
+  })
+})
+
+test("Move to the top of another subList", () => {
+  const action = NestedList.Move(["1", 2], ["2", 0])
+  const updated = NestedList.reducer(nested, action)
+  const events = PBIListEventBuilder.build(updated, action)
+  expect(events).toStrictEqual<PBIListChangeEvent[]>([
+    {
+      issueId: 3,
+      milestoneId: 2,
+      order: 700
+    }
+  ])
+})
+
+test("Move to the inside of another subList", () => {
+  const action = NestedList.Move(["1", 2], ["2", 1])
+  const updated = NestedList.reducer(nested, action)
+  const events = PBIListEventBuilder.build(updated, action)
+  expect(events).toStrictEqual<PBIListChangeEvent[]>([
+    {
+      issueId: 3,
+      milestoneId: 2,
+      order: 850
+    }
+  ])
+})
+
+test("Move within a subList", () => {
+  const action = NestedList.Move(["1", 2], ["1", 0])
+  const updated = NestedList.reducer(nested, action)
+  const events = PBIListEventBuilder.build(updated, action)
+  expect(events).toStrictEqual<PBIListChangeEvent[]>([
+    {
+      issueId: 3,
+      order: 0
+    }
+  ])
+})
+
+test("Move to the last", () => {
+  const action = NestedList.Move(["1", 2], ["1", 4])
+  const updated = NestedList.reducer(nested, action)
+  const events = PBIListEventBuilder.build(updated, action)
+  expect(events).toStrictEqual<PBIListChangeEvent[]>([
+    {
+      issueId: 3,
+      order: 500
+    }
+  ])
+})
+
+test("Move and cause rebalance", () => {
+  const action = NestedList.Move(["1", 2], ["3", 1])
+  const updated = NestedList.reducer(nested, action)
+  const events = PBIListEventBuilder.build(updated, action)
+  expect(events.sort((e1, e2) => e1.issueId - e2.issueId)).toStrictEqual<PBIListChangeEvent[]>([
+    {
+      issueId: 3,
+      milestoneId: 3,
+      order: 100
+    },
+    {
+      issueId: 7,
+      order: 0
+    },
+    {
+      issueId: 8,
+      order: 200
+    },
+    {
+      issueId: 9,
+      order: 300
+    },
+    {
+      issueId: 10,
+      order: 400
+    }
+  ])
+})
+
+test("Move and make order between null and some", () => {
+  const action = NestedList.Move(["1", 2], ["--", 1])
+  const updated = NestedList.reducer(nested, action)
+  const events = PBIListEventBuilder.build(updated, action)
+  expect(events.sort((e1, e2) => e1.issueId - e2.issueId)).toStrictEqual<PBIListChangeEvent[]>([
+    {
+      issueId: 3,
+      milestoneId: 0,
+      order: 25
+    },
+    {
+      issueId: 11,
+      order: -75
+    }
+  ])
+})
+
+test("Move and cause rebalance on existing issues", () => {
+  const action = NestedList.Move(["1", 2], ["--", 2])
+  const updated = NestedList.reducer(nested, action)
+  const events = PBIListEventBuilder.build(updated, action)
+  expect(events.sort((e1, e2) => e1.issueId - e2.issueId)).toStrictEqual<PBIListChangeEvent[]>([
+    {
+      issueId: 3,
+      milestoneId: 0,
+      order: 150
+    },
+    {
+      issueId: 13,
+      order: 250
+    },
+    {
+      issueId: 14,
+      order: 350
+    }
+  ])
+})

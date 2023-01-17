@@ -1,67 +1,98 @@
-import { Version } from "../../backlog/ProjectInfo"
-import { MoveAction, NestedListAction, NestMethods } from "./NestedList"
-import { IssueDataWithOrder, PBIListData } from "./PBIList"
+import { MoveAction, NestedListAction } from "./NestedList"
+import { PBIListData } from "./PBIList"
 import { PBIListChangeEvent } from "./ViewModel"
 
 class EventStore {
-  private readonly events = new Map<number, PBIListChangeEvent>()
+  private readonly events: Record<number, PBIListChangeEvent> = {}
   eventOf(issueId: number): PBIListChangeEvent {
-    let ev = this.events.get(issueId)
-    if (!ev) {
-      ev = { issueId: issueId }
-      this.events.set(issueId, ev)
+    if (!this.events[issueId]) {
+      this.events[issueId] = { issueId }
     }
-    return ev
+    return this.events[issueId]
   }
   values(): PBIListChangeEvent[] {
-    return Array.from(this.events.values())
+    return Object.values(this.events)
   }
 }
 
-const moved = (
-  pbiList: PBIListData,
-  action: MoveAction,
-  methods: NestMethods<Version, IssueDataWithOrder>
-): PBIListChangeEvent[] => {
-  const events = new EventStore()
-  const subList = pbiList.subLists.find((sl) => sl.id === action.destination.subListId)
-  if (subList) {
-    const index = action.destination.index
-    type Work = {
-      readonly issueId: number
-      order: number
-      event: PBIListChangeEvent | null
-    }
-    const works = subList.items.map(
-      (item): Work => ({
-        issueId: item.id,
-        order: item.order || 0,
-        event: null
-      })
-    )
-    const tgt = works[index]
-    tgt.event = events.eventOf(tgt.issueId)
-    tgt.event.milestoneId = subList.head?.id
+type PBISubList = PBIListData["subLists"][number]
 
-    for (let left = index - 1; left >= 0; left--) {
-      const l = works[left]
-      if (l.order < works[left + 1].order - 2) {
-        break
+type Work = {
+  readonly issueId: number
+  order: number | null
+  event: PBIListChangeEvent | null
+}
+const makeWorkingArray = (subList: PBISubList): Work[] =>
+  subList.items.map((item) => ({
+    issueId: item.id,
+    order: item.order,
+    event: null
+  }))
+
+const patchIndex = (eventStore: EventStore, works: Work[], index: number) => {
+  const target = works[index]
+  const left = index > 0 ? works[index - 1] : null
+  const right = index < works.length - 1 ? works[index + 1] : null
+  const setOrder = (newOrder: number) => {
+    if (target.order !== newOrder) {
+      target.event = eventStore.eventOf(target.issueId)
+      target.order = newOrder
+      target.event.order = newOrder
+    }
+  }
+  if (target.order === null) {
+    setOrder(0)
+  }
+  const lo = left?.order || 0
+  const ro = right?.order || 0
+  const to = () => target.order || 0
+  if (left && right) {
+    if (to() <= lo || to() >= ro) {
+      if (lo + 2 < ro) {
+        setOrder(Math.floor((lo + ro) / 2))
       } else {
-        l.order = works[left + 1].order - 100
+        setOrder(lo + 100)
+      }
+      if (to() <= lo || left.order === null) {
+        if (!left.event) {
+          patchIndex(eventStore, works, index - 1)
+        }
+      }
+      if (to() >= ro || right.order === null) {
+        if (!right.event) {
+          patchIndex(eventStore, works, index + 1)
+        }
       }
     }
+  } else if (!left && right) {
+    setOrder(ro - 100)
+  } else if (left && !right) {
+    setOrder(lo + 100)
   }
-  return events.values()
 }
 
-const build = (
-  pbiList: PBIListData,
-  action: NestedListAction,
-  methods: NestMethods<Version, IssueDataWithOrder>
-): PBIListChangeEvent[] => {
+const moved = (pbiList: PBIListData, action: MoveAction): PBIListChangeEvent[] => {
+  const eventStore = new EventStore()
+  const subList = pbiList.subLists.find((sl) => sl.id === action.destination.subListId)
+  if (subList) {
+    const index =
+      action.source.subListId === action.destination.subListId && action.source.index < action.destination.index
+        ? action.destination.index - 1
+        : action.destination.index
+    const works = makeWorkingArray(subList)
+    if (action.source.subListId !== action.destination.subListId) {
+      const target = works[index]
+      target.event = eventStore.eventOf(target.issueId)
+      target.event.milestoneId = subList.head?.id || 0
+    }
+    patchIndex(eventStore, works, index)
+  }
+  return eventStore.values()
+}
+
+const build = (pbiList: PBIListData, action: NestedListAction): PBIListChangeEvent[] => {
   if (action.id === "Move") {
-    return moved(pbiList, action, methods)
+    return moved(pbiList, action)
   } else {
     return []
   }

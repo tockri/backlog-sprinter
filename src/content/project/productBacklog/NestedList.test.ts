@@ -13,23 +13,29 @@ const heads: ReadonlyArray<TestHead> = new Array(3).fill("").map((_, i) => ({ he
 const items: ReadonlyArray<TestItem> = new Array(10).fill("").map((_, i) => ({ itemId: `i${i}`, order: 0 }))
 type TestState = NestedListData<TestHead, TestItem>
 
+const origData: TestState = {
+  subLists: [
+    {
+      head: heads[0],
+      id: heads[0].headId,
+      items: [items[0], items[1], items[2], items[3]]
+    },
+    {
+      head: heads[1],
+      id: heads[1].headId,
+      items: [items[4], items[5], items[6]]
+    },
+    {
+      head: null,
+      id: "--",
+      items: [items[7]]
+    }
+  ]
+}
+
 test("NestedList.move moves an item from a subList to another", () => {
-  const prev: TestState = {
-    subLists: [
-      {
-        head: heads[0],
-        id: heads[0].headId,
-        items: [items[0], items[1], items[2], items[3]]
-      },
-      {
-        head: heads[1],
-        id: heads[1].headId,
-        items: [items[4], items[5], items[6]]
-      }
-    ]
-  }
   const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[1].headId, 0])
-  expect<TestState>(R.moved(prev, action)).toStrictEqual<TestState>({
+  expect<TestState>(R.moved(origData, action)).toStrictEqual<TestState>({
     subLists: [
       {
         head: heads[0],
@@ -40,27 +46,18 @@ test("NestedList.move moves an item from a subList to another", () => {
         head: heads[1],
         id: heads[1].headId,
         items: [items[1], items[4], items[5], items[6]]
+      },
+      {
+        head: null,
+        id: "--",
+        items: [items[7]]
       }
     ]
   })
 })
 
-test("NestedList.move moves an item from a subList to another subList with empty headId", () => {
-  const prev: TestState = {
-    subLists: [
-      {
-        head: heads[0],
-        id: heads[0].headId,
-        items: [items[0], items[1], items[2], items[3]]
-      },
-      {
-        head: null,
-        id: "",
-        items: [items[4], items[5], items[6]]
-      }
-    ]
-  }
-  expect<TestState>(R.moved(prev, NestedList.Move([heads[0].headId, 1], ["", 3]))).toStrictEqual<TestState>({
+test("NestedList.move moves an item from a subList to another subList with empty head", () => {
+  expect<TestState>(R.moved(origData, NestedList.Move([heads[0].headId, 1], ["--", 2]))).toStrictEqual<TestState>({
     subLists: [
       {
         head: heads[0],
@@ -68,62 +65,44 @@ test("NestedList.move moves an item from a subList to another subList with empty
         items: [items[0], items[2], items[3]]
       },
       {
-        head: null,
-        id: "",
-        items: [items[4], items[5], items[6], items[1]]
-      }
-    ]
-  })
-})
-
-test("NestedList.move moves an item from a subList with empty headId to another subList", () => {
-  const prev: TestState = {
-    subLists: [
-      {
-        head: heads[0],
-        id: heads[0].headId,
-        items: [items[0], items[1], items[2], items[3]]
-      },
-      {
-        head: null,
-        id: "",
+        head: heads[1],
+        id: heads[1].headId,
         items: [items[4], items[5], items[6]]
-      }
-    ]
-  }
-  expect<TestState>(R.moved(prev, NestedList.Move(["", 1], [heads[0].headId, 3]))).toStrictEqual<TestState>({
-    subLists: [
-      {
-        head: heads[0],
-        id: heads[0].headId,
-        items: [items[0], items[1], items[2], items[5], items[3]]
       },
       {
         head: null,
-        id: "",
-        items: [items[4], items[6]]
+        id: "--",
+        items: [items[7], items[1]]
       }
     ]
   })
 })
 
-test("NestedList.move moves an item in a subList", () => {
-  const prev: TestState = {
+test("NestedList.move moves an item from a subList with empty head to another subList", () => {
+  expect<TestState>(R.moved(origData, NestedList.Move(["--", 0], [heads[0].headId, 3]))).toStrictEqual<TestState>({
     subLists: [
       {
         head: heads[0],
         id: heads[0].headId,
-        items: [items[0], items[1], items[2], items[3]]
+        items: [items[0], items[1], items[2], items[7], items[3]]
       },
       {
         head: heads[1],
         id: heads[1].headId,
         items: [items[4], items[5], items[6]]
+      },
+      {
+        head: null,
+        id: "--",
+        items: []
       }
     ]
-  }
+  })
+})
+
+test("NestedList.move moves an item to the top in a subList", () => {
   const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 0])
-  expect<TestState>(R.moved(prev, action)).toStrictEqual<TestState>({
+  expect<TestState>(R.moved(origData, action)).toStrictEqual<TestState>({
     subLists: [
       {
         head: heads[0],
@@ -134,28 +113,19 @@ test("NestedList.move moves an item in a subList", () => {
         head: heads[1],
         id: heads[1].headId,
         items: [items[4], items[5], items[6]]
+      },
+      {
+        head: null,
+        id: "--",
+        items: [items[7]]
       }
     ]
   })
 })
 
-test("NestedList.move moves an item in a subList to the end", () => {
-  const prev: TestState = {
-    subLists: [
-      {
-        head: heads[0],
-        id: heads[0].headId,
-        items: [items[0], items[1], items[2], items[3]]
-      },
-      {
-        head: heads[1],
-        id: heads[1].headId,
-        items: [items[4], items[5], items[6]]
-      }
-    ]
-  }
+test("NestedList.move moves an item to the last in a subList", () => {
   const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 4])
-  expect<TestState>(R.moved(prev, action)).toStrictEqual<TestState>({
+  expect<TestState>(R.moved(origData, action)).toStrictEqual<TestState>({
     subLists: [
       {
         head: heads[0],
@@ -166,6 +136,34 @@ test("NestedList.move moves an item in a subList to the end", () => {
         head: heads[1],
         id: heads[1].headId,
         items: [items[4], items[5], items[6]]
+      },
+      {
+        head: null,
+        id: "--",
+        items: [items[7]]
+      }
+    ]
+  })
+})
+
+test("NestedList.move moves an item in a subList to the end", () => {
+  const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 4])
+  expect<TestState>(R.moved(origData, action)).toStrictEqual<TestState>({
+    subLists: [
+      {
+        head: heads[0],
+        id: heads[0].headId,
+        items: [items[0], items[2], items[3], items[1]]
+      },
+      {
+        head: heads[1],
+        id: heads[1].headId,
+        items: [items[4], items[5], items[6]]
+      },
+      {
+        head: null,
+        id: "--",
+        items: [items[7]]
       }
     ]
   })
@@ -183,8 +181,9 @@ test("NestedList.nest makes a NestedList from an Array", () => {
   ]
   const nested = NestedList.nest<TestHead, Item>(orig, {
     itemToHead: (item) => item.head,
+    itemSortKey: (item) => item.item.order,
     headId: (head: TestHead | null) => (head ? head.headId : ""),
-    sortKey: (head) => (head ? parseInt(head.headId.substring(1)) : Number.MAX_VALUE)
+    headSortKey: (head) => (head ? parseInt(head.headId.substring(1)) : Number.MAX_VALUE)
   })
   expect(nested).toStrictEqual<NestedListData<TestHead, Item>>({
     subLists: [
