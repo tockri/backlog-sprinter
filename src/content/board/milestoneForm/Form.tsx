@@ -1,15 +1,16 @@
+import styled from "@emotion/styled"
 import React, { useEffect } from "react"
-import { ProjectInfoData } from "../../backlog/ProjectInfo"
-import { DateUtil } from "../../util/DateUtil"
+import { DateUtil } from "../../../util/DateUtil"
+import { ProjectInfoWithMilestones } from "../../backlog/ProjectInfo"
 import { i18n } from "../i18n"
-import { FormInfo } from "../types"
+import { MilestoneFormInfo } from "../types"
 import { Actions } from "./Actions"
 import { ReducerFunc, Reducers, ViewState } from "./Reducers"
 import { StorageSystem } from "./Storage"
 
 type MilestoneFormProps = {
-  formInfo: FormInfo
-  projectInfo: ProjectInfoData
+  formInfo: MilestoneFormInfo
+  projectInfo: ProjectInfoWithMilestones
   onSuccess: (newMilestoneId: number) => void
 }
 
@@ -49,37 +50,37 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
   }
 
   return (
-    <div>
+    <div className="modal__content">
       <div className="form-element__item">
         <label className="form-element__label" htmlFor={id("startDate")}>
           {t.period}
         </label>
-        <div className="bsp-row">
-          <input
+        <Row>
+          <DateInput
             id={id("startDate")}
             type="date"
             size={10}
-            className="input-text bsp-dateInput"
+            className="input-text"
             autoComplete="off"
             value={DateUtil.dateString(state.startDate)}
             onChange={(e) => dispatch({ src: "startDate", value: dateOrNull(e) })}
           />
           <span>&nbsp;〜&nbsp;</span>
-          <input
+          <DateInput
             type="date"
             size={10}
-            className="input-text bsp-dateInput"
+            className="input-text"
             autoComplete="off"
             value={DateUtil.dateString(state.endDate)}
             onChange={(e) => dispatch({ src: "endDate", value: dateOrNull(e) })}
           />
-        </div>
+        </Row>
       </div>
       <div className="form-element__item">
         <label className="form-element__label" htmlFor={id("title")}>
           {t.milestoneName}
         </label>
-        <div className="bsp-row">
+        <Row>
           <input
             id={id("title")}
             type="text"
@@ -89,7 +90,7 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
             value={state.title}
             onChange={(e) => dispatch({ src: "title", value: e.target.value })}
           />
-          <div className="bsp-input-follower">
+          <InputFollower>
             <input
               type="checkbox"
               checked={state.titleAuto}
@@ -100,8 +101,8 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
             <label htmlFor={id("titleAuto")} className="checkboxLabel">
               {t.auto}
             </label>
-          </div>
-        </div>
+          </InputFollower>
+        </Row>
         {state.sameTitleExists && (
           <div className="message message--error _mg-b-15">
             <span className="message__icon">
@@ -117,10 +118,10 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
         <div className="form-element__item">
           <fieldset>
             <legend>
-              {t.selecting} <span className="bsp-selected-milestone">{state.selectedMilestone.name}</span>
+              {t.selecting} <MilestoneDisplay>{state.selectedMilestone.name}</MilestoneDisplay>
             </legend>
-            <ul className="bsp-plain-list">
-              <li>
+            <PlainList>
+              <PlainListItem>
                 <div className="form-element__item">
                   <input
                     type="checkbox"
@@ -133,8 +134,8 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
                     {t.moveUnclosed}
                   </label>
                 </div>
-              </li>
-              <li>
+              </PlainListItem>
+              <PlainListItem>
                 <div className="form-element__item">
                   <input
                     type="checkbox"
@@ -147,19 +148,19 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
                     {t.archive}
                   </label>
                 </div>
-              </li>
-            </ul>
+              </PlainListItem>
+            </PlainList>
           </fieldset>
         </div>
       )}
       <div>
-        <div className="bsp-row --spacing">
+        <Row className="--spacing">
           <button type="button" disabled={!state.submittable} className="button button--primary" onClick={onSubmit}>
             {t.submit}
           </button>
           {state.submitting && <div className="loading--circle -small"></div>}
-          <div className="bsp-submitting-message">{state.submittingMessage}</div>
-        </div>
+          <SubmittingMessage>{state.submittingMessage}</SubmittingMessage>
+        </Row>
         {state.submitErrorMessage && (
           <div className="message message--error _mg-b-15">
             <span className="message__icon">
@@ -174,3 +175,39 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
     </div>
   )
 }
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  &.--spacing {
+    column-gap: 1em;
+  }
+`
+
+const DateInput = styled.input`
+  width: 10em;
+`
+
+const PlainList = styled.ul`
+  padding-left: 16px;
+`
+
+const PlainListItem = styled.li`
+  list-style: none;
+`
+
+const MilestoneDisplay = styled.span`
+  font-weight: bold;
+`
+const SubmittingMessage = styled.div`
+  padding: 6px 0;
+`
+
+const InputFollower = styled.div`
+  white-space: nowrap;
+  padding-left: 1em;
+  label {
+    white-space: nowrap;
+  }
+`

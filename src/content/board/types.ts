@@ -1,6 +1,6 @@
 import { UserLang } from "./i18n"
 
-export type FormInfo = {
+export type MilestoneFormInfo = {
   projectKey: string
   selectedMilestoneId: number
   lang: UserLang

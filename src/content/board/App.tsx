@@ -1,13 +1,13 @@
 import React, { useEffect } from "react"
-import { ProjectInfo, ProjectInfoData } from "../backlog/ProjectInfo"
+import { ProjectInfo, ProjectInfoWithMilestones } from "../backlog/ProjectInfo"
 
+import { MessageBroker } from "../../util/MessageBroker"
 import { Modal } from "../ui/Modal"
-import { MessageBroker } from "../util/MessageBroker"
 import { i18n, UserLang as i18nLang } from "./i18n"
 import { MilestoneForm } from "./milestoneForm/Form"
 import * as types from "./types"
 
-export type FormInfo = types.FormInfo
+export type FormInfo = types.MilestoneFormInfo
 export type Lang = i18nLang
 
 type BoardProps = {
@@ -22,7 +22,7 @@ const reloadOnMilestoneId = (milestoneId: number) => {
 
 type State = {
   formInfo: FormInfo | null
-  projectInfo: ProjectInfoData | null
+  projectInfo: ProjectInfoWithMilestones | null
 }
 
 export const BoardApp: React.FC<BoardProps> = (props) => {
@@ -31,7 +31,7 @@ export const BoardApp: React.FC<BoardProps> = (props) => {
   useEffect(() => {
     broker.subscribe("Board", async (formInfo) => {
       if (!state.projectInfo) {
-        const projectInfo = await ProjectInfo.get(formInfo.projectKey)
+        const projectInfo = await ProjectInfo.getMilestones(formInfo.projectKey)
         setState({
           formInfo,
           projectInfo
@@ -49,10 +49,10 @@ export const BoardApp: React.FC<BoardProps> = (props) => {
     const t = i18n(state.formInfo.lang)
     return (
       <Modal
-        onCloseEvent={() => setState((s) => ({ ...s, formInfo: null }))}
+        onClose={() => setState((s) => ({ ...s, formInfo: null }))}
         size="medium"
         title={t.formTitle}
-        additionalClass={state.formInfo?.selectedMilestoneId > 0 ? "bsp-milestone-large-form" : undefined}
+        height={state.formInfo?.selectedMilestoneId > 0 ? 450 : undefined}
       >
         <MilestoneForm formInfo={state.formInfo} projectInfo={state.projectInfo} onSuccess={reloadOnMilestoneId} />
       </Modal>
