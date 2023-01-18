@@ -10,9 +10,25 @@ type List<H, T> = {
 
 export type NestMethods<H, T> = {
   itemToHead: (item: T) => H | null
-  itemSortKey: (item: T) => number
+  itemComparator: (item1: T, item2: T) => number
   headId: (head: H | null) => string
-  headSortKey: (head: H | null) => number
+  headComparator: (head1: H | null, head2: H | null) => number
+}
+
+const compareNullable = (a: number | null, b: number | null): number => {
+  if (a === null && b === null) {
+    return 0
+  } else if (a === null) {
+    return -1
+  } else if (b === null) {
+    return 1
+  } else {
+    if (a === b) {
+      return 0
+    } else {
+      return a < b ? -1 : 1
+    }
+  }
 }
 
 const nest = <H, T>(list: ReadonlyArray<T>, methods: NestMethods<H, T>): List<H, T> => {
@@ -25,10 +41,8 @@ const nest = <H, T>(list: ReadonlyArray<T>, methods: NestMethods<H, T>): List<H,
     }
     store.get(id)?.items.push(item)
   })
-  const subLists = Array.from(store.values()).sort(
-    (c1, c2) => methods.headSortKey(c1.head) - methods.headSortKey(c2.head)
-  )
-  subLists.forEach((sl) => sl.items.sort((i1, i2) => methods.itemSortKey(i1) - methods.itemSortKey(i2)))
+  const subLists = Array.from(store.values()).sort((sl1, sl2) => methods.headComparator(sl1.head, sl2.head))
+  subLists.forEach((sl) => sl.items.sort(methods.itemComparator))
   return { subLists }
 }
 
@@ -113,6 +127,7 @@ const reducer = moved
 export const NestedList = {
   FOR_TEST_ONLY,
   reducer,
+  compareNullable,
   nest,
   Move
 }

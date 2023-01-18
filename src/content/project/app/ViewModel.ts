@@ -14,7 +14,6 @@ const start = (dispatch: DispatchType, state: AppState) => async (formInfo: PBFo
   if (!state.formInfo && !state.projectInfo) {
     const projectInfo = await ProjectInfo.getCustomFields(formInfo.projectKey)
     const settings = SettingStore.load(formInfo.projectKey)
-    console.log("loaded from LocalStorage", { settings })
     dispatch([ProjectInfoLoaded(formInfo, projectInfo), SettingsLoaded(settings), TabSelected(Tabs.Backlog)])
   }
 }

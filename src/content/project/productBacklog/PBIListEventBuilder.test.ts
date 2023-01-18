@@ -1,17 +1,12 @@
+import { ArrayUtil } from "../../../util/ArrayUtil"
 import { Version } from "../../backlog/ProjectInfo"
-import { NestedList, NestMethods } from "./NestedList"
-import { IssueDataWithOrder, PBIListData } from "./PBIList"
+import { NestedList } from "./NestedList"
+import { IssueDataWithOrder, PBIListData, pbiNestMethods } from "./PBI"
 import { PBIListEventBuilder } from "./PBIListEventBuilder"
 import { PBIListChangeEvent } from "./ViewModel"
 
 // -------------------- preparation --------------------------
 
-const pbiNestMethods: NestMethods<Version, IssueDataWithOrder> = {
-  itemToHead: (item) => item.milestone.find((m) => m.startDate && m.releaseDueDate) || null,
-  itemSortKey: (item) => item.order || 0,
-  headId: (head) => (head ? "" + head.id : "--"),
-  headSortKey: (head) => (head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE)
-}
 const fakeVersion = (id: number): Version => ({
   id,
   name: `MS ${id}`,
@@ -29,6 +24,7 @@ const fakeIssue = (id: number, versionId: number | null, order: number | null): 
   id,
   issueKey: `FAKE-${id}`,
   summary: `Issue ${id}`,
+  description: "",
   status: { id: 1, name: "Open", color: "#ff0000" },
   milestone: versionId ? [versions[versionId]] : [],
   customFields: [],
@@ -37,24 +33,25 @@ const fakeIssue = (id: number, versionId: number | null, order: number | null): 
 const makeFakeBacklog = (
   ...data: ReadonlyArray<[id: number, versionId: number | null, order: number | null]>
 ): Record<number, IssueDataWithOrder> =>
-  data.reduce((acc, [id, versionId, order]) => {
-    acc[id] = fakeIssue(id, versionId, order)
-    return acc
-  }, {} as Record<number, IssueDataWithOrder>)
+  ArrayUtil.toRecord(
+    data.map((args) => fakeIssue(...args)),
+    (issue) => issue.id
+  )
+
 const issues = makeFakeBacklog(
   [1, 1, 100],
-  [2, 1, 200],
   [3, 1, 300],
-  [4, 1, 400],
+  [2, 1, 200],
   [5, 2, 800],
+  [4, 1, 400],
   [6, 2, 900],
   [7, 3, null],
   [8, 3, null],
   [9, 3, null],
   [10, 3, null],
   [11, 0, null],
-  [12, 0, 50],
   [13, 0, 51],
+  [12, 0, null],
   [14, 0, 52]
 )
 const nested = NestedList.nest(Object.values(issues), pbiNestMethods)
@@ -172,23 +169,23 @@ test("Move and cause rebalance", () => {
     {
       issueId: 3,
       milestoneId: 3,
-      order: 100
+      order: 30
     },
     {
       issueId: 7,
-      order: 0
+      order: -70
     },
     {
       issueId: 8,
-      order: 200
+      order: 60
     },
     {
       issueId: 9,
-      order: 300
+      order: 90
     },
     {
       issueId: 10,
-      order: 400
+      order: 190
     }
   ])
 })
@@ -201,11 +198,15 @@ test("Move and make order between null and some", () => {
     {
       issueId: 3,
       milestoneId: 0,
-      order: 25
+      order: 30
     },
     {
       issueId: 11,
-      order: -75
+      order: -70
+    },
+    {
+      issueId: 12,
+      order: 40
     }
   ])
 })
@@ -218,15 +219,15 @@ test("Move and cause rebalance on existing issues", () => {
     {
       issueId: 3,
       milestoneId: 0,
-      order: 150
+      order: 25
     },
     {
-      issueId: 13,
-      order: 250
+      issueId: 11,
+      order: -88
     },
     {
-      issueId: 14,
-      order: 350
+      issueId: 12,
+      order: 12
     }
   ])
 })

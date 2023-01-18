@@ -40,17 +40,29 @@ export const OrderCustomFieldCreated = (customField: CustomField): OrderCustomFi
   }
 }
 
+type OrderCustomFieldDeletedAction = {
+  readonly id: "OrderCustomFieldDeleted"
+  readonly customFieldId: number
+}
+
+export const OrderCustomFieldDeleted = (customFieldId: number): OrderCustomFieldDeletedAction => ({
+  id: "OrderCustomFieldDeleted",
+  customFieldId
+})
+
 export type SettingAction =
   | NoAction
   | PBIIssueTypeIdSetAction
   | PBIIssueTypeCreatedAction
   | OrderCustomFieldCreatedAction
+  | OrderCustomFieldDeletedAction
 
 // ======================================
 // Reducers (pure function)
 // ======================================
+type SettingReducer = RecoilReducer<AppState, SettingAction>
 
-const pbiIssueTypeIdSet: RecoilReducer<AppState, SettingAction> = (curr, action) => {
+const pbiIssueTypeIdSet: SettingReducer = (curr, action) => {
   return action.id === "PBIIssueTypeIdSetAction"
     ? {
         ...curr,
@@ -63,7 +75,7 @@ const pbiIssueTypeIdSet: RecoilReducer<AppState, SettingAction> = (curr, action)
     : curr
 }
 
-const issueTypeCreated: RecoilReducer<AppState, SettingAction> = (curr, action) => {
+const issueTypeCreated: SettingReducer = (curr, action) => {
   const { projectInfo, settings } = curr
   if (action.id === "IssueTypeCreated" && projectInfo) {
     return {
@@ -82,7 +94,7 @@ const issueTypeCreated: RecoilReducer<AppState, SettingAction> = (curr, action) 
   }
 }
 
-const customFieldCreated: RecoilReducer<AppState, SettingAction> = (curr, action) => {
+const customFieldCreated: SettingReducer = (curr, action) => {
   const { projectInfo } = curr
   if (action.id === "OrderCustomFieldCreated" && projectInfo) {
     return {
@@ -97,4 +109,24 @@ const customFieldCreated: RecoilReducer<AppState, SettingAction> = (curr, action
   }
 }
 
-export const settingsReducer = composeReducers(issueTypeCreated, pbiIssueTypeIdSet, customFieldCreated)
+const customFieldDeleted: SettingReducer = (curr, action) => {
+  const { projectInfo } = curr
+  if (action.id === "OrderCustomFieldDeleted" && projectInfo && action.customFieldId === curr.orderCustomField?.id) {
+    return {
+      ...curr,
+      projectInfo: {
+        ...projectInfo,
+        customFields: projectInfo.customFields.filter((cf) => cf.id !== action.customFieldId)
+      }
+    }
+  } else {
+    return curr
+  }
+}
+
+export const settingsReducer = composeReducers(
+  issueTypeCreated,
+  pbiIssueTypeIdSet,
+  customFieldCreated,
+  customFieldDeleted
+)

@@ -73,10 +73,7 @@ const requestToken = async (config: BacklogOAuthConfig, code: string): Promise<T
 
 const issueAccessToken = async (config: BacklogOAuthConfig): Promise<TokenInfo> => {
   const code = await requestAccessCode(config, "" + Math.floor(Math.random() * 100000))
-  console.log({ code })
-
   const authInfo = await requestToken(config, code)
-  console.log({ authInfo })
   return authInfo
 }
 

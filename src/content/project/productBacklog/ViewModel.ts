@@ -5,7 +5,7 @@ import { Issue, IssueData } from "../../backlog/Issue"
 import { CustomNumberField } from "../../backlog/ProjectInfo"
 import { stateSelector } from "../common/atom"
 import { AppState } from "../common/types"
-import { IssueDataWithOrder } from "./PBIList"
+import { IssueDataWithOrder } from "./PBI"
 import { ProductBacklogAction, ProductBacklogChanged, ProductBacklogLoaded, productBacklogReducer } from "./Reducer"
 
 type DispatchType = Dispatcher<AppState, ProductBacklogAction>
@@ -33,13 +33,12 @@ const applyChanges =
       const chunked = ArrayUtil.chunk(events, 5)
       const updated: IssueData[] = []
       for (const chunk of chunked) {
-        console.log("events chunk", chunk)
         const issues = await Promise.all(
           chunk.map((ev) =>
             Issue.changeMilestoneAndCustomFieldValue(
               ev.issueId,
               ev.milestoneId !== undefined ? ev.milestoneId : null,
-              ev.order || null,
+              ev.order !== undefined ? ev.order : null,
               customField
             )
           )
@@ -53,7 +52,7 @@ const applyChanges =
 const getOrderValue = (orderCusomField: CustomNumberField, issue: IssueData): number | null => {
   const field = issue.customFields.find((cf) => cf.id === orderCusomField.id)
   if (field) {
-    return Number(field.value)
+    return field.value !== null ? Number(field.value) : null
   } else {
     return null
   }

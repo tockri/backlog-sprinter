@@ -3,3 +3,5 @@ export const BacklogOAuthKeys = {
   clientId: "",
   clientSecret: ""
 }
+
+export const BacklogApiKeys: Record<string, string> = {}

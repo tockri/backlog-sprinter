@@ -154,6 +154,10 @@ const createCustomField = async (projectKey: string, input: CustomFieldInput): P
   return await BackgroundClient.blgApiPost<CustomField>(`/api/v2/projects/${projectKey}/customFields`, postData)
 }
 
+const deleteCustomField = async (projectKey: string, customFieldId: number): Promise<CustomField> => {
+  return BackgroundClient.blgApiDelete<CustomField>(`/api/v2/projects/${projectKey}/customFields/${customFieldId}`)
+}
+
 export type MilestoneInput = {
   readonly projectId: number
   readonly name: string
@@ -183,6 +187,7 @@ export const ProjectInfo = {
   getMilestones,
   getCustomFields,
   createCustomField,
+  deleteCustomField,
   createMilestone,
   archiveMilestone
 }

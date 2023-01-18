@@ -3,7 +3,14 @@ import { CustomFieldTypes, CustomNumberField, IssueType, ProjectInfo } from "../
 import { stateSelector } from "../common/atom"
 import { SettingStore } from "../common/SettingStore"
 import { AppSettings, AppState } from "../common/types"
-import { OrderCustomFieldCreated, PBIIssueTypeIdSet, SettingAction, settingsReducer } from "./Reducers"
+import { UserLang } from "../types"
+import {
+  OrderCustomFieldCreated,
+  OrderCustomFieldDeleted,
+  PBIIssueTypeIdSet,
+  SettingAction,
+  settingsReducer
+} from "./Reducers"
 
 type DispatchType = Dispatcher<AppState, SettingAction>
 type AsyncVMFunc0 = (dispatch: DispatchType, state: AppState) => () => Promise<void>
@@ -26,8 +33,7 @@ const createCustomField: AsyncVMFunc0 = (dispatch, state) => async () => {
       name: `__PBI_ORDER__${issueTypeId}__`,
       applicableIssueTypes: [issueTypeId],
       description: "",
-      required: false,
-      initialValue: 0
+      required: false
     })
     dispatch(OrderCustomFieldCreated(created), (state) => {
       if (state.formInfo) {
@@ -37,12 +43,22 @@ const createCustomField: AsyncVMFunc0 = (dispatch, state) => async () => {
   }
 }
 
+const deleteCustomField: AsyncVMFunc0 = (dispatch, state) => async () => {
+  const projectKey = state?.formInfo?.projectKey
+  if (projectKey && state.orderCustomField) {
+    const deleted = await ProjectInfo.deleteCustomField(projectKey, state.orderCustomField.id)
+    dispatch(OrderCustomFieldDeleted(deleted.id))
+  }
+}
+
 export type ProjectSettingsViewModel = {
   readonly settings: AppSettings
   readonly issueTypes: ReadonlyArray<IssueType>
   readonly orderCustomField: CustomNumberField | null
   readonly selectIssueType: (issueTypeId: number) => void
   readonly createCustomField: () => Promise<void>
+  readonly deleteCustomField: () => Promise<void>
+  readonly lang: UserLang
 }
 
 export const useProjectSettingsViewModel = (): ProjectSettingsViewModel => {
@@ -52,6 +68,8 @@ export const useProjectSettingsViewModel = (): ProjectSettingsViewModel => {
     issueTypes: state.projectInfo?.issueTypes || [],
     orderCustomField: state.orderCustomField,
     selectIssueType: selectIssueType(dispatch),
-    createCustomField: createCustomField(dispatch, state)
+    createCustomField: createCustomField(dispatch, state),
+    deleteCustomField: deleteCustomField(dispatch, state),
+    lang: state.formInfo?.lang || "en"
   }
 }

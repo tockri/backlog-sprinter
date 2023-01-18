@@ -1,10 +1,11 @@
 import { Story } from "@storybook/react"
 import React from "react"
-import { Version } from "../content/backlog/ProjectInfo"
-import { IssueDataWithOrder, PBIList } from "../content/project/productBacklog/PBIList"
-import { DndTestView } from "../content/project/velocity"
-import { Modal } from "../content/ui/Modal"
-import { TabPanel } from "../content/ui/TabPanel"
+import { Version } from "../src/content/backlog/ProjectInfo"
+import { IssueDataWithOrder } from "../src/content/project/productBacklog/PBI"
+import { PBIList } from "../src/content/project/productBacklog/PBIList"
+import { DndTestView } from "../src/content/project/velocity"
+import { Modal } from "../src/content/ui/Modal"
+import { TabPanel } from "../src/content/ui/TabPanel"
 
 const fakeVersion = (id: number): Version => ({
   id,

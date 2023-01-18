@@ -1,5 +1,5 @@
 import { MoveAction, NestedListAction } from "./NestedList"
-import { PBIListData } from "./PBIList"
+import { PBIListData } from "./PBI"
 import { PBIListChangeEvent } from "./ViewModel"
 
 class EventStore {
@@ -43,15 +43,15 @@ const patchIndex = (eventStore: EventStore, works: Work[], index: number) => {
   if (target.order === null) {
     setOrder(0)
   }
-  const lo = left?.order || 0
-  const ro = right?.order || 0
   const to = () => target.order || 0
   if (left && right) {
+    const lo = left.order !== null ? left.order : Number.MIN_VALUE
+    const ro = right.order !== null ? right.order : Number.MIN_VALUE
     if (to() <= lo || to() >= ro) {
       if (lo + 2 < ro) {
         setOrder(Math.floor((lo + ro) / 2))
       } else {
-        setOrder(lo + 100)
+        setOrder(lo + 30)
       }
       if (to() <= lo || left.order === null) {
         if (!left.event) {
@@ -65,9 +65,17 @@ const patchIndex = (eventStore: EventStore, works: Work[], index: number) => {
       }
     }
   } else if (!left && right) {
-    setOrder(ro - 100)
+    if (right.order === null) {
+      patchIndex(eventStore, works, index + 1)
+    } else {
+      setOrder(right.order - 100)
+    }
   } else if (left && !right) {
-    setOrder(lo + 100)
+    if (left.order === null) {
+      patchIndex(eventStore, works, index - 1)
+    } else {
+      setOrder(left.order + 100)
+    }
   }
 }
 

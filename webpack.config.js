@@ -36,7 +36,7 @@ module.exports = {
       extensions: ["ts", "tsx"]
     })
   ],
-  devtool: process.env.NODE_ENV === "development" ? "inline-source-map" : false,
+  devtool: process.env.NODE_ENV === "development" ? "#inline-source-map" : false,
   watchOptions: {
     ignored: /node_modules/
   }

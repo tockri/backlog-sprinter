@@ -15,6 +15,7 @@ export type IssueData = {
   readonly status: Status
   readonly milestone: ReadonlyArray<Version>
   readonly customFields: ReadonlyArray<CustomFieldData>
+  readonly description: string
 }
 
 const searchUnclosedInMilestone = async (

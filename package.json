@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "private": true,
   "scripts": {
-    "build": "NODE_ENV=production webpack; cd dist; zip ../backlog-sprinter.zip -r *; yarn secret",
+    "build": "rm -rf dist; NODE_ENV=production webpack; cd dist; zip ../backlog-sprinter.zip -r *; yarn secret",
     "once": "webpack",
     "watch": "webpack --watch",
     "wsl": "DST_DIR=$(echo $PATH | grep -o '/mnt/c/Users/[a-zA-Z]*' | head -n 1)/dev/bnn/backlog-sprinter/dist yarn watch",
