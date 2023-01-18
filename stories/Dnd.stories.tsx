@@ -3,9 +3,9 @@ import React from "react"
 import { Version } from "../src/content/backlog/ProjectInfo"
 import { IssueDataWithOrder } from "../src/content/project/productBacklog/PBI"
 import { PBIList } from "../src/content/project/productBacklog/PBIList"
-import { DndTestView } from "../src/content/project/velocity"
 import { Modal } from "../src/content/ui/Modal"
 import { TabPanel } from "../src/content/ui/TabPanel"
+import { DndTestView } from "./DndTestView"
 
 const fakeVersion = (id: number): Version => ({
   id,
@@ -21,6 +21,7 @@ const fakeIssue = (id: number, versionId: number): IssueDataWithOrder => ({
   id,
   issueKey: `FAKE-${id}`,
   summary: `Issue ${id}`,
+  description: "",
   status: { id: 1, name: "Open", color: "#ff0000" },
   milestone: versionId ? [versions[versionId - 1]] : [],
   customFields: [],

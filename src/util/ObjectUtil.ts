@@ -6,13 +6,15 @@ const purify = <T extends object>(obj: T, template: T): T => {
   return ret as T
 }
 
-const isStrictEqual = (o1: any, o2: any): boolean => {
+const isRecord = <T = unknown>(o: unknown): o is Record<string, T> => o !== null && typeof o === "object"
+
+const isStrictEqual = (o1: unknown, o2: unknown): boolean => {
   if (o1 === o2) {
     return true
   } else if (typeof o1 === typeof o2) {
     if ((o1 && !o2) || (!o1 && o2)) {
       return false
-    } else if (typeof o1 === "object") {
+    } else if (isRecord(o1) && isRecord(o2)) {
       const keys1 = Object.keys(o1).sort()
       const keys2 = Object.keys(o2).sort()
       if (keys1.length === keys2.length) {
@@ -36,5 +38,6 @@ const isStrictEqual = (o1: any, o2: any): boolean => {
 
 export const ObjectUtil = {
   purify,
+  isRecord,
   isStrictEqual
 }
