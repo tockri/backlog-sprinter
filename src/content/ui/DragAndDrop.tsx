@@ -105,7 +105,8 @@ export const Draggable = <T,>(props: DraggableProps<T>): React.ReactElement => {
   return (
     <DraggableView
       draggable={true}
-      onDragStart={() => {
+      onDragStart={(e) => {
+        e.dataTransfer.dropEffect = "move"
         context.setDragging(item)
       }}
       onDragEnd={() => {
@@ -126,7 +127,7 @@ export const Draggable = <T,>(props: DraggableProps<T>): React.ReactElement => {
 
 const DraggableView = styled.div({
   cursor: "default",
-  ":active": {
+  ":active *": {
     cursor: "move"
   }
 })

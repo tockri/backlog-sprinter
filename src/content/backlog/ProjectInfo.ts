@@ -1,5 +1,5 @@
-import { BackgroundClient, ParamsType } from "../../background/BackgroundClient"
 import { DateUtil } from "../../util/DateUtil"
+import { BacklogApi, ParamsType } from "./BacklogApi"
 
 export type Status = {
   readonly id: number
@@ -29,9 +29,9 @@ export type ProjectInfoWithMilestones = {
 }
 
 const getMilestones = async (projectKey: string): Promise<ProjectInfoWithMilestones> => {
-  const project = await BackgroundClient.blgApiGet<Project>(`/api/v2/projects/${projectKey}`)
-  const versionsP = BackgroundClient.blgApiGet<Version[]>(`/api/v2/projects/${projectKey}/versions`)
-  const statusesP = BackgroundClient.blgApiGet<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
+  const project = await BacklogApi.get<Project>(`/api/v2/projects/${projectKey}`)
+  const versionsP = BacklogApi.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
+  const statusesP = BacklogApi.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
   const [versions, statuses] = await Promise.all([versionsP, statusesP])
   return {
     project,
@@ -114,12 +114,10 @@ export type ProjectInfoWithCustomFields = {
 }
 
 const getCustomFields = async (projectKey: string): Promise<ProjectInfoWithCustomFields> => {
-  const project = await BackgroundClient.blgApiGet<Project>(`/api/v2/projects/${projectKey}`)
-  const customFieldsP = BackgroundClient.blgApiGet<ReadonlyArray<CustomField>>(
-    `/api/v2/projects/${projectKey}/customFields`
-  )
-  const statusesP = BackgroundClient.blgApiGet<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
-  const issueTypesP = BackgroundClient.blgApiGet<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
+  const project = await BacklogApi.get<Project>(`/api/v2/projects/${projectKey}`)
+  const customFieldsP = BacklogApi.get<ReadonlyArray<CustomField>>(`/api/v2/projects/${projectKey}/customFields`)
+  const statusesP = BacklogApi.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
+  const issueTypesP = BacklogApi.get<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
   const [customFields, statuses, issueTypes] = await Promise.all([customFieldsP, statusesP, issueTypesP])
   return {
     project,
@@ -151,11 +149,11 @@ const createCustomField = async (projectKey: string, input: CustomFieldInput): P
     .concat(
       input.initialValue !== undefined ? [{ initialValue: `${input.initialValue}` } as Record<string, string>] : []
     )
-  return await BackgroundClient.blgApiPost<CustomField>(`/api/v2/projects/${projectKey}/customFields`, postData)
+  return await BacklogApi.post<CustomField>(`/api/v2/projects/${projectKey}/customFields`, postData)
 }
 
 const deleteCustomField = async (projectKey: string, customFieldId: number): Promise<CustomField> => {
-  return BackgroundClient.blgApiDelete<CustomField>(`/api/v2/projects/${projectKey}/customFields/${customFieldId}`)
+  return await BacklogApi.delete<CustomField>(`/api/v2/projects/${projectKey}/customFields/${customFieldId}`)
 }
 
 export type MilestoneInput = {
@@ -167,7 +165,7 @@ export type MilestoneInput = {
 }
 
 const createMilestone = async (input: MilestoneInput): Promise<number> => {
-  const created = await BackgroundClient.blgApiPost<Version>(`/api/v2/projects/${input.projectId}/versions`, {
+  const created = await BacklogApi.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
     name: input.name,
     startDate: DateUtil.dateString(input.startDate),
     releaseDueDate: DateUtil.dateString(input.endDate),
@@ -177,7 +175,7 @@ const createMilestone = async (input: MilestoneInput): Promise<number> => {
 }
 
 const archiveMilestone = async (projectId: number, milestone: Version) => {
-  await BackgroundClient.blgApiPatch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
+  await BacklogApi.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
     name: milestone.name,
     archived: "true"
   })

@@ -14,7 +14,7 @@ const getUserLang = (): UserLang => (document.documentElement.lang === "ja" ? "j
 
 const getProjectKey = (): string => {
   const path = location.pathname
-  const m = path.match(/^[/](?:projects|add|find|board|gantt|wiki|file|git|view)[/]([A-Z_]+)/)
+  const m = path.match(/^[/](?:projects|add|find|board|gantt|wiki|file|git|view)[/]([A-Z_0-9]+)/)
   if (m) {
     return m[1]
   } else {
@@ -52,7 +52,7 @@ const makePortalButton = () => {
     const buttonWrapper = jsxToElement(
       <div className="bsp-project-button-wrapper">
         <button type="button" className="icon-button icon-button--default -with-text bsp-project-button">
-          <img src={iconUrl} className="icon -large" />
+          <img alt="" src={iconUrl} className="icon -large" />
           <span className="_assistive-text">{t.buttonLabel}</span>
         </button>
       </div>

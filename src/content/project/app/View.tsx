@@ -2,12 +2,12 @@ import React from "react"
 import { MessageBroker } from "../../../util/MessageBroker"
 import { Modal } from "../../ui/Modal"
 import { TabPanel } from "../../ui/TabPanel"
-import { i18n } from "../common/i18n"
 import { useProjectAppViewModel } from "./ViewModel"
 
 import { ProjectProductBacklog } from "../productBacklog/View"
 import { ProjectSettings } from "../settings/View"
 import { PBFormInfo } from "../types"
+import { i18n } from "./i18n"
 
 type ProjectAppProps = {
   broker: MessageBroker<PBFormInfo>
@@ -33,8 +33,10 @@ export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
       <Modal onClose={vm.clear} size="large" title={t.formTitle} height="calc(100vh - 200px)">
         <TabPanel
           tabs={[
+
+
             {
-              label: "プロダクトバックログ",
+              label: t.productBacklog,
               component: () => <ProjectProductBacklog />
             },
             // {
@@ -42,7 +44,7 @@ export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
             //   component: () => <DndTestView />
             // },
             {
-              label: "設定",
+              label: t.setting,
               component: () => <ProjectSettings />
             }
           ]}

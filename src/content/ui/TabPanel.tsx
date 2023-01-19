@@ -22,7 +22,7 @@ const Panel = styled.div({
 const TabBar = styled.nav({
   display: "flex",
   flexDirection: "column",
-  width: "20em",
+  minWidth: 100,
   backgroundColor: "#f0f0f0",
   margin: 0,
   padding: 0
@@ -30,6 +30,7 @@ const TabBar = styled.nav({
 
 const Tab = styled.button({
   padding: "1em 2em",
+  whiteSpace: "nowrap",
   marginBottom: 1,
   border: "0 none",
   backgroundColor: "transparent",

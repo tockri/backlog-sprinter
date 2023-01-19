@@ -1,4 +1,4 @@
-import { BackgroundClient } from "../../background/BackgroundClient"
+import { BacklogApi } from "./BacklogApi"
 import { CustomNumberField, Project, Status, Version } from "./ProjectInfo"
 
 export type CustomFieldData = {
@@ -23,7 +23,7 @@ const searchUnclosedInMilestone = async (
   statuses: ReadonlyArray<Status>,
   milestoneId: number
 ): Promise<ReadonlyArray<IssueData>> => {
-  return await BackgroundClient.blgApiGet<IssueData[]>("/api/v2/issues", [
+  return await BacklogApi.get<IssueData[]>("/api/v2/issues", [
     {
       "projectId[]": "" + project.id,
       "milestoneId[]": "" + milestoneId,
@@ -39,7 +39,7 @@ const searchUnclosedInIssueType = async (
   issueTypeId: number,
   sortField: CustomNumberField
 ): Promise<Array<IssueData>> => {
-  return await BackgroundClient.blgApiGet<IssueData[]>("/api/v2/issues", [
+  return await BacklogApi.get<IssueData[]>("/api/v2/issues", [
     {
       "projectId[]": "" + project.id,
       "issueTypeId[]": "" + issueTypeId,
@@ -60,7 +60,7 @@ const bulkChangeMilestone = async (
   for (let i = 0; i < issueIds.length; i++) {
     const issueId = issueIds[i]
     beforeSend && beforeSend(issueId)
-    await BackgroundClient.blgApiPatch(`/api/v2/issues/${issueId}`, {
+    await BacklogApi.patch(`/api/v2/issues/${issueId}`, {
       "milestoneId[]": "" + milestoneId
     })
   }
@@ -79,7 +79,7 @@ const changeMilestoneAndCustomFieldValue = async (
   if (customFieldValue) {
     params[`customField_${customField.id}`] = "" + customFieldValue
   }
-  return await BackgroundClient.blgApiPatch(`/api/v2/issues/${issueId}`, params)
+  return await BacklogApi.patch(`/api/v2/issues/${issueId}`, params)
 }
 
 export const Issue = {

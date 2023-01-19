@@ -1,4 +1,3 @@
-import { Global } from "@emotion/react"
 import styled from "@emotion/styled"
 import React from "react"
 import { DateUtil } from "../../../util/DateUtil"
@@ -25,13 +24,6 @@ export const PBIList: React.FC<PBIListProps> = (props) => {
 
   return (
     <DragAndDropProvider>
-      <Global
-        styles={{
-          "body.dragging, body.dragging *": {
-            cursor: "default !important"
-          }
-        }}
-      />
       {nList.subLists.map((sl) => (
         <PBISubList subList={sl} dispatch={dispatch} key={sl.id} />
       ))}
@@ -160,7 +152,7 @@ const PBItem: React.FC<PBItemProps> = (props) => {
 const DropArea = styled.div({
   transition: "padding 0.2s ease",
   "&.empty": {
-    minHeight: 30
+    paddingBottom: 20
   },
   "&.hover": {
     paddingTop: 12
