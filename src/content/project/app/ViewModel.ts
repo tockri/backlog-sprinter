@@ -29,7 +29,7 @@ const selectTab: VMFunc1<number> = (dispatch) => (tab) => {
 export type ProjectAppViewModel = {
   readonly isReady: boolean
   readonly lang: UserLang
-  readonly start: (formInfo: PBFormInfo) => Promise<void>
+  readonly start: (formInfo: PBFormInfo) => void
   readonly clear: () => void
   readonly selectedTab: Tabs
   readonly selectTab: (tab: number) => void

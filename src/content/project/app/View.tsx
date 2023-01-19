@@ -33,8 +33,6 @@ export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
       <Modal onClose={vm.clear} size="large" title={t.formTitle} height="calc(100vh - 200px)">
         <TabPanel
           tabs={[
-
-
             {
               label: t.productBacklog,
               component: () => <ProjectProductBacklog />
