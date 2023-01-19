@@ -3,7 +3,6 @@ import { BackgroundMessage, BackgroundMessageUtil } from "./types"
 import MessageSender = chrome.runtime.MessageSender
 
 chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender: MessageSender, callback) => {
-  console.log("message received", message)
   if (BackgroundMessageUtil.isGetBlgAccessToken(message)) {
     BacklogOAuth.runGetAccessTokenFlow(message.hostname, message.renew).then((accessToken) => {
       callback(accessToken)

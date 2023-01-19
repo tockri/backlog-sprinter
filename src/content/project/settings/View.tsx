@@ -54,6 +54,7 @@ export const ProjectSettings: React.FC = () => {
             <div>
               {t.customFieldNotExist}
               <button onClick={() => vm.createCustomField()}>{t.createLabel}</button>
+              <div>{vm.errorMessageOnCreateCustomField}</div>
             </div>
           )
         ) : (

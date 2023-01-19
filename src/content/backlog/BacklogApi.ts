@@ -1,46 +1,34 @@
 import { BackgroundClient } from "../../background/client"
+import { Either, EitherT } from "../../util/Either"
 
-type Success<T> = {
-  readonly success: true
-  readonly data: T
+export type ErrorData = {
+  readonly errors: ReadonlyArray<{
+    readonly message: string
+    readonly code: number
+    readonly moreInfo: string
+  }>
 }
 
-type Error = {
-  readonly success: false
-  readonly errorData: {
-    readonly errors: ReadonlyArray<{
-      readonly message: string
-      readonly code: number
-      readonly moreInfo: string
-    }>
-  }
-}
 const send = async <T extends object>(
   url: URL,
   method: "GET" | "POST" | "PATCH" | "DELETE",
   body?: URLSearchParams
 ): Promise<T> => {
   const apiKey = localStorage.getItem("backlog-api-key")
-  const sendByApiKey = async (apiKey: string): Promise<Success<T> | Error> => {
+  const sendByApiKey = async (apiKey: string): Promise<EitherT<ErrorData, T>> => {
     url.searchParams.append("apiKey", apiKey)
     const resp = await fetch(url.href, {
       method,
       body
     })
     if (resp.status === 200) {
-      return {
-        success: true,
-        data: (await resp.json()) as T
-      }
+      return Either.right((await resp.json()) as T)
     } else {
-      return {
-        success: false,
-        errorData: await resp.json()
-      }
+      return Either.left((await resp.json()) as ErrorData)
     }
   }
 
-  const sendInner = async (accessToken: string, retryCounter: number): Promise<Success<T> | Error> => {
+  const sendInner = async (accessToken: string, retryCounter: number): Promise<EitherT<ErrorData, T>> => {
     const resp = await fetch(url.href, {
       method,
       headers: {
@@ -49,10 +37,7 @@ const send = async <T extends object>(
       body
     })
     if (resp.status === 200) {
-      return {
-        success: true,
-        data: (await resp.json()) as T
-      }
+      return Either.right((await resp.json()) as T)
     } else if (resp.status === 401) {
       const message = resp.headers.get("WWW-Authenticate") || "unknown error"
       if (message.match(/token expired/) && retryCounter > 0) {
@@ -61,19 +46,17 @@ const send = async <T extends object>(
         return sendInner(await BackgroundClient.getBlgAccessToken(url.hostname, true), retryCounter - 1)
       }
     }
-    return {
-      success: false,
-      errorData: await resp.json()
-    }
+    return Either.left((await resp.json()) as ErrorData)
   }
   const result = apiKey
     ? await sendByApiKey(apiKey)
     : await sendInner(await BackgroundClient.getBlgAccessToken(url.hostname), 2)
-  if (result.success) {
-    return result.data
+
+  if (Either.isLeft(result)) {
+    console.warn("api error", result.left)
+    throw result.left
   } else {
-    console.warn(result.errorData)
-    throw new Error(result.errorData.errors.map((e) => `${e.code}: ${e.message}`).join("\n"))
+    return result.right
   }
 }
 
