@@ -102,14 +102,21 @@ const patchIndex = (eventStore: EventStore, works: Work[], index: number) => {
   }
 }
 
-const buildMovedEvents = (pbiList: PBIListData, action: MoveAction): PBIListChangeEvent[] => {
+const indexAfterMove = (action: MoveAction): number => {
+  const src = action.source
+  const dst = action.destination
+  if (src.subListId === dst.subListId && src.index < dst.index) {
+    return dst.index - 1
+  } else {
+    return dst.index
+  }
+}
+
+const buildMovedEvents = (updated: PBIListData, action: MoveAction): PBIListChangeEvent[] => {
   const eventStore = new EventStore()
-  const subList = pbiList.subLists.find((sl) => sl.id === action.destination.subListId)
+  const subList = updated.subLists.find((sl) => sl.id === action.destination.subListId)
   if (subList) {
-    const index =
-      action.source.subListId === action.destination.subListId && action.source.index < action.destination.index
-        ? action.destination.index - 1
-        : action.destination.index
+    const index = indexAfterMove(action)
     const works = makeWorkingArray(subList)
     if (action.source.subListId !== action.destination.subListId) {
       const target = works[index]

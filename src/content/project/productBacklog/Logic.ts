@@ -8,12 +8,13 @@ import { AppState } from "../common/types"
 import { IssueDataWithOrder, PBIListChangeEvent } from "./PBIList/PBIListData"
 import { ProductBacklogAction, ProductBacklogChanged, ProductBacklogLoaded, productBacklogReducer } from "./Reducer"
 
-export type ViewModel = {
+export type Logic = {
   readonly items: ReadonlyArray<IssueDataWithOrder> | null
   readonly onChange: (events: ReadonlyArray<PBIListChangeEvent>) => Promise<void>
+  readonly selectedItem: IssueData | null
 }
 
-export const useViewModel = (): ViewModel => {
+export const useLogic = (): Logic => {
   const [state, dispatch] = useRecoilReducer(productBacklogReducer, stateSelector)
 
   React.useEffect(() => {
@@ -23,7 +24,8 @@ export const useViewModel = (): ViewModel => {
   }, [dispatch, state])
   return {
     items: getItems(state),
-    onChange: onChange(state, dispatch)
+    onChange: onChange(state, dispatch),
+    selectedItem: state.selectedItem
   }
 }
 

@@ -1,13 +1,13 @@
 import { UserLang } from "../types"
 
 const ja = {
-  productBacklog: "プロダクトバックログ",
+  productBacklog: "プロダクト\nバックログ",
   setting: "設定",
   formTitle: "スプリント開発"
 }
 
 const en: typeof ja = {
-  productBacklog: "Product Backlog",
+  productBacklog: "Product\nBacklog",
   setting: "Settings",
   formTitle: "Sprint Development"
 }

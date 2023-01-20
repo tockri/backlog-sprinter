@@ -5,7 +5,7 @@ export type ModalProps = {
   children: React.ReactNode
   title: string
   size: "small" | "medium" | "large"
-  height?: string | number
+  height?: React.CSSProperties["height"]
   onClose: () => void
 }
 
@@ -30,18 +30,19 @@ export const Modal: React.FC<ModalProps> = (props) => {
   )
 }
 
-const Wrapper = styled.div`
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`
+const Wrapper = styled.div({
+  width: "100vw",
+  height: "100vh",
+  position: "fixed",
+  top: 0,
+  left: 0,
+  zIndex: 999,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center"
+})
 
 const Content = styled.div({
-  height: "calc(100% - 36px)"
+  height: "calc(100% - 36px)",
+  overflow: "hidden"
 })

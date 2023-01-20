@@ -19,7 +19,11 @@ export type Version = {
 
 export type Project = {
   readonly id: number
+  readonly projectKey: string
   readonly name: string
+  readonly textFormattingRule: "markdown" | "backlog"
+  readonly chartEnabled: boolean
+  readonly useDevAttributes: boolean
 }
 
 export type ProjectInfoWithMilestones = {
@@ -28,7 +32,7 @@ export type ProjectInfoWithMilestones = {
   readonly statuses: ReadonlyArray<Status>
 }
 
-const getMilestones = async (projectKey: string): Promise<ProjectInfoWithMilestones> => {
+const getProjectInfoWithMilestones = async (projectKey: string): Promise<ProjectInfoWithMilestones> => {
   const project = await BacklogApi.get<Project>(`/api/v2/projects/${projectKey}`)
   const versionsP = BacklogApi.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
   const statusesP = BacklogApi.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
@@ -113,12 +117,13 @@ export type ProjectInfoWithCustomFields = {
   readonly statuses: ReadonlyArray<Status>
 }
 
-const getCustomFields = async (projectKey: string): Promise<ProjectInfoWithCustomFields> => {
+const getProjectInfoWithCustomFields = async (projectKey: string): Promise<ProjectInfoWithCustomFields> => {
   const project = await BacklogApi.get<Project>(`/api/v2/projects/${projectKey}`)
   const customFieldsP = BacklogApi.get<ReadonlyArray<CustomField>>(`/api/v2/projects/${projectKey}/customFields`)
   const statusesP = BacklogApi.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
   const issueTypesP = BacklogApi.get<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
   const [customFields, statuses, issueTypes] = await Promise.all([customFieldsP, statusesP, issueTypesP])
+  console.log({ project })
   return {
     project,
     issueTypes,
@@ -182,8 +187,8 @@ const archiveMilestone = async (projectId: number, milestone: Version) => {
 }
 
 export const ProjectInfo = {
-  getMilestones,
-  getCustomFields,
+  getMilestones: getProjectInfoWithMilestones,
+  getCustomFields: getProjectInfoWithCustomFields,
   createCustomField,
   deleteCustomField,
   createMilestone,

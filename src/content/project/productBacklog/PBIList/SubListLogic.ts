@@ -10,10 +10,10 @@ export const useSubListLogic = (): SubListLogic => {
 
   return {
     setHovered: (index: number, hover: boolean) => {
-      if (!hover) {
-        setHoverIndex(-1)
-      } else {
+      if (hover) {
         setHoverIndex(index)
+      } else {
+        setHoverIndex((hi) => (hi === index ? -1 : hi))
       }
     },
     isHovered: (index) => index === hoverIndex

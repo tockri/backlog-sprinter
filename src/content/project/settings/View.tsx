@@ -1,3 +1,4 @@
+import styled from "@emotion/styled"
 import React from "react"
 import { i18n } from "./i18n"
 import { useProjectSettingsViewModel } from "./ViewModel"
@@ -8,7 +9,7 @@ export const ProjectSettings: React.FC = () => {
   const t = i18n(vm.lang)
   const id = (key: string) => `project.settingsForm.${key}`
   return (
-    <div>
+    <Root>
       <div className="form-element__item">
         <label className="form-element__label" htmlFor={id("issueType")}>
           {t.issueTypeLabel}
@@ -61,6 +62,10 @@ export const ProjectSettings: React.FC = () => {
           <div>{t.setIssueType}</div>
         )}
       </div>
-    </div>
+    </Root>
   )
 }
+
+const Root = styled.div({
+  padding: 12
+})

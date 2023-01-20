@@ -1,3 +1,4 @@
+import styled from "@emotion/styled"
 import React from "react"
 import { DragAndDropProvider } from "../../../ui/DragAndDrop"
 import { IssueDataWithOrder, PBIListChangeEvent } from "./PBIListData"
@@ -6,7 +7,7 @@ import { PBISubList } from "./SubListView"
 
 type ViewProps = {
   readonly items: ReadonlyArray<IssueDataWithOrder>
-  readonly onChange: (events: ReadonlyArray<PBIListChangeEvent>) => void
+  readonly onChange?: (events: ReadonlyArray<PBIListChangeEvent>) => void
 }
 
 export const PBIListView: React.FC<ViewProps> = (props) => {
@@ -15,9 +16,17 @@ export const PBIListView: React.FC<ViewProps> = (props) => {
 
   return (
     <DragAndDropProvider>
-      {logic.pbiListData.subLists.map((sl) => (
-        <PBISubList subList={sl} dispatch={logic.dispatch} key={sl.id} />
-      ))}
+      <Root>
+        {logic.pbiListData.subLists.map((sl) => (
+          <PBISubList subList={sl} dispatch={logic.dispatch} key={sl.id} />
+        ))}
+      </Root>
     </DragAndDropProvider>
   )
 }
+
+const Root = styled.div({
+  padding: "8px 12px",
+  flexGrow: 1,
+  overflow: "auto"
+})

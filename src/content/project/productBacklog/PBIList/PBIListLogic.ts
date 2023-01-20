@@ -1,6 +1,6 @@
 import React from "react"
 import { NestedList, NestedListAction } from "../../../../util/NestedList"
-import { composeReducers } from "../../../../util/RecoilReducer"
+import { composeReducers, ReducerFunc } from "../../../../util/RecoilReducer"
 import { IssueDataWithOrder, PBIListChangeEvent, PBIListData, PBIListDataHandler } from "./PBIListData"
 
 export type PBIListLogic = {
@@ -10,15 +10,10 @@ export type PBIListLogic = {
 
 export const useLogic = (
   items: ReadonlyArray<IssueDataWithOrder>,
-  onChange: (events: ReadonlyArray<PBIListChangeEvent>) => void
+  onChange?: (events: ReadonlyArray<PBIListChangeEvent>) => void
 ): PBIListLogic => {
-  const sideEffect = (data: PBIListData, action: NestedListAction) => {
-    const events = PBIListDataHandler.buildEvent(data, action)
-    onChange && onChange(events)
-    return data
-  }
   const [pbiListData, dispatch] = React.useReducer(
-    composeReducers(NestedList.reducer, sideEffect),
+    composeReducers(NestedList.reducer, sideEffect(onChange)),
     PBIListDataHandler.nest(items)
   )
   return {
@@ -26,3 +21,11 @@ export const useLogic = (
     dispatch
   }
 }
+
+const sideEffect =
+  (onChange?: (events: ReadonlyArray<PBIListChangeEvent>) => void): ReducerFunc<PBIListData, NestedListAction> =>
+  (data, action) => {
+    const events = PBIListDataHandler.buildEvent(data, action)
+    onChange && onChange(events)
+    return data
+  }
