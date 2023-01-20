@@ -17,6 +17,8 @@ export type AppState = {
   readonly formInfo: PBFormInfo | null
   readonly projectInfo: ProjectInfoWithCustomFields | null
   readonly productBacklogItems: ReadonlyArray<IssueData> | null
+  readonly selectedItemId: number | null
+  readonly selectedItem: IssueData | null
   readonly orderCustomField: CustomNumberField | null
   readonly selectedTab: Tabs
   readonly settings: AppSettings

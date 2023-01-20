@@ -1,6 +1,29 @@
-import { MoveAction, NestedListAction } from "./NestedList"
-import { PBIListData } from "./PBI"
-import { PBIListChangeEvent } from "./ViewModel"
+import { MoveAction, NestedList, NestedListAction, NestedListData, NestMethods } from "../../../../util/NestedList"
+import { IssueData } from "../../../backlog/Issue"
+import { Version } from "../../../backlog/ProjectInfo"
+
+export type IssueDataWithOrder = IssueData & { readonly order: number | null }
+export type PBIListData = NestedListData<Version, IssueDataWithOrder>
+
+export type PBIListChangeEvent = {
+  issueId: number
+  milestoneId?: number | null
+  order?: number | null
+}
+
+const headSortKey = (head: Version | null) =>
+  head && head.releaseDueDate ? Date.parse(head.releaseDueDate) : Number.MAX_VALUE
+
+const pbiNestMethods: NestMethods<Version, IssueDataWithOrder> = {
+  itemToHead: (item) => item.milestone.find((m) => m.startDate && m.releaseDueDate) || null,
+  itemComparator: (item1, item2) => NestedList.compareNullable(item1.order, item2.order),
+  headId: (head) => (head ? "" + head.id : "--"),
+  headComparator: (head1, head2) => NestedList.compareNullable(headSortKey(head1), headSortKey(head2))
+}
+
+const nest = (items: ReadonlyArray<IssueDataWithOrder>): PBIListData => {
+  return NestedList.nest<Version, IssueDataWithOrder>(items, pbiNestMethods)
+}
 
 class EventStore {
   private readonly events: Record<number, PBIListChangeEvent> = {}
@@ -79,7 +102,7 @@ const patchIndex = (eventStore: EventStore, works: Work[], index: number) => {
   }
 }
 
-const moved = (pbiList: PBIListData, action: MoveAction): PBIListChangeEvent[] => {
+const buildMovedEvents = (pbiList: PBIListData, action: MoveAction): PBIListChangeEvent[] => {
   const eventStore = new EventStore()
   const subList = pbiList.subLists.find((sl) => sl.id === action.destination.subListId)
   if (subList) {
@@ -98,14 +121,15 @@ const moved = (pbiList: PBIListData, action: MoveAction): PBIListChangeEvent[] =
   return eventStore.values()
 }
 
-const build = (pbiList: PBIListData, action: NestedListAction): PBIListChangeEvent[] => {
+const buildEvent = (pbiList: PBIListData, action: NestedListAction): PBIListChangeEvent[] => {
   if (action.id === "Move") {
-    return moved(pbiList, action)
+    return buildMovedEvents(pbiList, action)
   } else {
     return []
   }
 }
 
-export const PBIListEventBuilder = {
-  build
+export const PBIListDataHandler = {
+  buildEvent,
+  nest
 }

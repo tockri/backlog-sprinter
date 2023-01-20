@@ -1,10 +1,23 @@
+import styled from "@emotion/styled"
 import React from "react"
 import { Loading } from "../../ui/Loading"
-import { PBIList } from "./PBIList"
-import { useProjectProductBacklogViewModel } from "./ViewModel"
+import { InfoArea } from "./InfoArea"
+import { PBIListView } from "./PBIList/PBIListView"
+import { useViewModel } from "./ViewModel"
 
 export const ProjectProductBacklog: React.FC = () => {
-  const vm = useProjectProductBacklogViewModel()
-  const { items, onChange } = vm
-  return items ? <PBIList items={items} onChange={onChange} /> : <Loading />
+  const vm = useViewModel()
+
+  return vm.items ? (
+    <Root>
+      <PBIListView items={vm.items} onChange={vm.onChange} />
+      <InfoArea />
+    </Root>
+  ) : (
+    <Loading />
+  )
 }
+
+const Root = styled.div({
+  display: "flex"
+})

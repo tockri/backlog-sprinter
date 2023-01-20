@@ -1,9 +1,7 @@
-import { ArrayUtil } from "../../../util/ArrayUtil"
-import { Version } from "../../backlog/ProjectInfo"
-import { NestedList } from "./NestedList"
-import { IssueDataWithOrder, PBIListData, pbiNestMethods } from "./PBI"
-import { PBIListEventBuilder } from "./PBIListEventBuilder"
-import { PBIListChangeEvent } from "./ViewModel"
+import { ArrayUtil } from "../../../../util/ArrayUtil"
+import { NestedList } from "../../../../util/NestedList"
+import { Version } from "../../../backlog/ProjectInfo"
+import { IssueDataWithOrder, PBIListChangeEvent, PBIListData, PBIListDataHandler } from "./PBIListData"
 
 // -------------------- preparation --------------------------
 
@@ -54,7 +52,7 @@ const issues = makeFakeBacklog(
   [12, 0, null],
   [14, 0, 52]
 )
-const nested = NestedList.nest(Object.values(issues), pbiNestMethods)
+const nested = PBIListDataHandler.nest(Object.values(issues))
 
 // ------------------- /preparation --------------------------
 test("preparations are correct", () => {
@@ -114,7 +112,7 @@ test("preparations are correct", () => {
 test("Move to the top of another subList", () => {
   const action = NestedList.Move(["1", 2], ["2", 0])
   const updated = NestedList.reducer(nested, action)
-  const events = PBIListEventBuilder.build(updated, action)
+  const events = PBIListDataHandler.buildEvent(updated, action)
   expect(events).toStrictEqual<PBIListChangeEvent[]>([
     {
       issueId: 3,
@@ -127,7 +125,7 @@ test("Move to the top of another subList", () => {
 test("Move to the inside of another subList", () => {
   const action = NestedList.Move(["1", 2], ["2", 1])
   const updated = NestedList.reducer(nested, action)
-  const events = PBIListEventBuilder.build(updated, action)
+  const events = PBIListDataHandler.buildEvent(updated, action)
   expect(events).toStrictEqual<PBIListChangeEvent[]>([
     {
       issueId: 3,
@@ -140,7 +138,7 @@ test("Move to the inside of another subList", () => {
 test("Move within a subList", () => {
   const action = NestedList.Move(["1", 2], ["1", 0])
   const updated = NestedList.reducer(nested, action)
-  const events = PBIListEventBuilder.build(updated, action)
+  const events = PBIListDataHandler.buildEvent(updated, action)
   expect(events).toStrictEqual<PBIListChangeEvent[]>([
     {
       issueId: 3,
@@ -152,7 +150,7 @@ test("Move within a subList", () => {
 test("Move to the last", () => {
   const action = NestedList.Move(["1", 2], ["1", 4])
   const updated = NestedList.reducer(nested, action)
-  const events = PBIListEventBuilder.build(updated, action)
+  const events = PBIListDataHandler.buildEvent(updated, action)
   expect(events).toStrictEqual<PBIListChangeEvent[]>([
     {
       issueId: 3,
@@ -164,7 +162,7 @@ test("Move to the last", () => {
 test("Move and cause rebalance", () => {
   const action = NestedList.Move(["1", 2], ["3", 1])
   const updated = NestedList.reducer(nested, action)
-  const events = PBIListEventBuilder.build(updated, action)
+  const events = PBIListDataHandler.buildEvent(updated, action)
   expect(events.sort((e1, e2) => e1.issueId - e2.issueId)).toStrictEqual<PBIListChangeEvent[]>([
     {
       issueId: 3,
@@ -193,7 +191,7 @@ test("Move and cause rebalance", () => {
 test("Move and make order between null and some", () => {
   const action = NestedList.Move(["1", 2], ["--", 1])
   const updated = NestedList.reducer(nested, action)
-  const events = PBIListEventBuilder.build(updated, action)
+  const events = PBIListDataHandler.buildEvent(updated, action)
   expect(events.sort((e1, e2) => e1.issueId - e2.issueId)).toStrictEqual<PBIListChangeEvent[]>([
     {
       issueId: 3,
@@ -214,7 +212,7 @@ test("Move and make order between null and some", () => {
 test("Move and cause rebalance on existing issues", () => {
   const action = NestedList.Move(["1", 2], ["--", 2])
   const updated = NestedList.reducer(nested, action)
-  const events = PBIListEventBuilder.build(updated, action)
+  const events = PBIListDataHandler.buildEvent(updated, action)
   expect(events.sort((e1, e2) => e1.issueId - e2.issueId)).toStrictEqual<PBIListChangeEvent[]>([
     {
       issueId: 3,

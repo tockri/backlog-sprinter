@@ -1,8 +1,8 @@
 import { Story } from "@storybook/react"
 import React from "react"
 import { Version } from "../src/content/backlog/ProjectInfo"
-import { IssueDataWithOrder } from "../src/content/project/productBacklog/PBI"
-import { PBIList } from "../src/content/project/productBacklog/PBIList"
+import { IssueDataWithOrder } from "../src/content/project/productBacklog/PBIList/PBIListData"
+import { PBIListView } from "../src/content/project/productBacklog/PBIList/PBIListView"
 import { Modal } from "../src/content/ui/Modal"
 import { TabPanel } from "../src/content/ui/TabPanel"
 import { DndTestView } from "./DndTestView"
@@ -45,7 +45,7 @@ const productBacklog = makeFakeBacklog(
 )
 
 const TestView: React.FC = () => {
-  return <PBIList items={productBacklog} />
+  return <PBIListView items={productBacklog} />
 }
 
 export const Dnd: Story = () => {

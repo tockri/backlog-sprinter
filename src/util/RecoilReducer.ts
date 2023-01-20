@@ -11,10 +11,10 @@ export const Reset: ResetAction = {
   id: "reset"
 }
 
-export type RecoilReducer<T, A extends Action> = (curr: T, a: A) => T
+export type ReducerFunc<T, A extends Action> = (curr: T, a: A) => T
 
 export const composeReducers =
-  <T, A extends Action>(...reducers: RecoilReducer<T, A>[]): RecoilReducer<T, A> =>
+  <T, A extends Action>(...reducers: ReducerFunc<T, A>[]): ReducerFunc<T, A> =>
   (curr, a) =>
     reducers.reduce((state, reducer) => reducer(state, a), curr)
 
@@ -24,7 +24,7 @@ const isArray = <A extends Action>(a: A | A[]): a is A[] =>
   typeof (a as Record<string, unknown>)["indexOf"] === "function"
 
 export const useRecoilReducer = <T, A extends Action>(
-  reducer: RecoilReducer<T, A>,
+  reducer: ReducerFunc<T, A>,
   rs: RecoilState<T>
 ): [T, Dispatcher<T, A>] => {
   const [state, setState] = useRecoilState(rs)

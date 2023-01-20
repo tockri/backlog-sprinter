@@ -1,0 +1,78 @@
+import styled from "@emotion/styled"
+import React from "react"
+import { NestedListAction } from "../../../../util/NestedList"
+import { Draggable } from "../../../ui/DragAndDrop"
+import { useItemLogic } from "./ItemLogic"
+import { IssueDataWithOrder } from "./PBIListData"
+
+type ItemViewProps = {
+  subListId: string
+  index: number
+  issue: IssueDataWithOrder
+  dispatch: React.Dispatch<NestedListAction>
+}
+
+export const ItemView: React.FC<ItemViewProps> = (props) => {
+  const { issue, subListId, index, dispatch } = props
+  const vm = useItemLogic(dispatch)
+
+  return (
+    <Draggable
+      item={{ subListId, index }}
+      onDragEnd={(where) => {
+        vm.move([subListId, index], [where.subListId, where.index])
+      }}
+    >
+      <Cell onClick={() => vm.selectItem(issue.id)} className={vm.isSelected(issue.id) ? "selected" : ""}>
+        <CellHeader>
+          <IssueKey>
+            <a href={`/view/${issue.issueKey}`} target="_blank" rel="noreferrer">
+              {issue.issueKey}
+            </a>
+          </IssueKey>
+          <StatusView>
+            <StatusIcon style={{ backgroundColor: issue.status.color }} />
+            {issue.status.name}
+          </StatusView>
+        </CellHeader>
+        <Summary>{issue.summary}</Summary>
+      </Cell>
+    </Draggable>
+  )
+}
+
+const Cell = styled.div({
+  padding: 4,
+  border: "1px solid #d0d0d0",
+  borderRadius: 2,
+  color: "#404040",
+  margin: "4px 0",
+  backgroundColor: "#ffffff",
+  "&.selected": {
+    border: "2px solid #e0c0c0"
+  }
+})
+
+const CellHeader = styled.div({ display: "flex" })
+
+const IssueKey = styled.div({
+  display: "inline-block",
+  marginRight: "1em"
+})
+
+const StatusView = styled.div({
+  display: "inline-block",
+  marginLeft: "1em"
+})
+
+const StatusIcon = styled.div({
+  display: "inline-block",
+  width: "1em",
+  height: "1em",
+  borderRadius: "0.5em",
+  marginRight: "0.5em",
+  position: "relative",
+  top: 1
+})
+
+const Summary = styled.div({ overflow: "hidden" })

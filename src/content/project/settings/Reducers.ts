@@ -1,4 +1,4 @@
-import { Action, composeReducers, RecoilReducer } from "../../../util/RecoilReducer"
+import { Action, composeReducers, ReducerFunc } from "../../../util/RecoilReducer"
 import { CustomField, CustomNumberField, isNumberField, IssueType } from "../../backlog/ProjectInfo"
 import { AppState, No, NoAction } from "../common/types"
 
@@ -60,7 +60,7 @@ export type SettingAction =
 // ======================================
 // Reducers (pure function)
 // ======================================
-type SettingReducer = RecoilReducer<AppState, SettingAction>
+type SettingReducer = ReducerFunc<AppState, SettingAction>
 
 const pbiIssueTypeIdSet: SettingReducer = (curr, action) => {
   return action.id === "PBIIssueTypeIdSetAction"

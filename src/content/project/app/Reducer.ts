@@ -1,4 +1,4 @@
-import { Action, composeReducers, RecoilReducer, ResetAction } from "../../../util/RecoilReducer"
+import { Action, composeReducers, ReducerFunc, ResetAction } from "../../../util/RecoilReducer"
 import { ProjectInfoWithCustomFields } from "../../backlog/ProjectInfo"
 import { AppSettings, AppState, No, NoAction, Tabs } from "../common/types"
 import { PBFormInfo } from "../types"
@@ -47,7 +47,7 @@ export const TabSelected = (index: number): TabSelectedAction | NoAction => {
 
 export type AppAction = NoAction | TabSelectedAction | SettingsLoadedAction | ProjectInfoLoadedAction | ResetAction
 
-const projectInfoLoaded: RecoilReducer<AppState, AppAction> = (curr, action) => {
+const projectInfoLoaded: ReducerFunc<AppState, AppAction> = (curr, action) => {
   return action.id === "ProjectInfoLoaded"
     ? {
         ...curr,
@@ -57,7 +57,7 @@ const projectInfoLoaded: RecoilReducer<AppState, AppAction> = (curr, action) => 
     : curr
 }
 
-const settingsLoaded: RecoilReducer<AppState, AppAction> = (curr, action) => {
+const settingsLoaded: ReducerFunc<AppState, AppAction> = (curr, action) => {
   return action.id === "SettingsLoadedAction"
     ? {
         ...curr,
@@ -66,7 +66,7 @@ const settingsLoaded: RecoilReducer<AppState, AppAction> = (curr, action) => {
     : curr
 }
 
-const selectTab: RecoilReducer<AppState, AppAction> = (curr, action) => {
+const selectTab: ReducerFunc<AppState, AppAction> = (curr, action) => {
   if (action.id === "TabSelected") {
     return {
       ...curr,
