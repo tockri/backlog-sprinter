@@ -1,17 +1,17 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { Loading } from "../../ui/Loading"
-import { InfoArea } from "./InfoArea/InfoArea"
+import { InfoAreaView } from "./InfoArea/InfoAreaView"
 import { useLogic } from "./Logic"
 import { PBIListView } from "./PBIList/PBIListView"
 
 export const ProjectProductBacklog: React.FC = () => {
   const vm = useLogic()
   const selectedItem = vm.selectedItem
-  return vm.items ? (
+  return vm.isReady ? (
     <Root>
-      <PBIListView items={vm.items} onChange={vm.onChange} />
-      {selectedItem && <InfoArea issue={selectedItem} />}
+      <PBIListView />
+      {selectedItem && <InfoAreaView issue={selectedItem} markdown={vm.markdownOnDescription} />}
     </Root>
   ) : (
     <Loading />

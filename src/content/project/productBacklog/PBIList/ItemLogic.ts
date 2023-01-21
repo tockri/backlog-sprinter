@@ -1,11 +1,12 @@
 import React from "react"
-import { NestedList, NestedListAction } from "../../../../util/NestedList"
+import { NestedList } from "../../../../util/NestedList"
 import { Dispatcher, useRecoilReducer } from "../../../../util/RecoilReducer"
 import { stateSelector } from "../../common/atom"
 import { AppState } from "../../common/types"
 import { ItemAction, ItemDeselected, ItemReducer, ItemSelected } from "./ItemReducer"
+import { PBIListAction } from "./PBIListData"
 
-type LocalDispatchType = React.Dispatch<NestedListAction>
+type LocalDispatchType = React.Dispatch<PBIListAction>
 type NestedListPoint = [subListId: string, index: number]
 
 export type ItemLogic = {

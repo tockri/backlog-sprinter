@@ -2,7 +2,7 @@ import React from "react"
 import { MessageBroker } from "../../../util/MessageBroker"
 import { Modal } from "../../ui/Modal"
 import { TabPanel } from "../../ui/TabPanel"
-import { useProjectAppViewModel } from "./ViewModel"
+import { useProjectAppLogic } from "./Logic"
 
 import { ProjectProductBacklog } from "../productBacklog/View"
 import { ProjectSettings } from "../settings/View"
@@ -15,7 +15,7 @@ type ProjectAppProps = {
 
 export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
   const { broker } = props
-  const vm = useProjectAppViewModel()
+  const vm = useProjectAppLogic()
   React.useEffect(() => {
     if (!vm.isReady) {
       broker.subscribe("Project", (formInfo) => {

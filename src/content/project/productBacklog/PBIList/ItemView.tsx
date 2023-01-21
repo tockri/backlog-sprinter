@@ -1,15 +1,14 @@
 import styled from "@emotion/styled"
 import React from "react"
-import { NestedListAction } from "../../../../util/NestedList"
 import { Draggable } from "../../../ui/DragAndDrop"
 import { useItemLogic } from "./ItemLogic"
-import { IssueDataWithOrder } from "./PBIListData"
+import { IssueDataWithOrder, PBIListAction } from "./PBIListData"
 
 type ItemViewProps = {
   subListId: string
   index: number
   issue: IssueDataWithOrder
-  dispatch: React.Dispatch<NestedListAction>
+  dispatch: React.Dispatch<PBIListAction>
 }
 
 export const ItemView: React.FC<ItemViewProps> = (props) => {

@@ -1,5 +1,5 @@
 import { DateUtil } from "../../util/DateUtil"
-import { BacklogApi, ParamsType } from "./BacklogApi"
+import { BacklogApiRequest, ParamsType } from "./BacklogApiRequest"
 
 export type Status = {
   readonly id: number
@@ -33,9 +33,9 @@ export type ProjectInfoWithMilestones = {
 }
 
 const getProjectInfoWithMilestones = async (projectKey: string): Promise<ProjectInfoWithMilestones> => {
-  const project = await BacklogApi.get<Project>(`/api/v2/projects/${projectKey}`)
-  const versionsP = BacklogApi.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
-  const statusesP = BacklogApi.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
+  const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
+  const versionsP = BacklogApiRequest.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
+  const statusesP = BacklogApiRequest.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
   const [versions, statuses] = await Promise.all([versionsP, statusesP])
   return {
     project,
@@ -118,10 +118,10 @@ export type ProjectInfoWithCustomFields = {
 }
 
 const getProjectInfoWithCustomFields = async (projectKey: string): Promise<ProjectInfoWithCustomFields> => {
-  const project = await BacklogApi.get<Project>(`/api/v2/projects/${projectKey}`)
-  const customFieldsP = BacklogApi.get<ReadonlyArray<CustomField>>(`/api/v2/projects/${projectKey}/customFields`)
-  const statusesP = BacklogApi.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
-  const issueTypesP = BacklogApi.get<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
+  const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
+  const customFieldsP = BacklogApiRequest.get<ReadonlyArray<CustomField>>(`/api/v2/projects/${projectKey}/customFields`)
+  const statusesP = BacklogApiRequest.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
+  const issueTypesP = BacklogApiRequest.get<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
   const [customFields, statuses, issueTypes] = await Promise.all([customFieldsP, statusesP, issueTypesP])
   console.log({ project })
   return {
@@ -154,11 +154,11 @@ const createCustomField = async (projectKey: string, input: CustomFieldInput): P
     .concat(
       input.initialValue !== undefined ? [{ initialValue: `${input.initialValue}` } as Record<string, string>] : []
     )
-  return await BacklogApi.post<CustomField>(`/api/v2/projects/${projectKey}/customFields`, postData)
+  return await BacklogApiRequest.post<CustomField>(`/api/v2/projects/${projectKey}/customFields`, postData)
 }
 
 const deleteCustomField = async (projectKey: string, customFieldId: number): Promise<CustomField> => {
-  return await BacklogApi.delete<CustomField>(`/api/v2/projects/${projectKey}/customFields/${customFieldId}`)
+  return await BacklogApiRequest.delete<CustomField>(`/api/v2/projects/${projectKey}/customFields/${customFieldId}`)
 }
 
 export type MilestoneInput = {
@@ -170,7 +170,7 @@ export type MilestoneInput = {
 }
 
 const createMilestone = async (input: MilestoneInput): Promise<number> => {
-  const created = await BacklogApi.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
+  const created = await BacklogApiRequest.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
     name: input.name,
     startDate: DateUtil.dateString(input.startDate),
     releaseDueDate: DateUtil.dateString(input.endDate),
@@ -180,17 +180,21 @@ const createMilestone = async (input: MilestoneInput): Promise<number> => {
 }
 
 const archiveMilestone = async (projectId: number, milestone: Version) => {
-  await BacklogApi.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
+  await BacklogApiRequest.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
     name: milestone.name,
     archived: "true"
   })
 }
 
-export const ProjectInfo = {
-  getMilestones: getProjectInfoWithMilestones,
-  getCustomFields: getProjectInfoWithCustomFields,
+const ProjectInfo = {
+  getProjectInfoWithMilestones,
+  getProjectInfoWithCustomFields,
   createCustomField,
   deleteCustomField,
   createMilestone,
   archiveMilestone
 }
+
+export type ProjectInfoApi = typeof ProjectInfo
+
+export const RealProjectInfo = ProjectInfo

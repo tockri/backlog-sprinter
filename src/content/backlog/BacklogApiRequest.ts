@@ -94,7 +94,7 @@ const sendFormData =
     return await send<T>(url, httpMethod, body)
   }
 
-export const BacklogApi = {
+export const BacklogApiRequest = {
   get: sendUrlOnly("GET"),
   delete: sendUrlOnly("DELETE"),
   post: sendFormData("POST"),

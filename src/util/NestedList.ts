@@ -1,3 +1,5 @@
+import { composeReducers } from "./RecoilReducer"
+
 type SubList<H, T> = {
   readonly id: string
   readonly head: H | null
@@ -71,9 +73,7 @@ const Move = (
   destination: toLocation(destination)
 })
 
-type Action = MoveAction
-
-const moved = <H, T>(prev: List<H, T>, action: Action): List<H, T> => {
+const moved = <H, T>(prev: List<H, T>, action: NestedListAction<H, T>): List<H, T> => {
   if (action.id === "Move") {
     const src = action.source
     const dst = action.destination
@@ -118,20 +118,36 @@ const moved = <H, T>(prev: List<H, T>, action: Action): List<H, T> => {
   return prev
 }
 
+export type ReloadAction<H, T> = {
+  id: "Reload"
+  newList: List<H, T>
+}
+
+const Reload = <H, T>(newList: List<H, T>): ReloadAction<H, T> => ({
+  id: "Reload",
+  newList
+})
+
+const reloaded = <H, T>(state: List<H, T>, action: NestedListAction<H, T>) =>
+  action.id === "Reload" ? action.newList : state
+
 const FOR_TEST_ONLY = {
   moved
 }
 
-const reducer = moved
+type NestedListReducer<H = any, T = any> = (state: List<H, T>, action: NestedListAction<H, T>) => List<H, T>
+
+const reducer: NestedListReducer = composeReducers(moved, reloaded)
 
 export const NestedList = {
   FOR_TEST_ONLY,
   reducer,
   compareNullable,
   nest,
-  Move
+  Move,
+  Reload
 }
 
 export type NestedListData<H, T> = List<H, T>
 
-export type NestedListAction = Action
+export type NestedListAction<H, T> = MoveAction | ReloadAction<H, T>

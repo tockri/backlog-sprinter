@@ -1,4 +1,4 @@
-import { BacklogApi } from "./BacklogApi"
+import { BacklogApiRequest } from "./BacklogApiRequest"
 import { CustomNumberField, Project, Status, Version } from "./ProjectInfo"
 
 export type CustomFieldData = {
@@ -23,7 +23,7 @@ const searchUnclosedInMilestone = async (
   statuses: ReadonlyArray<Status>,
   milestoneId: number
 ): Promise<ReadonlyArray<IssueData>> => {
-  return await BacklogApi.get<IssueData[]>("/api/v2/issues", [
+  return await BacklogApiRequest.get<IssueData[]>("/api/v2/issues", [
     {
       "projectId[]": "" + project.id,
       "milestoneId[]": "" + milestoneId,
@@ -39,7 +39,7 @@ const searchUnclosedInIssueType = async (
   issueTypeId: number,
   sortField: CustomNumberField
 ): Promise<Array<IssueData>> => {
-  return await BacklogApi.get<IssueData[]>("/api/v2/issues", [
+  return await BacklogApiRequest.get<IssueData[]>("/api/v2/issues", [
     {
       "projectId[]": "" + project.id,
       "issueTypeId[]": "" + issueTypeId,
@@ -60,7 +60,7 @@ const bulkChangeMilestone = async (
   for (let i = 0; i < issueIds.length; i++) {
     const issueId = issueIds[i]
     beforeSend && beforeSend(issueId)
-    await BacklogApi.patch(`/api/v2/issues/${issueId}`, {
+    await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, {
       "milestoneId[]": "" + milestoneId
     })
   }
@@ -76,15 +76,37 @@ const changeMilestoneAndCustomFieldValue = async (
   if (milestoneId !== null) {
     params["milestoneId[]"] = milestoneId ? String(milestoneId) : ""
   }
-  if (customFieldValue) {
+  if (customFieldValue !== null) {
     params[`customField_${customField.id}`] = "" + customFieldValue
   }
-  return await BacklogApi.patch(`/api/v2/issues/${issueId}`, params)
+  return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
 }
 
-export const Issue = {
+export type IssueChangeInput = {
+  summary?: string
+  description?: string
+}
+
+const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<IssueData> => {
+  const { summary, description } = input
+  const params: Record<string, string> = {}
+  if (summary !== undefined) {
+    params["summary"] = summary
+  }
+  if (description !== undefined) {
+    params["description"] = description
+  }
+  return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
+}
+
+const Issue = {
   searchUnclosedInMilestone,
   searchUnclosedInIssueType,
   bulkChangeMilestone,
-  changeMilestoneAndCustomFieldValue
+  changeMilestoneAndCustomFieldValue,
+  changeInfo
 }
+
+export type IssueApi = typeof Issue
+
+export const RealIssue = Issue

@@ -1,17 +1,16 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
-import { NestedListAction } from "../../../../util/NestedList"
 import { Droppable } from "../../../ui/DragAndDrop"
 import { ItemView } from "./ItemView"
-import { PBIListData } from "./PBIListData"
+import { PBIListAction, PBIListData } from "./PBIListData"
 import { useSubListLogic } from "./SubListLogic"
 
 type PBISubList = PBIListData["subLists"][number]
 
 type PBISubListProps = {
   readonly subList: PBISubList
-  readonly dispatch: React.Dispatch<NestedListAction>
+  readonly dispatch: React.Dispatch<PBIListAction>
 }
 
 type DragItem = {

@@ -2,6 +2,7 @@ import React from "react"
 import { createRoot } from "react-dom/client"
 import { RecoilRoot } from "recoil"
 import { MessageBroker } from "../util/MessageBroker"
+import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
 import { ProjectApp } from "./project/app/View"
 import { i18n, PBFormInfo, UserLang } from "./project/types"
 import { jsxToElement } from "./ui/JSXUtil"
@@ -26,16 +27,12 @@ const renderApp = () => {
   if (!document.querySelector(".bsp-project-root")) {
     const rootElem = jsxToElement(<div className="bsp-project-root" />)
     document.body.append(rootElem)
-    // ReactDOM.render(
-    //   <RecoilRoot>
-    //     <ProjectApp broker={broker} />
-    //   </RecoilRoot>,
-    //   rootElem
-    // )
     const reactRoot = createRoot(rootElem)
     reactRoot.render(
       <RecoilRoot>
-        <ProjectApp broker={broker} />
+        <BacklogApiContext.Provider value={RealBacklogApi}>
+          <ProjectApp broker={broker} />
+        </BacklogApiContext.Provider>
       </RecoilRoot>
     )
   }

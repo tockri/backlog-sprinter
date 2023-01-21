@@ -4,6 +4,7 @@ import { Version } from "../../../backlog/ProjectInfo"
 
 export type IssueDataWithOrder = IssueData & { readonly order: number | null }
 export type PBIListData = NestedListData<Version, IssueDataWithOrder>
+export type PBIListAction = NestedListAction<Version, IssueDataWithOrder>
 
 export type PBIListChangeEvent = {
   issueId: number
@@ -128,7 +129,7 @@ const buildMovedEvents = (updated: PBIListData, action: MoveAction): PBIListChan
   return eventStore.values()
 }
 
-const buildEvent = (pbiList: PBIListData, action: NestedListAction): PBIListChangeEvent[] => {
+const buildEvent = (pbiList: PBIListData, action: PBIListAction): PBIListChangeEvent[] => {
   if (action.id === "Move") {
     return buildMovedEvents(pbiList, action)
   } else {

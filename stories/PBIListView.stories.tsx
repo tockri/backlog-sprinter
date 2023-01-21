@@ -1,6 +1,8 @@
 import { Story } from "@storybook/react"
 import React from "react"
+import { useSetRecoilState } from "recoil"
 import { Version } from "../src/content/backlog/ProjectInfo"
+import { stateSelector } from "../src/content/project/common/atom"
 import { IssueDataWithOrder } from "../src/content/project/productBacklog/PBIList/PBIListData"
 import { PBIListView } from "../src/content/project/productBacklog/PBIList/PBIListView"
 import { Modal } from "../src/content/ui/Modal"
@@ -30,7 +32,7 @@ const fakeIssue = (id: number, versionId: number): IssueDataWithOrder => ({
 const makeFakeBacklog = (...data: ReadonlyArray<[id: number, vIdx: number]>): ReadonlyArray<IssueDataWithOrder> =>
   data.map(([id, vIdx]) => fakeIssue(id, vIdx))
 
-const productBacklog = makeFakeBacklog(
+const fakeProductBacklog = makeFakeBacklog(
   [1, 1],
   [2, 1],
   [3, 1],
@@ -45,10 +47,18 @@ const productBacklog = makeFakeBacklog(
 )
 
 const TestView: React.FC = () => {
-  return <PBIListView items={productBacklog} />
+  const setState = useSetRecoilState(stateSelector)
+  React.useEffect(() => {
+    setState((s) => ({ ...s, productBacklogItems: fakeProductBacklog }))
+  }, [setState])
+  return <PBIListView />
 }
 
-export const Dnd: Story = () => {
+export const Simple: Story = () => {
+  return <TestView />
+}
+
+export const OnModal: Story = () => {
   return (
     <Modal size="large" title="test" onClose={() => {}}>
       <TabPanel
@@ -72,5 +82,5 @@ export const Test: Story = () => {
 }
 
 export default {
-  title: "Dnd"
+  title: "PBIListView"
 }

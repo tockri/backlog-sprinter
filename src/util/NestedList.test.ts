@@ -34,7 +34,7 @@ const origData: TestState = {
 }
 
 test("NestedList.move moves an item from a subList to another", () => {
-  const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[1].headId, 0])
+  const action: NestedListAction<TestHead, TestItem> = NestedList.Move([heads[0].headId, 1], [heads[1].headId, 0])
   expect<TestState>(R.moved(origData, action)).toStrictEqual<TestState>({
     subLists: [
       {
@@ -101,7 +101,7 @@ test("NestedList.move moves an item from a subList with empty head to another su
 })
 
 test("NestedList.move moves an item to the top in a subList", () => {
-  const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 0])
+  const action: NestedListAction<TestHead, TestItem> = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 0])
   expect<TestState>(R.moved(origData, action)).toStrictEqual<TestState>({
     subLists: [
       {
@@ -124,7 +124,7 @@ test("NestedList.move moves an item to the top in a subList", () => {
 })
 
 test("NestedList.move moves an item to the last in a subList", () => {
-  const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 4])
+  const action: NestedListAction<TestHead, TestItem> = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 4])
   expect<TestState>(R.moved(origData, action)).toStrictEqual<TestState>({
     subLists: [
       {
@@ -147,7 +147,7 @@ test("NestedList.move moves an item to the last in a subList", () => {
 })
 
 test("NestedList.move moves an item in a subList to the end", () => {
-  const action: NestedListAction = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 4])
+  const action: NestedListAction<TestHead, TestItem> = NestedList.Move([heads[0].headId, 1], [heads[0].headId, 4])
   expect<TestState>(R.moved(origData, action)).toStrictEqual<TestState>({
     subLists: [
       {
