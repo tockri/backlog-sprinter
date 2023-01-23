@@ -10,6 +10,6 @@ const en: typeof ja = {
 
 const resources = { ja, en }
 
-export type UserLang = keyof typeof resources
+import { UserLang } from "./types"
 
 export const i18n = (lang: UserLang) => resources[lang]

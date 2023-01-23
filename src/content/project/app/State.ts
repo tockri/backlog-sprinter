@@ -1,37 +1,62 @@
 import { Immutable } from "immer"
-import { atomWithImmer } from "jotai-immer"
+import { Atom, atom, WritableAtom } from "jotai"
+import { atomWithImmer, withImmer } from "jotai-immer"
 import { atomWithStorage } from "jotai/utils"
-import { CustomField, IssueType, Project, Status } from "../../backlog/ProjectInfo"
-import { Tabs } from "../common/types"
-import { PBFormInfo } from "../types"
+import { BacklogApi, RealBacklogApi } from "../../backlog/BacklogApiForReact"
 
-type AppSetting = Immutable<{
+import { ProjectFormInfo } from "../types"
+
+export enum Tabs {
+  Backlog = 0,
+  //  Velocity = 1,
+  Settings = 1
+}
+
+export type AppSetting = Immutable<{
   selectedTab: Tabs
   pbiIssueTypeId: number | null
 }>
 
-const InitialAppData: AppSetting = {
+const InitialAppSetting: AppSetting = {
   selectedTab: Tabs.Backlog,
   pbiIssueTypeId: null
 }
 
-export const appSettingAtom = atomWithStorage<AppSetting>("project.app.setting", InitialAppData)
+export const appSettingAtom = withImmer(atomWithStorage<AppSetting>("bsp.project.app.setting", InitialAppSetting))
 
-export const formInfoAtom = atomWithImmer<PBFormInfo | null>(null)
+export const formInfoAtom = atomWithImmer<ProjectFormInfo>({
+  lang: "en",
+  projectKey: ""
+})
 
-export const projectAtom = atomWithImmer<Project | null>(null)
+export const backlogApiAtom = atom<BacklogApi>(RealBacklogApi)
 
-export const issueTypesAtom = atomWithImmer<Immutable<IssueType[]>>([])
+const makeDerivedAtom = <T, U>(parentAtom: Atom<Promise<T>>, relation: (t: T) => U): WritableAtom<U, U> => {
+  const store = atom<U | null>(null)
+  const derived = atom<U, U>(
+    (get) => {
+      const stored = get(store)
+      if (stored) {
+        return stored
+      } else {
+        const parent = get(parentAtom)
+        return relation(parent)
+      }
+    },
+    (get, set, value) => {
+      set(store, value)
+    }
+  )
+  return derived
+}
 
-export const statusesAtom = atomWithImmer<Immutable<Status[]>>([])
+const projectInfoAtom = atom(async (get) => {
+  const formInfo = get(formInfoAtom)
+  const api = get(backlogApiAtom)
+  return await api.projectInfo.getProjectInfoWithCustomFields(formInfo.projectKey)
+})
 
-export const customFieldsAtom = atomWithImmer<Immutable<CustomField[]>>([])
-//
-// const projectInfoLoader = atom(null, async (get, set) => {
-//   const formInfo = get(formInfoAtom)
-//   const projectInfo = await RealProjectInfo.getProjectInfoWithCustomFields(formInfo.projectKey)
-//   set(projectAtom, projectInfo.project)
-//   set(issueTypesAtom, projectInfo.issueTypes)
-//   set(statusesAtom, projectInfo.statuses)
-//   set(customFieldsAtom, projectInfo.customFields)
-// })
+export const projectAtom = makeDerivedAtom(projectInfoAtom, (pi) => pi.project)
+export const issueTypesAtom = makeDerivedAtom(projectInfoAtom, (pi) => pi.issueTypes)
+export const customFieldsAtom = makeDerivedAtom(projectInfoAtom, (pi) => pi.customFields)
+export const statusesAtom = makeDerivedAtom(projectInfoAtom, (pi) => pi.statuses)

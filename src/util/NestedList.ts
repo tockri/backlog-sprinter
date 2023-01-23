@@ -1,4 +1,4 @@
-import { composeReducers } from "./RecoilReducer"
+import { ReducerUtil } from "./ReducerUtil"
 
 type SubList<H, T> = {
   readonly id: string
@@ -137,7 +137,7 @@ const FOR_TEST_ONLY = {
 
 type NestedListReducer<H = any, T = any> = (state: List<H, T>, action: NestedListAction<H, T>) => List<H, T>
 
-const reducer: NestedListReducer = composeReducers(moved, reloaded)
+const reducer: NestedListReducer = ReducerUtil.compose(moved, reloaded)
 
 export const NestedList = {
   FOR_TEST_ONLY,

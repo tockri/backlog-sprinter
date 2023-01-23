@@ -1,13 +1,12 @@
 import React from "react"
 import { createRoot } from "react-dom/client"
-import { RecoilRoot } from "recoil"
 import { MessageBroker } from "../util/MessageBroker"
 import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
 import { ProjectApp } from "./project/app/View"
-import { i18n, PBFormInfo, UserLang } from "./project/types"
+import { i18n, ProjectFormInfo, UserLang } from "./project/types"
 import { jsxToElement } from "./ui/JSXUtil"
 
-const broker = new MessageBroker<PBFormInfo>()
+const broker = new MessageBroker<ProjectFormInfo>()
 
 const getButtonPlace = () => document.querySelector(".project-header__summary")
 
@@ -29,11 +28,9 @@ const renderApp = () => {
     document.body.append(rootElem)
     const reactRoot = createRoot(rootElem)
     reactRoot.render(
-      <RecoilRoot>
-        <BacklogApiContext.Provider value={RealBacklogApi}>
-          <ProjectApp broker={broker} />
-        </BacklogApiContext.Provider>
-      </RecoilRoot>
+      <BacklogApiContext.Provider value={RealBacklogApi}>
+        <ProjectApp broker={broker} />
+      </BacklogApiContext.Provider>
     )
   }
 }
