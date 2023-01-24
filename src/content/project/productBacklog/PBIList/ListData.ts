@@ -1,12 +1,13 @@
 import { Immutable } from "immer"
+import { WritableDraft } from "immer/dist/internal"
 import { NestedList, NestedListData, NestMethods, NLLocation } from "../../../../util/NestedList"
-import { IssueData } from "../../../backlog/Issue"
-import { Version } from "../../../backlog/ProjectInfo"
+import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
+import { CustomNumberField, Version } from "../../../backlog/ProjectInfo"
 
 export type IssueDataWithOrder = IssueData & { readonly order: number | null }
 export type PBIListData = NestedListData<Version, IssueDataWithOrder>
 
-export type PBIListChangeEvent = {
+export type PBIListMovedEvent = {
   issueId: number
   milestoneId?: number | null
   order?: number | null
@@ -26,15 +27,34 @@ const nest = (items: ReadonlyArray<IssueDataWithOrder>): PBIListData => {
   return NestedList.nest<Version, IssueDataWithOrder>(items, pbiNestMethods)
 }
 
+const nestIssues = (issues: ReadonlyArray<IssueData>, orderCustomField: CustomNumberField): PBIListData =>
+  nest(
+    issues.map((issue) => ({
+      ...issue,
+      order: getOrderValue(orderCustomField, issue)
+    }))
+  )
+
+const getOrderValue = (orderCustomField: CustomNumberField, issue: IssueData): number | null => {
+  const field = issue.customFields.find((cf) => cf.id === orderCustomField.id)
+  if (field) {
+    return field.value !== null ? Number(field.value) : null
+  } else {
+    return null
+  }
+}
 class EventStore {
-  private readonly events: Record<number, PBIListChangeEvent> = {}
-  eventOf(issueId: number): PBIListChangeEvent {
+  private readonly events: Record<number, PBIListMovedEvent> = {}
+  eventExists(issueId: number): boolean {
+    return !!this.events[issueId]
+  }
+  eventOf(issueId: number): PBIListMovedEvent {
     if (!this.events[issueId]) {
       this.events[issueId] = { issueId }
     }
     return this.events[issueId]
   }
-  values(): PBIListChangeEvent[] {
+  values(): PBIListMovedEvent[] {
     return Object.values(this.events)
   }
 }
@@ -44,7 +64,7 @@ type PBISubList = PBIListData["subLists"][number]
 type Work = {
   readonly issueId: number
   order: number | null
-  event: PBIListChangeEvent | null
+  event: PBIListMovedEvent | null
 }
 const makeWorkingArray = (subList: PBISubList): Work[] =>
   subList.items.map((item) => ({
@@ -117,23 +137,71 @@ const indexAfterMove = (action: MoveAction): number => {
   }
 }
 
-const buildMovedEvents = (updated: PBIListData, action: MoveAction): ReadonlyArray<PBIListChangeEvent> => {
+const mutateByMoveAction = (data: WritableDraft<PBIListData>, action: MoveAction): PBIListMovedEvent[] => {
+  const updated = NestedList.move(data, action)
   const eventStore = new EventStore()
   const subList = updated.subLists.find((sl) => sl.id === action.dst.subListId)
   if (subList) {
     const index = indexAfterMove(action)
     const works = makeWorkingArray(subList)
-    if (action.dst.subListId !== action.dst.subListId) {
+    if (action.src.subListId !== action.dst.subListId) {
       const target = works[index]
       target.event = eventStore.eventOf(target.issueId)
       target.event.milestoneId = subList.head?.id || 0
     }
     patchIndex(eventStore, works, index)
+
+    for (const issue of subList.items) {
+      if (eventStore.eventExists(issue.id)) {
+        const ev = eventStore.eventOf(issue.id)
+        if (ev.order !== undefined) {
+          issue.order = ev.order
+        }
+        if (ev.milestoneId !== undefined) {
+          issue.milestone = subList.head ? [subList.head] : []
+        }
+      }
+    }
   }
   return eventStore.values()
 }
 
+export type PBIChangeAction = {
+  issueId: number
+  input: IssueChangeInput
+}
+
+const mutateByChangeAction = (data: WritableDraft<PBIListData>, action: PBIChangeAction) => {
+  const { issueId, input } = action
+  const [item] = findIssue(data, issueId)
+  if (item) {
+    if (input.summary !== undefined) {
+      item.summary = input.summary
+    }
+    if (input.description !== undefined) {
+      item.description = input.description
+    }
+  }
+}
+
+const findIssue = <T extends PBIListData | WritableDraft<PBIListData>>(
+  data: T,
+  issueId: number
+): [T["subLists"][number]["items"][number], T["subLists"][number]["head"]] | [null, null] => {
+  for (const subList of data.subLists) {
+    for (const item of subList.items) {
+      if (item.id === issueId) {
+        return [item, subList.head]
+      }
+    }
+  }
+  return [null, null]
+}
+
 export const PBIListDataHandler = {
-  buildMovedEvents,
-  nest
+  mutateByChangeAction,
+  mutateByMoveAction,
+  getIssue: findIssue,
+  nest,
+  nestIssues
 }

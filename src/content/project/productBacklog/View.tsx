@@ -1,15 +1,13 @@
 import styled from "@emotion/styled"
 import React from "react"
-import { InfoAreaView } from "./InfoArea/InfoAreaView"
-import { useProductBacklogModel } from "./Model"
-import { PBIListView } from "./PBIList/PBIListView"
+import { InfoAreaView } from "./InfoArea/View"
+import { PBIListView } from "./PBIList/ListView"
 
 export const ProductBacklogView: React.FC = () => {
-  const model = useProductBacklogModel()
   return (
     <Root>
       <PBIListView />
-      {model.selectedIssueId && <InfoAreaView issueId={model.selectedIssueId} markdown={model.markdownOnDescription} />}
+      <InfoAreaView />
     </Root>
   )
 }

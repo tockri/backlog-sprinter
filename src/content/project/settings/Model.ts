@@ -32,7 +32,7 @@ type SettingModel = Immutable<{
 export const useSettingModel = (): SettingModel => {
   const [setting, setSetting] = useAtom(appSettingAtom)
   const formInfo = useAtomValue(formInfoAtom)
-  const [issueTypes, setIssueTypes] = useAtom(issueTypesAtom)
+  const issueTypes = useAtomValue(issueTypesAtom)
   const setCustomFields = useSetAtom(customFieldsAtom)
   const orderCustomField = useAtomValue(orderCustomFieldAtom)
   const api = useAtomValue(backlogApiAtom)

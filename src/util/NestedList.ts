@@ -54,11 +54,17 @@ export type NLLocation = Immutable<{
   index: number
 }>
 
-const move = <H, T>(prev: List<H, T>, src: NLLocation, dst: NLLocation): List<H, T> => {
-  return produce(prev, (draft) => mutateMove(draft, src, dst))
+export type NLMoveAction = Immutable<{
+  src: NLLocation
+  dst: NLLocation
+}>
+
+const move = <H, T>(prev: List<H, T>, action: NLMoveAction): List<H, T> => {
+  return produce(prev, (draft) => mutateMove(draft, action))
 }
 
-const mutateMove = <H, T>(draft: WritableDraft<List<H, T>>, src: NLLocation, dst: NLLocation) => {
+const mutateMove = <H, T>(draft: WritableDraft<List<H, T>>, action: NLMoveAction) => {
+  const { src, dst } = action
   if (src.subListId === dst.subListId) {
     const subListId = src.subListId
     const subList = draft.subLists.find((sl) => sl.id === subListId)

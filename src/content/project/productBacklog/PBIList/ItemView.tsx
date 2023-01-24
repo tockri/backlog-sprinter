@@ -1,24 +1,25 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { Draggable } from "../../../ui/DragAndDrop"
-import { useItemModel } from "./ItemModel"
-import { IssueDataWithOrder } from "./PBIListData"
+import { usePBIItemModel } from "./ItemModel"
+import { IssueDataWithOrder } from "./ListData"
 
-type ItemViewProps = {
+type PBIItemViewProps = {
   subListId: string
   index: number
   issue: IssueDataWithOrder
 }
 
-export const ItemView: React.FC<ItemViewProps> = (props) => {
+export const PBIItemView: React.FC<PBIItemViewProps> = (props) => {
   const { issue, subListId, index } = props
-  const model = useItemModel()
+  const model = usePBIItemModel()
+  const item = { subListId, index }
 
   return (
     <Draggable
-      item={{ subListId, index }}
+      item={item}
       onDragEnd={(where) => {
-        model.move({ subListId, index }, where)
+        model.move({ src: item, dst: where })
       }}
     >
       <Cell onClick={() => model.selectItem(issue.id)} className={model.isSelected(issue.id) ? "selected" : ""}>
@@ -30,7 +31,7 @@ export const ItemView: React.FC<ItemViewProps> = (props) => {
           </IssueKey>
           <StatusView>
             <StatusIcon style={{ backgroundColor: issue.status.color }} />
-            {issue.status.name} / {issue.order}
+            {issue.status.name}
           </StatusView>
         </CellHeader>
         <Summary>{issue.summary}</Summary>

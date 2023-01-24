@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { DragAndDropProvider } from "../../../ui/DragAndDrop"
-import { usePBIListModel } from "./PBIListModel"
+import { usePBIListModel } from "./ListModel"
 import { PBISubList } from "./SubListView"
 
 export const PBIListView: React.FC = () => {

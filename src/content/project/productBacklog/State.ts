@@ -1,42 +1,102 @@
+import produce from "immer"
 import { atom } from "jotai"
-import { withImmer } from "jotai-immer"
+import { ArrayUtil } from "../../../util/ArrayUtil"
+import { NLMoveAction } from "../../../util/NestedList"
+import { BacklogApi } from "../../backlog/BacklogApiForReact"
 import { IssueData } from "../../backlog/Issue"
 import { CustomNumberField } from "../../backlog/ProjectInfo"
-import { JotaiUtil } from "../../util/JotaiUtil"
 import { appSettingAtom, backlogApiAtom, milestonesAtom, orderCustomFieldAtom, projectAtom } from "../app/State"
-import { PBIListDataHandler } from "./PBIList/PBIListData"
+import { PBIChangeAction, PBIListData, PBIListDataHandler, PBIListMovedEvent } from "./PBIList/ListData"
 
-export const productBacklogAtom = withImmer(
-  JotaiUtil.atomWithAsync(async (get) => {
-    const project = get(projectAtom)
-    const api = get(backlogApiAtom)
-    const setting = get(appSettingAtom)
-    const today = new Date().getTime()
-    const milestones = get(milestonesAtom).filter(
-      (ms) => !ms.archived && ms.releaseDueDate && Date.parse(ms.releaseDueDate) > today
-    )
+const pbiListDataStoreAtom = atom<PBIListData | null>(null)
+
+export const productBacklogAtom = atom<Promise<PBIListData>, NLMoveAction, Promise<void> | void>(
+  async (get) => {
     const orderCustomField = get(orderCustomFieldAtom)
     if (orderCustomField) {
-      const list = await api.issue.searchInIssueTypeAndMilestones(project, setting.pbiIssueTypeId, milestones)
-      return PBIListDataHandler.nest(
-        list.map((issue) => ({
-          ...issue,
-          order: orderCustomField && getOrderValue(orderCustomField, issue)
-        }))
-      )
+      const stored = get(pbiListDataStoreAtom)
+      if (stored) {
+        return stored
+      } else {
+        const project = get(projectAtom)
+        const api = get(backlogApiAtom)
+        const setting = get(appSettingAtom)
+        const milestones = get(milestonesAtom)
+        const today = new Date().getTime()
+        const milestoneFilter = milestones.filter(
+          (ms) => !ms.archived && ms.startDate && ms.releaseDueDate && Date.parse(ms.releaseDueDate) > today
+        )
+        const list = await api.issue.searchInIssueTypeAndMilestones(project, setting.pbiIssueTypeId, milestoneFilter)
+        return PBIListDataHandler.nestIssues(list, orderCustomField)
+      }
     } else {
       throw new Error("orderCustomField is not set.")
     }
-  })
+  },
+  async (get, set, moveAction) => {
+    console.log({ moveAction })
+    let events: PBIListMovedEvent[] = []
+    set(pbiListDataStoreAtom, (data) => {
+      data = data || get(productBacklogAtom)
+      return produce(data, (draft) => {
+        events = PBIListDataHandler.mutateByMoveAction(draft, moveAction)
+      })
+    })
+    console.log({ events })
+    if (events.length) {
+      const api = get(backlogApiAtom)
+      const orderCustomField = get(orderCustomFieldAtom)
+      if (orderCustomField) {
+        await updateIssues(orderCustomField, events, api)
+      }
+    }
+  }
 )
 
-const getOrderValue = (orderCusomField: CustomNumberField, issue: IssueData): number | null => {
-  const field = issue.customFields.find((cf) => cf.id === orderCusomField.id)
-  if (field) {
-    return field.value !== null ? Number(field.value) : null
-  } else {
-    return null
+const updateIssues = async (
+  customField: CustomNumberField,
+  events: ReadonlyArray<PBIListMovedEvent>,
+  api: BacklogApi
+): Promise<ReadonlyArray<IssueData>> => {
+  const chunked = ArrayUtil.chunk(events, 5)
+  const updated: IssueData[] = []
+  for (const chunk of chunked) {
+    const issues = await Promise.all(
+      chunk.map((ev) =>
+        api.issue.changeMilestoneAndCustomFieldValue(
+          ev.issueId,
+          ev.milestoneId !== undefined ? ev.milestoneId : null,
+          ev.order !== undefined ? ev.order : null,
+          customField
+        )
+      )
+    )
+    updated.push(...issues)
   }
+  return updated
 }
 
 export const selectedIssueIdAtom = atom<number | null>(null)
+
+export const selectedIssueAtom = atom<IssueData | null, PBIChangeAction, Promise<void>>(
+  (get) => {
+    const selectedId = get(selectedIssueIdAtom)
+    const data = get(productBacklogAtom)
+    if (selectedId) {
+      const [item] = PBIListDataHandler.getIssue(data, selectedId)
+      return item
+    }
+    return null
+  },
+  async (get, set, action) => {
+    set(pbiListDataStoreAtom, (data) => {
+      data = data || get(productBacklogAtom)
+      return produce(data, (draft) => {
+        PBIListDataHandler.mutateByChangeAction(draft, action)
+      })
+    })
+    const api = get(backlogApiAtom)
+    const { issueId, input } = action
+    await api.issue.changeInfo(issueId, input)
+  }
+)

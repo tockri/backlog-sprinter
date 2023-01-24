@@ -2,9 +2,9 @@ import styled from "@emotion/styled"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
 import { Droppable } from "../../../ui/DragAndDrop"
-import { ItemView } from "./ItemView"
-import { PBIListData } from "./PBIListData"
-import { useSubListLogic } from "./SubListLogic"
+import { PBIItemView } from "./ItemView"
+import { PBIListData } from "./ListData"
+import { usePBISubListModel } from "./SubListModel"
 
 type PBISubList = PBIListData["subLists"][number]
 
@@ -33,7 +33,7 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
   const { subList } = props
   const milestone = subList.head
   const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
-  const logic = useSubListLogic()
+  const model = usePBISubListModel()
   const lastIdx = subList.items.length
   return (
     <SL>
@@ -47,19 +47,19 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
             key={issue.id}
             item={{ index, subListId: subList.id }}
             canDrop={canDropOn(index, subList.id)}
-            hoverStateChanged={(h) => logic.setHovered(index, h)}
+            hoverStateChanged={(h) => model.setHovered(index, h)}
           >
-            <DropArea className={logic.isHovered(index) ? "hover" : ""}>
-              <ItemView issue={issue} key={index} index={index} subListId={subList.id} />
+            <DropArea className={model.isHovered(index) ? "hover" : ""}>
+              <PBIItemView issue={issue} key={index} index={index} subListId={subList.id} />
             </DropArea>
           </Droppable>
         ))}
         <Droppable
           item={{ index: lastIdx, subListId: subList.id }}
           canDrop={canDropOn(lastIdx, subList.id)}
-          hoverStateChanged={(h) => logic.setHovered(lastIdx, h)}
+          hoverStateChanged={(h) => model.setHovered(lastIdx, h)}
         >
-          <DropArea className={logic.isHovered(lastIdx) ? "hover empty" : "empty"} />
+          <DropArea className={model.isHovered(lastIdx) ? "hover empty" : "empty"} />
         </Droppable>
       </SLBody>
     </SL>

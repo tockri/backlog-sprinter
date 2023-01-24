@@ -1,7 +1,7 @@
 import { Immutable } from "immer"
 import { useAtomValue } from "jotai"
 import { productBacklogAtom } from "../State"
-import { PBIListData } from "./PBIListData"
+import { PBIListData } from "./ListData"
 
 type PBIListModel = Immutable<{
   data: PBIListData

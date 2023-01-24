@@ -1,11 +1,11 @@
 import React from "react"
 
-export type SubListLogic = {
+type PBISubListModel = {
   setHovered: (index: number, hover: boolean) => void
   isHovered: (index: number) => boolean
 }
 
-export const useSubListLogic = (): SubListLogic => {
+export const usePBISubListModel = (): PBISubListModel => {
   const [hoverIndex, setHoverIndex] = React.useState(-1)
 
   return {
