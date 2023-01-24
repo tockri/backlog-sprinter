@@ -2,43 +2,27 @@ import produce from "immer"
 import { Provider, useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { MessageBroker } from "../../../util/MessageBroker"
-import { BacklogApiContext } from "../../backlog/BacklogApiForReact"
 import { IssueType } from "../../backlog/ProjectInfo"
 import { Loading } from "../../ui/Loading"
 import { Modal } from "../../ui/Modal"
 import { TabPanel } from "../../ui/TabPanel"
 import { ProjectFormInfo } from "../types"
 import { i18n } from "./i18n"
-import { appSettingAtom, backlogApiAtom, formInfoAtom, issueTypesAtom, projectAtom } from "./State"
+import { useAppModel, useInnerModel } from "./Model"
+import { issueTypesAtom, orderCustomFieldAtom } from "./State"
 
 type ProjectAppProps = {
   broker: MessageBroker<ProjectFormInfo>
 }
 
-export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
-  const { broker } = props
-  const [formInfo, setFormInfo] = React.useState<ProjectFormInfo | null>(null)
-  const api = React.useContext(BacklogApiContext)
-  React.useEffect(() => {
-    if (!formInfo) {
-      broker.subscribe("Project", (formInfo) => {
-        setFormInfo(formInfo)
-      })
-    }
-    return () => {
-      broker.unsubscribe("Project")
-    }
-  }, [formInfo, broker, setFormInfo])
+export const ProjectApp: React.FC<ProjectAppProps> = ({ broker }) => {
+  const model = useAppModel(broker)
+  const formInfo = model.formInfo
   if (formInfo) {
     const t = i18n(formInfo.lang)
     return (
-      <Modal onClose={() => setFormInfo(null)} size="large" title={t.formTitle} height="calc(100vh - 200px)">
-        <Provider
-          initialValues={[
-            [formInfoAtom, formInfo],
-            [backlogApiAtom, api]
-          ]}
-        >
+      <Modal onClose={model.clear} size="large" title={t.formTitle} height="calc(100vh - 200px)">
+        <Provider initialValues={model.providerInitialValues}>
           <React.Suspense fallback={<Loading />}>
             <Inner />
           </React.Suspense>
@@ -51,16 +35,14 @@ export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
 }
 
 const Inner: React.FC = () => {
-  const formInfo = useAtomValue(formInfoAtom)
-  const [appSetting, setAppSetting] = useAtom(appSettingAtom)
-  const project = useAtomValue(projectAtom)
-  const t = i18n(formInfo.lang)
+  const model = useInnerModel()
+  const t = i18n(model.lang)
   return (
     <TabPanel
       tabs={[
         {
           label: t.productBacklog,
-          component: () => <div>Project ID:{project.id}</div>
+          component: () => <div>ぷろだくとー</div>
         },
         // {
         //   label: "ベロシティ",
@@ -71,18 +53,15 @@ const Inner: React.FC = () => {
           component: () => <Inner2 />
         }
       ]}
-      selectedIndex={appSetting.selectedTab}
-      onTabClicked={(tab) => {
-        setAppSetting((s) => {
-          s.selectedTab = tab
-        })
-      }}
+      selectedIndex={model.selectedTab}
+      onTabClicked={model.setSelectedTab}
     />
   )
 }
 
 const Inner2: React.FC = () => {
   const [issueTypes, setIssueTypes] = useAtom(issueTypesAtom)
+  const orderCustomField = useAtomValue(orderCustomFieldAtom)
 
   const clicked = () => {
     const created: IssueType = {
@@ -102,6 +81,7 @@ const Inner2: React.FC = () => {
   }
   return (
     <div>
+      <div>カスタム属性：{orderCustomField?.name}</div>
       <button type="button" onClick={clicked}>
         Add
       </button>

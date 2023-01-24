@@ -1,8 +1,10 @@
 import { Immutable } from "immer"
-import { Atom, atom, WritableAtom } from "jotai"
+import { atom } from "jotai"
 import { atomWithImmer, withImmer } from "jotai-immer"
 import { atomWithStorage } from "jotai/utils"
+import { JotaiUtil } from "../../../util/JotaiUtil"
 import { BacklogApi, RealBacklogApi } from "../../backlog/BacklogApiForReact"
+import { CustomNumberField, isNumberField } from "../../backlog/ProjectInfo"
 
 import { ProjectFormInfo } from "../types"
 
@@ -14,12 +16,12 @@ export enum Tabs {
 
 export type AppSetting = Immutable<{
   selectedTab: Tabs
-  pbiIssueTypeId: number | null
+  pbiIssueTypeId: number
 }>
 
 const InitialAppSetting: AppSetting = {
   selectedTab: Tabs.Backlog,
-  pbiIssueTypeId: null
+  pbiIssueTypeId: 0
 }
 
 export const appSettingAtom = withImmer(atomWithStorage<AppSetting>("bsp.project.app.setting", InitialAppSetting))
@@ -31,32 +33,45 @@ export const formInfoAtom = atomWithImmer<ProjectFormInfo>({
 
 export const backlogApiAtom = atom<BacklogApi>(RealBacklogApi)
 
-const makeDerivedAtom = <T, U>(parentAtom: Atom<Promise<T>>, relation: (t: T) => U): WritableAtom<U, U> => {
-  const store = atom<U | null>(null)
-  const derived = atom<U, U>(
-    (get) => {
-      const stored = get(store)
-      if (stored) {
-        return stored
-      } else {
-        const parent = get(parentAtom)
-        return relation(parent)
-      }
-    },
-    (get, set, value) => {
-      set(store, value)
-    }
-  )
-  return derived
-}
-
 const projectInfoAtom = atom(async (get) => {
   const formInfo = get(formInfoAtom)
   const api = get(backlogApiAtom)
   return await api.projectInfo.getProjectInfoWithCustomFields(formInfo.projectKey)
 })
 
-export const projectAtom = makeDerivedAtom(projectInfoAtom, (pi) => pi.project)
-export const issueTypesAtom = makeDerivedAtom(projectInfoAtom, (pi) => pi.issueTypes)
-export const customFieldsAtom = makeDerivedAtom(projectInfoAtom, (pi) => pi.customFields)
-export const statusesAtom = makeDerivedAtom(projectInfoAtom, (pi) => pi.statuses)
+export const projectAtom = JotaiUtil.makeChildAtom(projectInfoAtom, (pi) => pi.project)
+export const issueTypesAtom = JotaiUtil.makeChildAtom(projectInfoAtom, (pi) => pi.issueTypes)
+export const customFieldsAtom = JotaiUtil.makeChildAtom(projectInfoAtom, (pi) => pi.customFields)
+export const statusesAtom = JotaiUtil.makeChildAtom(projectInfoAtom, (pi) => pi.statuses)
+
+export const orderCustomFieldAtom = atom((get) => {
+  const customFields = get(customFieldsAtom)
+  const setting = get(appSettingAtom)
+  const issueTypes = get(issueTypesAtom)
+  const issueType = issueTypes.find((it) => it.id === setting.pbiIssueTypeId)
+  if (issueType) {
+    return (
+      (customFields.find(
+        (customField) =>
+          customField.applicableIssueTypes.includes(issueType.id) &&
+          isNumberField(customField) &&
+          customField.name == `__PBI_ORDER__${issueType.id}__`
+      ) as CustomNumberField) || null
+    )
+  } else {
+    return null
+  }
+})
+
+export const productBacklogAtom = atom(async (get) => {
+  const project = get(projectAtom)
+  const api = get(backlogApiAtom)
+  const setting = get(appSettingAtom)
+  const orderCustomField = get(orderCustomFieldAtom)
+  const statuses = get(statusesAtom)
+  if (orderCustomField !== null) {
+    return await api.issue.searchUnclosedInIssueType(project, statuses, setting.pbiIssueTypeId, orderCustomField)
+  } else {
+    return null
+  }
+})
