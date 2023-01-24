@@ -33,20 +33,18 @@ const searchUnclosedInMilestone = async (
   ])
 }
 
-const searchUnclosedInIssueType = async (
+const searchInIssueTypeAndMilestones = async (
   project: Project,
-  statuses: ReadonlyArray<Status>,
   issueTypeId: number,
-  sortField: CustomNumberField
-): Promise<Array<IssueData>> => {
-  return await BacklogApiRequest.get<IssueData[]>("/api/v2/issues", [
+  milestones: ReadonlyArray<Version>
+): Promise<ReadonlyArray<IssueData>> => {
+  return await BacklogApiRequest.get<ReadonlyArray<IssueData>>("/api/v2/issues", [
     {
       "projectId[]": "" + project.id,
       "issueTypeId[]": "" + issueTypeId,
-      sort: `customField_${sortField.id}`,
       count: "100"
     },
-    ...statuses.filter((s) => s.id !== 4).map((s) => ({ "statusId[]": "" + s.id }))
+    ...milestones.map((v) => ({ "milestoneId[]": "" + v.id }))
   ])
 }
 
@@ -101,7 +99,7 @@ const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<Iss
 
 const Issue = {
   searchUnclosedInMilestone,
-  searchUnclosedInIssueType,
+  searchInIssueTypeAndMilestones,
   bulkChangeMilestone,
   changeMilestoneAndCustomFieldValue,
   changeInfo

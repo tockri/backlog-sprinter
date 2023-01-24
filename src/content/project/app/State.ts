@@ -43,6 +43,7 @@ export const projectAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.
 export const issueTypesAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes))
 export const customFieldsAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.customFields))
 export const statusesAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.statuses))
+export const milestonesAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.milestones))
 
 export const orderCustomFieldAtom = atom((get) => {
   const customFields = get(customFieldsAtom)
@@ -58,19 +59,6 @@ export const orderCustomFieldAtom = atom((get) => {
           customField.name == `__PBI_ORDER__${issueType.id}__`
       ) as CustomNumberField) || null
     )
-  } else {
-    return null
-  }
-})
-
-export const productBacklogAtom = JotaiUtil.atomWithAsync(async (get) => {
-  const project = get(projectAtom)
-  const api = get(backlogApiAtom)
-  const setting = get(appSettingAtom)
-  const orderCustomField = get(orderCustomFieldAtom)
-  const statuses = get(statusesAtom)
-  if (orderCustomField !== null) {
-    return await api.issue.searchUnclosedInIssueType(project, statuses, setting.pbiIssueTypeId, orderCustomField)
   } else {
     return null
   }

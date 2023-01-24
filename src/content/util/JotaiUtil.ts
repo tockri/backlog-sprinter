@@ -19,15 +19,16 @@ const atomFromParent = <T, U>(parentAtom: Atom<Promise<T>>, relation: (t: T) => 
 }
 
 type Read<T> = (get: Getter) => Promise<T>
-const atomWithAsync = <T>(read: Read<T>): WritableAtom<Promise<T>, ValueOrUpdater<T>> => {
+const atomWithAsync = <T>(read: Read<T>): WritableAtom<T, ValueOrUpdater<T>> => {
   const store = atom<T | null>(null)
-  return atom<Promise<T>, ValueOrUpdater<T>>(
-    (get) => read(get),
-    async (get, set, update) => {
+  const getAtom = atom(read)
+  return atom<T, ValueOrUpdater<T>>(
+    (get) => get(store) || get(getAtom),
+    (get, set, update) => {
       if (isValue(update)) {
         set(store, update)
       } else {
-        set(store, update(get(store) || (await read(get))))
+        set(store, update(get(store) || get(getAtom)))
       }
     }
   )

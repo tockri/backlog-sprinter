@@ -1,28 +1,27 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { Draggable } from "../../../ui/DragAndDrop"
-import { useItemLogic } from "./ItemLogic"
-import { IssueDataWithOrder, PBIListAction } from "./PBIListData"
+import { useItemModel } from "./ItemModel"
+import { IssueDataWithOrder } from "./PBIListData"
 
 type ItemViewProps = {
   subListId: string
   index: number
   issue: IssueDataWithOrder
-  dispatch: React.Dispatch<PBIListAction>
 }
 
 export const ItemView: React.FC<ItemViewProps> = (props) => {
-  const { issue, subListId, index, dispatch } = props
-  const vm = useItemLogic(dispatch)
+  const { issue, subListId, index } = props
+  const model = useItemModel()
 
   return (
     <Draggable
       item={{ subListId, index }}
       onDragEnd={(where) => {
-        vm.move([subListId, index], [where.subListId, where.index])
+        model.move({ subListId, index }, where)
       }}
     >
-      <Cell onClick={() => vm.selectItem(issue.id)} className={vm.isSelected(issue.id) ? "selected" : ""}>
+      <Cell onClick={() => model.selectItem(issue.id)} className={model.isSelected(issue.id) ? "selected" : ""}>
         <CellHeader>
           <IssueKey>
             <a href={`/view/${issue.issueKey}`} target="_blank" rel="noreferrer">
@@ -31,7 +30,7 @@ export const ItemView: React.FC<ItemViewProps> = (props) => {
           </IssueKey>
           <StatusView>
             <StatusIcon style={{ backgroundColor: issue.status.color }} />
-            {issue.status.name}
+            {issue.status.name} / {issue.order}
           </StatusView>
         </CellHeader>
         <Summary>{issue.summary}</Summary>

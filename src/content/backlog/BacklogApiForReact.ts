@@ -11,7 +11,7 @@ const rejector = () => Promise.reject()
 
 const fakeIssueApi: IssueApi = {
   searchUnclosedInMilestone: rejector,
-  searchUnclosedInIssueType: rejector,
+  searchInIssueTypeAndMilestones: rejector,
   bulkChangeMilestone: rejector,
   changeMilestoneAndCustomFieldValue: rejector,
   changeInfo: rejector

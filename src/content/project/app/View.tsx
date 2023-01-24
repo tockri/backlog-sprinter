@@ -4,6 +4,7 @@ import { MessageBroker } from "../../../util/MessageBroker"
 import { Loading } from "../../ui/Loading"
 import { Modal } from "../../ui/Modal"
 import { TabPanel } from "../../ui/TabPanel"
+import { ProductBacklogView } from "../productBacklog/View"
 import { ProjectSettings } from "../settings/View"
 import { ProjectFormInfo } from "../types"
 import { i18n } from "./i18n"
@@ -40,7 +41,11 @@ const Inner: React.FC = () => {
       tabs={[
         {
           label: t.productBacklog,
-          component: () => <div>ぷろだくとー</div>
+          component: () => (
+            <React.Suspense fallback={<Loading />}>
+              <ProductBacklogView />
+            </React.Suspense>
+          )
         },
         // {
         //   label: "ベロシティ",

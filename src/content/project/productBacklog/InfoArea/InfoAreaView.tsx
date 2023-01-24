@@ -1,25 +1,23 @@
 import styled from "@emotion/styled"
 import React from "react"
-import { IssueData } from "../../../backlog/Issue"
 import { EditableField } from "../../../ui/EditableField"
-import { useInfoAreaLogic } from "./InfoAreaLogic"
 
 export type InfoAreaViewProps = {
-  issue: IssueData
+  issueId: number
   markdown?: boolean
 }
 
 export const InfoAreaView: React.FC<InfoAreaViewProps> = (props) => {
-  const { issue, markdown } = props
-  const logic = useInfoAreaLogic(props.issue)
+  const { issueId, markdown } = props
+  // const logic = useInfoAreaLogic(props.issue)
 
   return (
     <Area>
       <Float>
         <Summary>
           <EditableField
-            defaultValue={issue.summary}
-            onFix={(value) => logic.changeIssue("summary", value)}
+            defaultValue={"さまりー"}
+            // onFix={(value) => logic.changeIssue("summary", value)}
             blurAction="cancel"
             editStyle={{
               flexGrow: 1
@@ -28,7 +26,7 @@ export const InfoAreaView: React.FC<InfoAreaViewProps> = (props) => {
         </Summary>
         <Description>
           <EditableField
-            defaultValue={issue.description}
+            defaultValue={"ですく"}
             markdown={markdown}
             multiline={true}
             editStyle={{
@@ -39,7 +37,7 @@ export const InfoAreaView: React.FC<InfoAreaViewProps> = (props) => {
               overflow: "scroll",
               backgroundColor: "#f0f0f0"
             }}
-            onFix={(value) => logic.changeIssue("description", value)}
+            // onFix={(value) => logic.changeIssue("description", value)}
             blurAction="cancel"
           />
         </Description>

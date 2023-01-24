@@ -1,4 +1,5 @@
-import { ReducerUtil } from "./ReducerUtil"
+import { Immutable, produce } from "immer"
+import { WritableDraft } from "immer/dist/types/types-external"
 
 type SubList<H, T> = {
   readonly id: string
@@ -48,106 +49,39 @@ const nest = <H, T>(list: ReadonlyArray<T>, methods: NestMethods<H, T>): List<H,
   return { subLists }
 }
 
-type NLLocation = {
-  readonly subListId: string
-  readonly index: number
+export type NLLocation = Immutable<{
+  subListId: string
+  index: number
+}>
+
+const move = <H, T>(prev: List<H, T>, src: NLLocation, dst: NLLocation): List<H, T> => {
+  return produce(prev, (draft) => mutateMove(draft, src, dst))
 }
 
-export type MoveAction = {
-  readonly id: "Move"
-  readonly source: NLLocation
-  readonly destination: NLLocation
-}
-
-const toLocation = (arg: readonly [subListId: string, index: number]): NLLocation => ({
-  subListId: arg[0],
-  index: arg[1]
-})
-
-const Move = (
-  source: readonly [subListId: string, index: number],
-  destination: readonly [subListId: string, index: number]
-): MoveAction => ({
-  id: "Move",
-  source: toLocation(source),
-  destination: toLocation(destination)
-})
-
-const moved = <H, T>(prev: List<H, T>, action: NestedListAction<H, T>): List<H, T> => {
-  if (action.id === "Move") {
-    const src = action.source
-    const dst = action.destination
-    if (src.subListId === dst.subListId) {
-      const subListId = src.subListId
-      const subList = prev.subLists.find((sl) => sl.id === subListId)
-      if (subList) {
-        const items = Array.from(subList.items)
-        const target = items.splice(src.index, 1)
-        const dstIndex = dst.index < src.index ? dst.index : dst.index - 1
-        items.splice(dstIndex, 0, ...target)
-        return {
-          subLists: prev.subLists.map((sl) => (sl.id === subListId ? { ...sl, items: items } : sl))
-        }
-      }
-    } else {
-      const srcSub = prev.subLists.find((g) => g.id === src.subListId)
-      const dstSub = prev.subLists.find((g) => g.id === dst.subListId)
-      if (srcSub && dstSub) {
-        const srcItems = Array.from(srcSub.items)
-        const target = srcItems.splice(src.index, 1)
-        const dstItems = Array.from(dstSub.items)
-        dstItems.splice(dst.index, 0, ...target)
-        return {
-          subLists: prev.subLists.map((sl) =>
-            sl.id === src.subListId
-              ? {
-                  ...sl,
-                  items: srcItems
-                }
-              : sl.id === dst.subListId
-              ? {
-                  ...sl,
-                  items: dstItems
-                }
-              : sl
-          )
-        }
-      }
+const mutateMove = <H, T>(draft: WritableDraft<List<H, T>>, src: NLLocation, dst: NLLocation) => {
+  if (src.subListId === dst.subListId) {
+    const subListId = src.subListId
+    const subList = draft.subLists.find((sl) => sl.id === subListId)
+    if (subList) {
+      const target = subList.items.splice(src.index, 1)
+      const dstIndex = dst.index < src.index ? dst.index : dst.index - 1
+      subList.items.splice(dstIndex, 0, ...target)
+    }
+  } else {
+    const srcSub = draft.subLists.find((g) => g.id === src.subListId)
+    const dstSub = draft.subLists.find((g) => g.id === dst.subListId)
+    if (srcSub && dstSub) {
+      const target = srcSub.items.splice(src.index, 1)
+      dstSub.items.splice(dst.index, 0, ...target)
     }
   }
-  return prev
 }
-
-export type ReloadAction<H, T> = {
-  id: "Reload"
-  newList: List<H, T>
-}
-
-const Reload = <H, T>(newList: List<H, T>): ReloadAction<H, T> => ({
-  id: "Reload",
-  newList
-})
-
-const reloaded = <H, T>(state: List<H, T>, action: NestedListAction<H, T>) =>
-  action.id === "Reload" ? action.newList : state
-
-const FOR_TEST_ONLY = {
-  moved
-}
-
-type NestedListReducer<H = any, T = any> = (state: List<H, T>, action: NestedListAction<H, T>) => List<H, T>
-
-const reducer: NestedListReducer = ReducerUtil.compose(moved, reloaded)
 
 export const NestedList = {
-  FOR_TEST_ONLY,
-  reducer,
+  move,
+  mutateMove,
   compareNullable,
-  nest,
-  Move,
-  Reload
+  nest
 }
 
 export type NestedListData<H, T> = List<H, T>
-
-export type NestedListAction<H, T> = MoveAction | ReloadAction<H, T>

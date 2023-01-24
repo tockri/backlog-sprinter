@@ -3,14 +3,13 @@ import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
 import { Droppable } from "../../../ui/DragAndDrop"
 import { ItemView } from "./ItemView"
-import { PBIListAction, PBIListData } from "./PBIListData"
+import { PBIListData } from "./PBIListData"
 import { useSubListLogic } from "./SubListLogic"
 
 type PBISubList = PBIListData["subLists"][number]
 
 type PBISubListProps = {
   readonly subList: PBISubList
-  readonly dispatch: React.Dispatch<PBIListAction>
 }
 
 type DragItem = {
@@ -31,7 +30,7 @@ const canDropOn =
   }
 
 export const PBISubList: React.FC<PBISubListProps> = (props) => {
-  const { subList, dispatch } = props
+  const { subList } = props
   const milestone = subList.head
   const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
   const logic = useSubListLogic()
@@ -51,7 +50,7 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
             hoverStateChanged={(h) => logic.setHovered(index, h)}
           >
             <DropArea className={logic.isHovered(index) ? "hover" : ""}>
-              <ItemView issue={issue} key={index} index={index} subListId={subList.id} dispatch={dispatch} />
+              <ItemView issue={issue} key={index} index={index} subListId={subList.id} />
             </DropArea>
           </Droppable>
         ))}

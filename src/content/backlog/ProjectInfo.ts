@@ -118,6 +118,7 @@ export type ProjectInfoWithCustomFields = Immutable<{
   project: Project
   issueTypes: IssueType[]
   customFields: CustomField[]
+  milestones: Version[]
   statuses: Status[]
 }>
 
@@ -125,13 +126,20 @@ const getProjectInfoWithCustomFields = async (projectKey: string): Promise<Proje
   const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
   const customFieldsP = BacklogApiRequest.get<ReadonlyArray<CustomField>>(`/api/v2/projects/${projectKey}/customFields`)
   const statusesP = BacklogApiRequest.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
+  const milestonesP = BacklogApiRequest.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
   const issueTypesP = BacklogApiRequest.get<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
-  const [customFields, statuses, issueTypes] = await Promise.all([customFieldsP, statusesP, issueTypesP])
+  const [customFields, statuses, milestones, issueTypes] = await Promise.all([
+    customFieldsP,
+    statusesP,
+    milestonesP,
+    issueTypesP
+  ])
   console.log({ project })
   return {
     project,
     issueTypes,
     customFields,
+    milestones,
     statuses
   }
 }

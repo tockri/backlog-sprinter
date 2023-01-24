@@ -1,12 +1,9 @@
 import React from "react"
 import { ArrayUtil } from "../../../../util/ArrayUtil"
 import { NestedList } from "../../../../util/NestedList"
-import { composeReducers, Dispatcher, ReducerFunc, useRecoilReducer } from "../../../../util/RecoilReducer"
 import { BacklogApi, BacklogApiContext } from "../../../backlog/BacklogApiForReact"
 import { IssueData } from "../../../backlog/Issue"
 import { CustomNumberField } from "../../../backlog/ProjectInfo"
-import { stateSelector } from "../../common/atom"
-import { AppState } from "../../common/types"
 import { ProductBacklogAction, ProductBacklogChanged, productBacklogReducer } from "../Reducer"
 import { IssueDataWithOrder, PBIListAction, PBIListChangeEvent, PBIListData, PBIListDataHandler } from "./PBIListData"
 
