@@ -1,15 +1,13 @@
-import produce from "immer"
-import { Provider, useAtom, useAtomValue } from "jotai"
+import { Provider } from "jotai"
 import React from "react"
 import { MessageBroker } from "../../../util/MessageBroker"
-import { IssueType } from "../../backlog/ProjectInfo"
 import { Loading } from "../../ui/Loading"
 import { Modal } from "../../ui/Modal"
 import { TabPanel } from "../../ui/TabPanel"
+import { ProjectSettings } from "../settings/View"
 import { ProjectFormInfo } from "../types"
 import { i18n } from "./i18n"
 import { useAppModel, useInnerModel } from "./Model"
-import { issueTypesAtom, orderCustomFieldAtom } from "./State"
 
 type ProjectAppProps = {
   broker: MessageBroker<ProjectFormInfo>
@@ -50,46 +48,11 @@ const Inner: React.FC = () => {
         // },
         {
           label: t.setting,
-          component: () => <Inner2 />
+          component: () => <ProjectSettings />
         }
       ]}
       selectedIndex={model.selectedTab}
       onTabClicked={model.setSelectedTab}
     />
-  )
-}
-
-const Inner2: React.FC = () => {
-  const [issueTypes, setIssueTypes] = useAtom(issueTypesAtom)
-  const orderCustomField = useAtomValue(orderCustomFieldAtom)
-
-  const clicked = () => {
-    const created: IssueType = {
-      id: 1,
-      projectId: 1,
-      name: "created",
-      color: "#ff0000",
-      displayOrder: 0,
-      templateSummary: "",
-      templateDescription: ""
-    }
-    setIssueTypes(
-      produce(issueTypes, (it) => {
-        it.splice(0, 0, created)
-      })
-    )
-  }
-  return (
-    <div>
-      <div>カスタム属性：{orderCustomField?.name}</div>
-      <button type="button" onClick={clicked}>
-        Add
-      </button>
-      <ul>
-        {issueTypes.map((it, idx) => (
-          <li key={idx}>{it.name}</li>
-        ))}
-      </ul>
-    </div>
   )
 }

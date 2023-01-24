@@ -2,9 +2,9 @@ import { Immutable } from "immer"
 import { atom } from "jotai"
 import { atomWithImmer, withImmer } from "jotai-immer"
 import { atomWithStorage } from "jotai/utils"
-import { JotaiUtil } from "../../../util/JotaiUtil"
 import { BacklogApi, RealBacklogApi } from "../../backlog/BacklogApiForReact"
 import { CustomNumberField, isNumberField } from "../../backlog/ProjectInfo"
+import { JotaiUtil } from "../../util/JotaiUtil"
 
 import { ProjectFormInfo } from "../types"
 
@@ -39,10 +39,10 @@ const projectInfoAtom = atom(async (get) => {
   return await api.projectInfo.getProjectInfoWithCustomFields(formInfo.projectKey)
 })
 
-export const projectAtom = JotaiUtil.makeChildAtom(projectInfoAtom, (pi) => pi.project)
-export const issueTypesAtom = JotaiUtil.makeChildAtom(projectInfoAtom, (pi) => pi.issueTypes)
-export const customFieldsAtom = JotaiUtil.makeChildAtom(projectInfoAtom, (pi) => pi.customFields)
-export const statusesAtom = JotaiUtil.makeChildAtom(projectInfoAtom, (pi) => pi.statuses)
+export const projectAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.project)
+export const issueTypesAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes))
+export const customFieldsAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.customFields))
+export const statusesAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.statuses))
 
 export const orderCustomFieldAtom = atom((get) => {
   const customFields = get(customFieldsAtom)
@@ -63,7 +63,7 @@ export const orderCustomFieldAtom = atom((get) => {
   }
 })
 
-export const productBacklogAtom = atom(async (get) => {
+export const productBacklogAtom = JotaiUtil.atomWithAsync(async (get) => {
   const project = get(projectAtom)
   const api = get(backlogApiAtom)
   const setting = get(appSettingAtom)

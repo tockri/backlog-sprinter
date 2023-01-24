@@ -1,11 +1,10 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { i18n } from "./i18n"
-import { useProjectSettingsViewModel } from "./ViewModel"
+import { useSettingModel } from "./Model"
 
 export const ProjectSettings: React.FC = () => {
-  const vm = useProjectSettingsViewModel()
-  const settings = vm.settings
+  const vm = useSettingModel()
   const t = i18n(vm.lang)
   const id = (key: string) => `project.settingsForm.${key}`
   return (
@@ -23,7 +22,7 @@ export const ProjectSettings: React.FC = () => {
               vm.selectIssueType(issueType.id)
             }
           }}
-          value={settings.pbiIssueTypeId || ""}
+          value={vm.pbiIssueTypeId || ""}
         >
           <option value=""></option>
           {vm.issueTypes.map((it) => (
@@ -37,7 +36,7 @@ export const ProjectSettings: React.FC = () => {
         <label className="form-element__label" htmlFor={id("customField")}>
           {t.customFieldTitle}
         </label>
-        {settings.pbiIssueTypeId ? (
+        {vm.pbiIssueTypeId ? (
           vm.orderCustomField ? (
             <div>
               {t.storeOrderOn(vm.orderCustomField.name)}
@@ -55,7 +54,7 @@ export const ProjectSettings: React.FC = () => {
             <div>
               {t.customFieldNotExist}
               <button onClick={() => vm.createCustomField()}>{t.createLabel}</button>
-              <div>{vm.errorMessageOnCreateCustomField}</div>
+              <div>{vm.errorMessageOnCustomField}</div>
             </div>
           )
         ) : (

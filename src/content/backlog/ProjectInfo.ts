@@ -1,3 +1,4 @@
+import { Immutable } from "immer"
 import { DateUtil } from "../../util/DateUtil"
 import { BacklogApiRequest, ParamsType } from "./BacklogApiRequest"
 
@@ -65,37 +66,40 @@ export enum CustomFieldTypes {
   Radio = 8
 }
 
-type CustomFieldBase = {
-  readonly id: number
-  readonly typeId: CustomFieldTypes
-  readonly name: string
-  readonly description: string
-  readonly required: boolean
-  readonly applicableIssueTypes: ReadonlyArray<number>
-}
+export type CustomFieldBase = Immutable<{
+  id: number
+  typeId: CustomFieldTypes
+  name: string
+  description: string
+  required: boolean
+  applicableIssueTypes: number[]
+}>
 
 export type CustomTextField = CustomFieldBase
 
-export type CustomNumberField = {
-  readonly min: number
-  readonly max: number
-  readonly initialValue: number | null
-  readonly unit: string
-} & CustomFieldBase
+export type CustomNumberField = CustomFieldBase &
+  Immutable<{
+    min: number
+    max: number
+    initialValue: number | null
+    unit: string
+  }>
 
-export type CustomDateField = {
-  readonly min: string
-  readonly max: string
-  readonly initialValueType: 1 | 2 | 3
-  readonly initialDate: string
-  readonly initialShift: number
-} & CustomFieldBase
+export type CustomDateField = CustomFieldBase &
+  Immutable<{
+    min: string
+    max: string
+    initialValueType: 1 | 2 | 3
+    initialDate: string
+    initialShift: number
+  }>
 
-export type CustomListField = {
-  readonly items: ReadonlyArray<string>
-  readonly allowInput: boolean
-  readonly allowAddItem: boolean
-} & CustomFieldBase
+export type CustomListField = CustomFieldBase &
+  Immutable<{
+    items: string[]
+    allowInput: boolean
+    allowAddItem: boolean
+  }>
 
 export type CustomField = CustomTextField | CustomNumberField | CustomDateField | CustomListField
 
@@ -110,12 +114,12 @@ export const isListField = (cf: CustomField): cf is CustomListField =>
   cf.typeId in
   [CustomFieldTypes.SingleSelect, CustomFieldTypes.MultiSelect, CustomFieldTypes.Radio, CustomFieldTypes.Checkbox]
 
-export type ProjectInfoWithCustomFields = {
-  readonly project: Project
-  readonly issueTypes: ReadonlyArray<IssueType>
-  readonly customFields: ReadonlyArray<CustomField>
-  readonly statuses: ReadonlyArray<Status>
-}
+export type ProjectInfoWithCustomFields = Immutable<{
+  project: Project
+  issueTypes: IssueType[]
+  customFields: CustomField[]
+  statuses: Status[]
+}>
 
 const getProjectInfoWithCustomFields = async (projectKey: string): Promise<ProjectInfoWithCustomFields> => {
   const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
@@ -132,14 +136,14 @@ const getProjectInfoWithCustomFields = async (projectKey: string): Promise<Proje
   }
 }
 
-export type CustomFieldInput = {
+export type CustomFieldInput = Immutable<{
   typeId: CustomFieldTypes
   name: string
-  applicableIssueTypes: ReadonlyArray<number>
+  applicableIssueTypes: number[]
   description: string
   required: boolean
   initialValue?: number
-}
+}>
 
 const createCustomField = async (projectKey: string, input: CustomFieldInput): Promise<CustomField> => {
   const postData: ParamsType = [
@@ -161,13 +165,13 @@ const deleteCustomField = async (projectKey: string, customFieldId: number): Pro
   return await BacklogApiRequest.delete<CustomField>(`/api/v2/projects/${projectKey}/customFields/${customFieldId}`)
 }
 
-export type MilestoneInput = {
-  readonly projectId: number
-  readonly name: string
-  readonly startDate: Date | null
-  readonly endDate: Date | null
-  readonly description: string
-}
+export type MilestoneInput = Immutable<{
+  projectId: number
+  name: string
+  startDate: Date | null
+  endDate: Date | null
+  description: string
+}>
 
 const createMilestone = async (input: MilestoneInput): Promise<number> => {
   const created = await BacklogApiRequest.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
