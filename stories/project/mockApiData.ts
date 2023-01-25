@@ -1,5 +1,5 @@
-import { IssueData } from "../../src/content/backlog/Issue"
-import { ProjectInfoWithCustomFields } from "../../src/content/backlog/ProjectInfo"
+import { IssueData } from "../../../src/content/backlog/Issue"
+import { CustomField, Project, ProjectInfoWithCustomFields } from "../../../src/content/backlog/ProjectInfo"
 
 export const projectInfoBT: ProjectInfoWithCustomFields = {
   project: {
@@ -7,20 +7,20 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
     projectKey: "BT",
     name: "board test",
     chartEnabled: true,
-    //    useResolvedForChart: false,
-    //    subtaskingEnabled: false,
-    //    projectLeaderCanEditProjectLeader: false,
-    //    useWiki: true,
-    //    useFileSharing: true,
-    //    useWikiTreeView: true,
-    //    useSubversion: false,
-    //    useGit: false,
-    //    useOriginalImageSizeAtWiki: false,
+    useResolvedForChart: false,
+    subtaskingEnabled: false,
+    projectLeaderCanEditProjectLeader: false,
+    useWiki: true,
+    useFileSharing: true,
+    useWikiTreeView: true,
+    useSubversion: false,
+    useGit: false,
+    useOriginalImageSizeAtWiki: false,
     textFormattingRule: "markdown",
-    //    archived: false,
-    //    displayOrder: 2147483646,
+    archived: false,
+    displayOrder: 2147483646,
     useDevAttributes: true
-  },
+  } as Project,
   issueTypes: [
     {
       id: 389286,
@@ -63,18 +63,18 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
     {
       id: 71491,
       typeId: 3,
-      // version: 1674542544000,
+      version: 1674542544000,
       name: "__PBI_ORDER__389286__",
       description: "",
       required: false,
-      // useIssueType: true,
+      useIssueType: true,
       applicableIssueTypes: [389286],
-      // displayOrder: 2147483646,
-      // min: null,
-      // max: null,
-      initialValue: null
-      //      unit: null
-    }
+      displayOrder: 2147483646,
+      min: null,
+      max: null,
+      initialValue: null,
+      unit: null
+    } as CustomField
   ],
   statuses: [
     { id: 1, projectId: 78386, name: "未対応", color: "#ed8077", displayOrder: 1000 },
@@ -146,7 +146,6 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
   ]
 }
 
-// @ts-ignore
 export const productBacklogBT = [
   {
     id: 20641035,
