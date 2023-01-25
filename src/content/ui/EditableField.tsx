@@ -54,7 +54,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
   type KeyEvent = React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
   const onKeyDown = (e: KeyEvent) => {
     if (!isComposing(e)) {
-      if ((e.ctrlKey || !multiline) && e.key === "Enter") {
+      if ((e.ctrlKey || e.metaKey || !multiline) && e.key === "Enter") {
         submit()
       } else if (e.key === "Escape") {
         if (editor.current) {
@@ -122,8 +122,11 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
   )
 }
 
+// 2023-01-25 "keyCode" is deprecated
+// but since "isComposing" is not exist on Mac chrome,
+// keyCode === 229 condition is necessary
 const isComposing = (e: React.KeyboardEvent): boolean =>
-  (e as React.KeyboardEvent & { isComposing: boolean }).isComposing || false
+  (e as React.KeyboardEvent & { isComposing: boolean }).isComposing || e.keyCode === 229 || false
 
 const inputStyle: React.CSSProperties = {
   padding: 6,

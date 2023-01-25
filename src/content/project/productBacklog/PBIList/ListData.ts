@@ -138,9 +138,9 @@ const indexAfterMove = (action: MoveAction): number => {
 }
 
 const mutateByMoveAction = (data: WritableDraft<PBIListData>, action: MoveAction): PBIListMovedEvent[] => {
-  const updated = NestedList.move(data, action)
+  NestedList.mutateMove(data, action)
   const eventStore = new EventStore()
-  const subList = updated.subLists.find((sl) => sl.id === action.dst.subListId)
+  const subList = data.subLists.find((sl) => sl.id === action.dst.subListId)
   if (subList) {
     const index = indexAfterMove(action)
     const works = makeWorkingArray(subList)

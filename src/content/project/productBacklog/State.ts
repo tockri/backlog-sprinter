@@ -26,6 +26,7 @@ export const productBacklogAtom = atom<Promise<PBIListData>, NLMoveAction, Promi
         const milestoneFilter = milestones.filter(
           (ms) => !ms.archived && ms.startDate && ms.releaseDueDate && Date.parse(ms.releaseDueDate) > today
         )
+        console.log("api searchInIssueTypeAndMilestones")
         const list = await api.issue.searchInIssueTypeAndMilestones(project, setting.pbiIssueTypeId, milestoneFilter)
         return PBIListDataHandler.nestIssues(list, orderCustomField)
       }
@@ -34,22 +35,19 @@ export const productBacklogAtom = atom<Promise<PBIListData>, NLMoveAction, Promi
     }
   },
   async (get, set, moveAction) => {
-    console.log({ moveAction })
-    let events: PBIListMovedEvent[] = []
-    set(pbiListDataStoreAtom, (data) => {
-      data = data || get(productBacklogAtom)
-      return produce(data, (draft) => {
-        events = PBIListDataHandler.mutateByMoveAction(draft, moveAction)
-      })
+    const prev = get(productBacklogAtom)
+    const events: PBIListMovedEvent[] = []
+    const updated = produce(prev, (draft) => {
+      events.push(...PBIListDataHandler.mutateByMoveAction(draft, moveAction))
     })
-    console.log({ events })
     if (events.length) {
       const api = get(backlogApiAtom)
       const orderCustomField = get(orderCustomFieldAtom)
       if (orderCustomField) {
-        await updateIssues(orderCustomField, events, api)
+        await updateIssues(orderCustomField, events, api).then()
       }
     }
+    set(pbiListDataStoreAtom, updated)
   }
 )
 

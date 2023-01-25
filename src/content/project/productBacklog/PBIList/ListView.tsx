@@ -6,7 +6,6 @@ import { PBISubList } from "./SubListView"
 
 export const PBIListView: React.FC = () => {
   const model = usePBIListModel()
-
   return (
     <DragAndDropProvider>
       <Root>
