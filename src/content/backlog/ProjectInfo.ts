@@ -134,7 +134,6 @@ const getProjectInfoWithCustomFields = async (projectKey: string): Promise<Proje
     milestonesP,
     issueTypesP
   ])
-  console.log({ project })
   return {
     project,
     issueTypes,

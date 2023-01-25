@@ -201,7 +201,7 @@ const findIssue = <T extends PBIListData | WritableDraft<PBIListData>>(
 export const PBIListDataHandler = {
   mutateByChangeAction,
   mutateByMoveAction,
-  getIssue: findIssue,
+  findIssue,
   nest,
   nestIssues
 }

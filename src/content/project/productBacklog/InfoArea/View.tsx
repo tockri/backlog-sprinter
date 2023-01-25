@@ -60,7 +60,8 @@ const Float = styled.div({
 
 const Summary = styled.div({
   padding: 4,
-  display: "flex"
+  display: "flex",
+  flexDirection: "column"
 })
 
 const Description = styled.div({

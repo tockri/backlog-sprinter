@@ -81,7 +81,7 @@ export const selectedIssueAtom = atom<IssueData | null, PBIChangeAction, Promise
     const selectedId = get(selectedIssueIdAtom)
     const data = get(productBacklogAtom)
     if (selectedId) {
-      const [item] = PBIListDataHandler.getIssue(data, selectedId)
+      const [item] = PBIListDataHandler.findIssue(data, selectedId)
       return item
     }
     return null
