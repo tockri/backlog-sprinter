@@ -26,7 +26,6 @@ export const productBacklogAtom = atom<Promise<PBIListData>, NLMoveAction, Promi
         const milestoneFilter = milestones.filter(
           (ms) => !ms.archived && ms.startDate && ms.releaseDueDate && Date.parse(ms.releaseDueDate) > today
         )
-        console.log("api searchInIssueTypeAndMilestones")
         const list = await api.issue.searchInIssueTypeAndMilestones(project, setting.pbiIssueTypeId, milestoneFilter)
         return PBIListDataHandler.nestIssues(list, orderCustomField)
       }
