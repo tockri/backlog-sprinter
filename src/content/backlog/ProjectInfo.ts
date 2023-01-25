@@ -1,5 +1,6 @@
-import { BackgroundClient, ParamsType } from "../../background/BackgroundClient"
+import { Immutable } from "immer"
 import { DateUtil } from "../../util/DateUtil"
+import { BacklogApiRequest, ParamsType } from "./BacklogApiRequest"
 
 export type Status = {
   readonly id: number
@@ -19,7 +20,11 @@ export type Version = {
 
 export type Project = {
   readonly id: number
+  readonly projectKey: string
   readonly name: string
+  readonly textFormattingRule: "markdown" | "backlog"
+  readonly chartEnabled: boolean
+  readonly useDevAttributes: boolean
 }
 
 export type ProjectInfoWithMilestones = {
@@ -28,10 +33,10 @@ export type ProjectInfoWithMilestones = {
   readonly statuses: ReadonlyArray<Status>
 }
 
-const getMilestones = async (projectKey: string): Promise<ProjectInfoWithMilestones> => {
-  const project = await BackgroundClient.blgApiGet<Project>(`/api/v2/projects/${projectKey}`)
-  const versionsP = BackgroundClient.blgApiGet<Version[]>(`/api/v2/projects/${projectKey}/versions`)
-  const statusesP = BackgroundClient.blgApiGet<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
+const getProjectInfoWithMilestones = async (projectKey: string): Promise<ProjectInfoWithMilestones> => {
+  const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
+  const versionsP = BacklogApiRequest.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
+  const statusesP = BacklogApiRequest.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
   const [versions, statuses] = await Promise.all([versionsP, statusesP])
   return {
     project,
@@ -61,37 +66,40 @@ export enum CustomFieldTypes {
   Radio = 8
 }
 
-type CustomFieldBase = {
-  readonly id: number
-  readonly typeId: CustomFieldTypes
-  readonly name: string
-  readonly description: string
-  readonly required: boolean
-  readonly applicableIssueTypes: ReadonlyArray<number>
-}
+export type CustomFieldBase = Immutable<{
+  id: number
+  typeId: CustomFieldTypes
+  name: string
+  description: string
+  required: boolean
+  applicableIssueTypes: number[]
+}>
 
 export type CustomTextField = CustomFieldBase
 
-export type CustomNumberField = {
-  readonly min: number
-  readonly max: number
-  readonly initialValue: number | null
-  readonly unit: string
-} & CustomFieldBase
+export type CustomNumberField = CustomFieldBase &
+  Immutable<{
+    min: number
+    max: number
+    initialValue: number | null
+    unit: string
+  }>
 
-export type CustomDateField = {
-  readonly min: string
-  readonly max: string
-  readonly initialValueType: 1 | 2 | 3
-  readonly initialDate: string
-  readonly initialShift: number
-} & CustomFieldBase
+export type CustomDateField = CustomFieldBase &
+  Immutable<{
+    min: string
+    max: string
+    initialValueType: 1 | 2 | 3
+    initialDate: string
+    initialShift: number
+  }>
 
-export type CustomListField = {
-  readonly items: ReadonlyArray<string>
-  readonly allowInput: boolean
-  readonly allowAddItem: boolean
-} & CustomFieldBase
+export type CustomListField = CustomFieldBase &
+  Immutable<{
+    items: string[]
+    allowInput: boolean
+    allowAddItem: boolean
+  }>
 
 export type CustomField = CustomTextField | CustomNumberField | CustomDateField | CustomListField
 
@@ -106,37 +114,43 @@ export const isListField = (cf: CustomField): cf is CustomListField =>
   cf.typeId in
   [CustomFieldTypes.SingleSelect, CustomFieldTypes.MultiSelect, CustomFieldTypes.Radio, CustomFieldTypes.Checkbox]
 
-export type ProjectInfoWithCustomFields = {
-  readonly project: Project
-  readonly issueTypes: ReadonlyArray<IssueType>
-  readonly customFields: ReadonlyArray<CustomField>
-  readonly statuses: ReadonlyArray<Status>
-}
+export type ProjectInfoWithCustomFields = Immutable<{
+  project: Project
+  issueTypes: IssueType[]
+  customFields: CustomField[]
+  milestones: Version[]
+  statuses: Status[]
+}>
 
-const getCustomFields = async (projectKey: string): Promise<ProjectInfoWithCustomFields> => {
-  const project = await BackgroundClient.blgApiGet<Project>(`/api/v2/projects/${projectKey}`)
-  const customFieldsP = BackgroundClient.blgApiGet<ReadonlyArray<CustomField>>(
-    `/api/v2/projects/${projectKey}/customFields`
-  )
-  const statusesP = BackgroundClient.blgApiGet<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
-  const issueTypesP = BackgroundClient.blgApiGet<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
-  const [customFields, statuses, issueTypes] = await Promise.all([customFieldsP, statusesP, issueTypesP])
+const getProjectInfoWithCustomFields = async (projectKey: string): Promise<ProjectInfoWithCustomFields> => {
+  const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
+  const customFieldsP = BacklogApiRequest.get<ReadonlyArray<CustomField>>(`/api/v2/projects/${projectKey}/customFields`)
+  const statusesP = BacklogApiRequest.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
+  const milestonesP = BacklogApiRequest.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
+  const issueTypesP = BacklogApiRequest.get<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
+  const [customFields, statuses, milestones, issueTypes] = await Promise.all([
+    customFieldsP,
+    statusesP,
+    milestonesP,
+    issueTypesP
+  ])
   return {
     project,
     issueTypes,
     customFields,
+    milestones,
     statuses
   }
 }
 
-export type CustomFieldInput = {
+export type CustomFieldInput = Immutable<{
   typeId: CustomFieldTypes
   name: string
-  applicableIssueTypes: ReadonlyArray<number>
+  applicableIssueTypes: number[]
   description: string
   required: boolean
   initialValue?: number
-}
+}>
 
 const createCustomField = async (projectKey: string, input: CustomFieldInput): Promise<CustomField> => {
   const postData: ParamsType = [
@@ -151,19 +165,23 @@ const createCustomField = async (projectKey: string, input: CustomFieldInput): P
     .concat(
       input.initialValue !== undefined ? [{ initialValue: `${input.initialValue}` } as Record<string, string>] : []
     )
-  return await BackgroundClient.blgApiPost<CustomField>(`/api/v2/projects/${projectKey}/customFields`, postData)
+  return await BacklogApiRequest.post<CustomField>(`/api/v2/projects/${projectKey}/customFields`, postData)
 }
 
-export type MilestoneInput = {
-  readonly projectId: number
-  readonly name: string
-  readonly startDate: Date | null
-  readonly endDate: Date | null
-  readonly description: string
+const deleteCustomField = async (projectKey: string, customFieldId: number): Promise<CustomField> => {
+  return await BacklogApiRequest.delete<CustomField>(`/api/v2/projects/${projectKey}/customFields/${customFieldId}`)
 }
+
+export type MilestoneInput = Immutable<{
+  projectId: number
+  name: string
+  startDate: Date | null
+  endDate: Date | null
+  description: string
+}>
 
 const createMilestone = async (input: MilestoneInput): Promise<number> => {
-  const created = await BackgroundClient.blgApiPost<Version>(`/api/v2/projects/${input.projectId}/versions`, {
+  const created = await BacklogApiRequest.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
     name: input.name,
     startDate: DateUtil.dateString(input.startDate),
     releaseDueDate: DateUtil.dateString(input.endDate),
@@ -173,16 +191,21 @@ const createMilestone = async (input: MilestoneInput): Promise<number> => {
 }
 
 const archiveMilestone = async (projectId: number, milestone: Version) => {
-  await BackgroundClient.blgApiPatch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
+  await BacklogApiRequest.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
     name: milestone.name,
     archived: "true"
   })
 }
 
-export const ProjectInfo = {
-  getMilestones,
-  getCustomFields,
+const ProjectInfo = {
+  getProjectInfoWithMilestones,
+  getProjectInfoWithCustomFields,
   createCustomField,
+  deleteCustomField,
   createMilestone,
   archiveMilestone
 }
+
+export type ProjectInfoApi = typeof ProjectInfo
+
+export const RealProjectInfo = ProjectInfo

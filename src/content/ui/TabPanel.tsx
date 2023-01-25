@@ -13,37 +13,6 @@ export type TabPanelProps = {
   readonly onTabClicked?: (tab: number) => void
 }
 
-const Panel = styled.div({
-  display: "flex",
-  width: "100%",
-  height: "100%"
-})
-
-const TabBar = styled.nav({
-  display: "flex",
-  flexDirection: "column",
-  width: "20em",
-  backgroundColor: "#f0f0f0",
-  margin: 0,
-  padding: 0
-})
-
-const Tab = styled.button({
-  padding: "1em 2em",
-  marginBottom: 1,
-  border: "0 none",
-  backgroundColor: "transparent",
-  "&.selected": {
-    backgroundColor: "white"
-  }
-})
-
-const Body = styled.div({
-  flexGrow: 1,
-  padding: 24,
-  overflow: "auto"
-})
-
 export const TabPanel: React.FC<TabPanelProps> = (props) => {
   const { tabs, initialIndex, selectedIndex, onTabClicked } = props
   const [stateIndex, select] = React.useState<number>(initialIndex || 0)
@@ -65,3 +34,34 @@ export const TabPanel: React.FC<TabPanelProps> = (props) => {
     </Panel>
   )
 }
+
+const Panel = styled.div({
+  display: "flex",
+  width: "100%",
+  height: "100%"
+})
+
+const TabBar = styled.nav({
+  display: "flex",
+  flexDirection: "column",
+  minWidth: 100,
+  backgroundColor: "#f0f0f0",
+  margin: 0,
+  padding: 0
+})
+
+const Tab = styled.button({
+  padding: "1em 2em",
+  whiteSpace: "pre",
+  marginBottom: 1,
+  border: "0 none",
+  backgroundColor: "transparent",
+  "&.selected": {
+    backgroundColor: "white"
+  }
+})
+
+const Body = styled.div({
+  flexGrow: 1,
+  position: "relative"
+})

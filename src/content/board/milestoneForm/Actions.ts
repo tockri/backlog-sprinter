@@ -1,5 +1,6 @@
-import { Issue, IssueData } from "../../backlog/Issue"
-import { MilestoneInput, ProjectInfo, ProjectInfoWithMilestones } from "../../backlog/ProjectInfo"
+import { BacklogApi } from "../../backlog/BacklogApiForReact"
+import { IssueData } from "../../backlog/Issue"
+import { MilestoneInput, ProjectInfoWithMilestones } from "../../backlog/ProjectInfo"
 import { ViewState } from "./Reducers"
 
 type SubmitResult = {
@@ -8,6 +9,7 @@ type SubmitResult = {
 }
 
 const submitForm = async (
+  api: BacklogApi,
   state: ViewState,
   projectInfo: ProjectInfoWithMilestones,
   callback?: (issue: IssueData) => void
@@ -20,15 +22,15 @@ const submitForm = async (
     description: ""
   }
   try {
-    const createdMilestoneId = await ProjectInfo.createMilestone(milestoneInput)
+    const createdMilestoneId = await api.projectInfo.createMilestone(milestoneInput)
     if (state.selectedMilestone) {
       if (state.moveUnclosed) {
-        const unclosed = await Issue.searchUnclosedInMilestone(
+        const unclosed = await api.issue.searchUnclosedInMilestone(
           projectInfo.project,
           projectInfo.statuses,
           state.selectedMilestone.id
         )
-        await Issue.bulkChangeMilestone(
+        await api.issue.bulkChangeMilestone(
           unclosed.map((i) => i.id),
           createdMilestoneId,
           (id) => {
@@ -40,7 +42,7 @@ const submitForm = async (
         )
       }
       if (state.archiveCurrent) {
-        await ProjectInfo.archiveMilestone(projectInfo.project.id, state.selectedMilestone)
+        await api.projectInfo.archiveMilestone(projectInfo.project.id, state.selectedMilestone)
       }
     }
     return {

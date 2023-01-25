@@ -17,7 +17,7 @@ const parseDate = (str: string | null): Date | null => {
     if (str.match(/\d{4}-\d{2}-\d{2}/)) {
       return new Date(`${str} 00:00:00`)
     } else {
-      console.log(`not a date string: ${str}`)
+      console.warn(`not a date string: ${str}`)
     }
   }
   return null

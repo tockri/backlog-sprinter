@@ -1,4 +1,6 @@
-export type BacklogOAuthConfig = {
+import { BacklogOAuthKeys } from "./backlog-api-keys"
+
+type BacklogOAuthConfig = {
   readonly hostname: string
   readonly clientId: string
   readonly clientSecret: string
@@ -43,7 +45,7 @@ type TokenResponse = {
   readonly refresh_token: string
 }
 
-export type TokenInfo = {
+type TokenInfo = {
   readonly accessToken: string
   readonly refreshToken: string
 }
@@ -73,11 +75,7 @@ const requestToken = async (config: BacklogOAuthConfig, code: string): Promise<T
 
 const issueAccessToken = async (config: BacklogOAuthConfig): Promise<TokenInfo> => {
   const code = await requestAccessCode(config, "" + Math.floor(Math.random() * 100000))
-  console.log({ code })
-
-  const authInfo = await requestToken(config, code)
-  console.log({ authInfo })
-  return authInfo
+  return await requestToken(config, code)
 }
 
 const refreshAccessToken = async (config: BacklogOAuthConfig, refreshToken: string): Promise<TokenInfo> => {
@@ -102,7 +100,48 @@ const refreshAccessToken = async (config: BacklogOAuthConfig, refreshToken: stri
   }
 }
 
+const accessTokenStorageKey = (hostname: string) => `access-token-${hostname}`
+
+const backlogOAuth2Config = (hostname: string): BacklogOAuthConfig => ({
+  ...BacklogOAuthKeys,
+  hostname,
+  redirectUri: chrome.identity.getRedirectURL("backlog-api")
+})
+
+const runGetAccessTokenFlow = async (hostname: string, renew?: boolean): Promise<string> => {
+  const strKey = accessTokenStorageKey(hostname)
+  if (renew) {
+    await chrome.storage.local.remove(strKey)
+  }
+  const stored = (await chrome.storage.local.get(strKey))[strKey] as TokenInfo | undefined
+  if (stored?.accessToken) {
+    return stored.accessToken
+  } else {
+    const issued = await issueAccessToken(backlogOAuth2Config(hostname))
+    if (issued.accessToken) {
+      await chrome.storage.local.set({ [strKey]: issued })
+      return issued.accessToken
+    }
+  }
+  throw new Error(`failed to get access token`)
+}
+
+const runRenewAccessTokenFlow = async (hostname: string): Promise<string> => {
+  const strKey = accessTokenStorageKey(hostname)
+  const stored = (await chrome.storage.local.get(strKey))[strKey] as TokenInfo | undefined
+  if (!stored) {
+    throw new Error(`storage data ${strKey} not found.`)
+  } else {
+    const refreshed = await refreshAccessToken(backlogOAuth2Config(hostname), stored.refreshToken)
+    if (refreshed.accessToken) {
+      await chrome.storage.local.set({ [strKey]: refreshed })
+      return refreshed.accessToken
+    }
+  }
+  throw new Error(`failed to refresh access token`)
+}
+
 export const BacklogOAuth = {
-  issueAccessToken,
-  refreshAccessToken
+  runGetAccessTokenFlow,
+  runRenewAccessTokenFlow
 } as const

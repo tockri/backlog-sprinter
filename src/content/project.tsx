@@ -1,12 +1,12 @@
 import React from "react"
 import { createRoot } from "react-dom/client"
-import { RecoilRoot } from "recoil"
 import { MessageBroker } from "../util/MessageBroker"
+import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
 import { ProjectApp } from "./project/app/View"
-import { i18n, PBFormInfo, UserLang } from "./project/types"
+import { i18n, ProjectFormInfo, UserLang } from "./project/types"
 import { jsxToElement } from "./ui/JSXUtil"
 
-const broker = new MessageBroker<PBFormInfo>()
+const broker = new MessageBroker<ProjectFormInfo>()
 
 const getButtonPlace = () => document.querySelector(".project-header__summary")
 
@@ -14,7 +14,7 @@ const getUserLang = (): UserLang => (document.documentElement.lang === "ja" ? "j
 
 const getProjectKey = (): string => {
   const path = location.pathname
-  const m = path.match(/^[/](?:projects|add|find|board|gantt|wiki|file|git|view)[/]([A-Z_]+)/)
+  const m = path.match(/^[/](?:projects|add|find|board|gantt|wiki|file|git|view)[/]([A-Z_0-9]+)/)
   if (m) {
     return m[1]
   } else {
@@ -26,17 +26,11 @@ const renderApp = () => {
   if (!document.querySelector(".bsp-project-root")) {
     const rootElem = jsxToElement(<div className="bsp-project-root" />)
     document.body.append(rootElem)
-    // ReactDOM.render(
-    //   <RecoilRoot>
-    //     <ProjectApp broker={broker} />
-    //   </RecoilRoot>,
-    //   rootElem
-    // )
     const reactRoot = createRoot(rootElem)
     reactRoot.render(
-      <RecoilRoot>
+      <BacklogApiContext.Provider value={RealBacklogApi}>
         <ProjectApp broker={broker} />
-      </RecoilRoot>
+      </BacklogApiContext.Provider>
     )
   }
 }
@@ -52,7 +46,7 @@ const makePortalButton = () => {
     const buttonWrapper = jsxToElement(
       <div className="bsp-project-button-wrapper">
         <button type="button" className="icon-button icon-button--default -with-text bsp-project-button">
-          <img src={iconUrl} className="icon -large" />
+          <img alt="" src={iconUrl} className="icon -large" />
           <span className="_assistive-text">{t.buttonLabel}</span>
         </button>
       </div>

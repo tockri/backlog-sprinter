@@ -10,7 +10,7 @@ module.exports = {
   entry: {
     board: path.join(srcDir, "content/board.tsx"),
     project: path.join(srcDir, "content/project.tsx"),
-    background: path.join(srcDir, "background/index.ts")
+    background: path.join(srcDir, "background/worker.ts")
   },
   output: {
     path: dstDir,
@@ -36,7 +36,7 @@ module.exports = {
       extensions: ["ts", "tsx"]
     })
   ],
-  devtool: process.env.NODE_ENV === "development" ? "inline-source-map" : false,
+  devtool: process.env.NODE_ENV === "development" ? "#inline-source-map" : false,
   watchOptions: {
     ignored: /node_modules/
   }

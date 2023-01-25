@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "private": true,
   "scripts": {
-    "build": "NODE_ENV=production webpack; cd dist; zip ../backlog-sprinter.zip -r *; yarn secret",
+    "build": "rm -rf build; mkdir -p build/code; NODE_ENV=production DST_DIR=$PWD/build/code webpack; cd build/code; zip ../backlog-sprinter.zip -r *; yarn secret",
     "once": "webpack",
     "watch": "webpack --watch",
     "wsl": "DST_DIR=$(echo $PATH | grep -o '/mnt/c/Users/[a-zA-Z]*' | head -n 1)/dev/bnn/backlog-sprinter/dist yarn watch",
@@ -52,12 +52,13 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "immutability-helper": "^3.1.1",
+    "immer": "^9.0.18",
+    "jotai": "^1.13.1",
+    "jotai-immer": "^0.1.0",
     "react": "^18.2.0",
-    "react-dnd": "^16.0.1",
-    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
-    "recoil": "^0.7.6",
+    "react-markdown": "^8.0.5",
+    "remark-gfm": "^3.0.1",
     "typescript": "^4.9.3"
   },
   "devDependencies": {

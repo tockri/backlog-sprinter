@@ -5,8 +5,8 @@
     "target": "es6",
     "esModuleInterop": true,
     "sourceMap": true,
-    "rootDir": "src",
-    "outDir": "dist",
+    "rootDirs": ["src", "stories"],
+    "outDir": "dist/out",
     "noEmitOnError": true,
     "jsx": "react",
     "typeRoots": ["node_modules/@types"]

@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import React, { useEffect } from "react"
 import { DateUtil } from "../../../util/DateUtil"
+import { BacklogApiContext } from "../../backlog/BacklogApiForReact"
 import { ProjectInfoWithMilestones } from "../../backlog/ProjectInfo"
 import { i18n } from "../i18n"
 import { MilestoneFormInfo } from "../types"
@@ -26,6 +27,7 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
   })
 
   const t = i18n(formInfo.lang)
+  const api = React.useContext(BacklogApiContext)
 
   const toSave = StorageSystem.extract(state)
   useEffect(() => {
@@ -38,7 +40,7 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
         dispatch({ src: "submit", submitting, submitErrorMessage, submittingMessage })
       }
       submitting(true, null, null)
-      const result = await Actions.submitForm(state, projectInfo, (issue) => {
+      const result = await Actions.submitForm(api, state, projectInfo, (issue) => {
         submitting(true, null, `${t.updating}${issue.issueKey} ${issue.summary}`)
       })
       if (result.errorMessage) {

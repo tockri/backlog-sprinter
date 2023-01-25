@@ -1,15 +1,17 @@
+import styled from "@emotion/styled"
 import React from "react"
-import { useProjectSettingsViewModel } from "./ViewModel"
+import { i18n } from "./i18n"
+import { useSettingModel } from "./Model"
 
 export const ProjectSettings: React.FC = () => {
-  const vm = useProjectSettingsViewModel()
-  const settings = vm.settings
+  const vm = useSettingModel()
+  const t = i18n(vm.lang)
   const id = (key: string) => `project.settingsForm.${key}`
   return (
-    <div>
+    <Root>
       <div className="form-element__item">
         <label className="form-element__label" htmlFor={id("issueType")}>
-          プロダクトバックログを表す課題種別
+          {t.issueTypeLabel}
         </label>
         <select
           id={id("issueType")}
@@ -20,7 +22,7 @@ export const ProjectSettings: React.FC = () => {
               vm.selectIssueType(issueType.id)
             }
           }}
-          value={settings.pbiIssueTypeId || ""}
+          value={vm.pbiIssueTypeId || ""}
         >
           <option value=""></option>
           {vm.issueTypes.map((it) => (
@@ -32,21 +34,37 @@ export const ProjectSettings: React.FC = () => {
       </div>
       <div className="form-element__item">
         <label className="form-element__label" htmlFor={id("customField")}>
-          プロダクトバックログの順序
+          {t.customFieldTitle}
         </label>
-        {settings.pbiIssueTypeId ? (
+        {vm.pbiIssueTypeId ? (
           vm.orderCustomField ? (
-            <div>カスタム属性「{vm.orderCustomField.name}」に格納します。</div>
+            <div>
+              {t.storeOrderOn(vm.orderCustomField.name)}
+              <button
+                onClick={() => {
+                  if (window.confirm(t.confirmDelete)) {
+                    vm.deleteCustomField()
+                  }
+                }}
+              >
+                {t.deleteLabel}
+              </button>
+            </div>
           ) : (
             <div>
-              カスタム属性が作られていません。
-              <button onClick={() => vm.createCustomField()}>作る</button>
+              {t.customFieldNotExist}
+              <button onClick={() => vm.createCustomField()}>{t.createLabel}</button>
+              <div>{vm.errorMessageOnCustomField}</div>
             </div>
           )
         ) : (
-          <div>まず課題種別を決めてください</div>
+          <div>{t.setIssueType}</div>
         )}
       </div>
-    </div>
+    </Root>
   )
 }
+
+const Root = styled.div({
+  padding: 12
+})

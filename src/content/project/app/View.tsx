@@ -1,57 +1,63 @@
+import { Provider } from "jotai"
 import React from "react"
 import { MessageBroker } from "../../../util/MessageBroker"
+import { Loading } from "../../ui/Loading"
 import { Modal } from "../../ui/Modal"
 import { TabPanel } from "../../ui/TabPanel"
-import { i18n } from "../common/i18n"
-import { useProjectAppViewModel } from "./ViewModel"
-
-import { ProjectProductBacklog } from "../productBacklog/View"
+import { ProductBacklogView } from "../productBacklog/View"
 import { ProjectSettings } from "../settings/View"
-import { PBFormInfo } from "../types"
+import { ProjectFormInfo } from "../types"
+import { i18n } from "./i18n"
+import { useAppModel, useInnerModel } from "./Model"
 
 type ProjectAppProps = {
-  broker: MessageBroker<PBFormInfo>
+  broker: MessageBroker<ProjectFormInfo>
 }
 
-export const ProjectApp: React.FC<ProjectAppProps> = (props) => {
-  const { broker } = props
-  const vm = useProjectAppViewModel()
-  React.useEffect(() => {
-    if (!vm.isReady) {
-      broker.subscribe("Project", (formInfo) => {
-        vm.start(formInfo)
-      })
-    }
-    return () => {
-      broker.unsubscribe("Project")
-    }
-  }, [vm, broker])
-
-  if (vm.isReady) {
-    const t = i18n(vm.lang)
+export const ProjectApp: React.FC<ProjectAppProps> = ({ broker }) => {
+  const model = useAppModel(broker)
+  const formInfo = model.formInfo
+  if (formInfo) {
+    const t = i18n(formInfo.lang)
     return (
-      <Modal onClose={vm.clear} size="large" title={t.formTitle} height="calc(100vh - 200px)">
-        <TabPanel
-          tabs={[
-            {
-              label: "プロダクトバックログ",
-              component: () => <ProjectProductBacklog />
-            },
-            // {
-            //   label: "ベロシティ",
-            //   component: () => <DndTestView />
-            // },
-            {
-              label: "設定",
-              component: () => <ProjectSettings />
-            }
-          ]}
-          selectedIndex={vm.selectedTab}
-          onTabClicked={vm.selectTab}
-        />
+      <Modal onClose={model.clear} size="large" title={t.formTitle} height="calc(100vh - 200px)">
+        <Provider initialValues={model.providerInitialValues}>
+          <React.Suspense fallback={<Loading />}>
+            <Inner />
+          </React.Suspense>
+        </Provider>
       </Modal>
     )
   } else {
     return <></>
   }
+}
+
+const Inner: React.FC = () => {
+  const model = useInnerModel()
+  const t = i18n(model.lang)
+  return (
+    <TabPanel
+      tabs={[
+        {
+          label: t.productBacklog,
+          component: () => (
+            <React.Suspense fallback={<Loading />}>
+              <ProductBacklogView />
+            </React.Suspense>
+          )
+        },
+        // {
+        //   label: "ベロシティ",
+        //   component: () => <DndTestView />
+        // },
+        {
+          label: t.setting,
+          component: () => <ProjectSettings />
+        }
+      ]}
+      selectedIndex={model.selectedTab}
+      onTabClicked={model.setSelectedTab}
+    />
+  )
 }

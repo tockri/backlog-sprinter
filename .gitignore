@@ -3,3 +3,5 @@
 /dist
 /backlog-sprinter.zip
 /public/manifest.json
+/.idea
+/build

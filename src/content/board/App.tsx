@@ -1,7 +1,8 @@
 import React, { useEffect } from "react"
-import { ProjectInfo, ProjectInfoWithMilestones } from "../backlog/ProjectInfo"
+import { ProjectInfoWithMilestones } from "../backlog/ProjectInfo"
 
 import { MessageBroker } from "../../util/MessageBroker"
+import { BacklogApiContext } from "../backlog/BacklogApiForReact"
 import { Modal } from "../ui/Modal"
 import { i18n, UserLang as i18nLang } from "./i18n"
 import { MilestoneForm } from "./milestoneForm/Form"
@@ -28,10 +29,11 @@ type State = {
 export const BoardApp: React.FC<BoardProps> = (props) => {
   const { broker } = props
   const [state, setState] = React.useState<State>({ formInfo: null, projectInfo: null })
+  const api = React.useContext(BacklogApiContext)
   useEffect(() => {
     broker.subscribe("Board", async (formInfo) => {
       if (!state.projectInfo) {
-        const projectInfo = await ProjectInfo.getMilestones(formInfo.projectKey)
+        const projectInfo = await api.projectInfo.getProjectInfoWithMilestones(formInfo.projectKey)
         setState({
           formInfo,
           projectInfo
@@ -43,7 +45,7 @@ export const BoardApp: React.FC<BoardProps> = (props) => {
     return () => {
       broker.unsubscribe("Board")
     }
-  }, [broker, state.projectInfo])
+  }, [broker, state.projectInfo, api])
 
   if (state.formInfo && state.projectInfo) {
     const t = i18n(state.formInfo.lang)
