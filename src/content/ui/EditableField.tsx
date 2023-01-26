@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { cnu } from "./cnu"
 
 export type EditableFieldProps = {
   readonly placeholder?: string
@@ -33,7 +34,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
     }
   }
 
-  const onClick: React.MouseEventHandler<HTMLElement> = (e) => {
+  const onFocus: React.FocusEventHandler<HTMLElement> = (e) => {
     if (!disabled) {
       const targetElem = e.target as HTMLElement
       if (targetElem.tagName !== "A") {
@@ -41,6 +42,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
       }
     }
   }
+
   const onBlur: React.FocusEventHandler<HTMLTextAreaElement | HTMLInputElement> = () => {
     switch (props.blurAction) {
       case "submit":
@@ -83,7 +85,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
     <>
       {editing ? (
         multiline ? (
-          <TextArea
+          <TextAreaBase
             ref={editor}
             style={props.editStyle}
             placeholder={placeholder}
@@ -103,7 +105,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
           />
         )
       ) : (
-        <Viewer className={disabled ? "disabled" : ""} style={props.viewStyle} onClick={onClick}>
+        <Viewer tabIndex={0} className={cnu({ disabled })} style={props.viewStyle} onFocus={onFocus}>
           {defaultValue ? (
             markdown ? (
               <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget={"_blank"}>
@@ -125,7 +127,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
 
 // 2023-01-25 "keyCode" is deprecated
 // but since "isComposing" is not exist on Mac chrome,
-// keyCode === 229 condition is necessary
+// (keyCode === 229) is the only way to know composing status.
 const isComposing = (e: React.KeyboardEvent): boolean =>
   (e as React.KeyboardEvent & { isComposing: boolean }).isComposing || e.keyCode === 229 || false
 
@@ -139,7 +141,7 @@ const TextInput = styled.input({
   ...inputStyle
 })
 
-const TextArea = styled.textarea({
+const TextAreaBase = styled.textarea({
   ...inputStyle,
   minHeight: "3em"
 })

@@ -84,6 +84,7 @@ const changeMilestoneAndCustomFieldValue = async (
 export type IssueChangeInput = {
   summary?: string
   description?: string
+  estimatedHours?: number
 }
 
 const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<IssueData> => {
