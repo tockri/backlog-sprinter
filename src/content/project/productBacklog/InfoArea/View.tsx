@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { EditableField } from "../../../ui/EditableField"
+import { Estimated } from "../Estimated"
 import { useInfoAreaModel } from "./Model"
 
 export const InfoAreaView: React.FC = () => {
@@ -10,16 +11,21 @@ export const InfoAreaView: React.FC = () => {
     return (
       <Area>
         <Float>
-          <Summary>
-            <EditableField
-              defaultValue={issue.summary}
-              onFix={(value) => model.changeIssue("summary", value)}
-              blurAction="cancel"
-              editStyle={{
-                flexGrow: 1
-              }}
-            />
-          </Summary>
+          <Head>
+            <Summary>
+              <EditableField
+                defaultValue={issue.summary}
+                onFix={(value) => model.changeIssue("summary", value)}
+                blurAction="cancel"
+                editStyle={{
+                  flexGrow: 1
+                }}
+              />
+            </Summary>
+            <SummarySide>
+              <Estimated issue={issue} variant="edit" />
+            </SummarySide>
+          </Head>
           <Description>
             <EditableField
               defaultValue={issue.description}
@@ -46,7 +52,7 @@ export const InfoAreaView: React.FC = () => {
 }
 
 const Area = styled.div({
-  width: "50%"
+  width: "75%"
 })
 
 const Float = styled.div({
@@ -58,10 +64,21 @@ const Float = styled.div({
   flexDirection: "column"
 })
 
+const Head = styled.div({
+  display: "flex"
+})
+
 const Summary = styled.div({
   padding: 4,
+  flexGrow: 1,
   display: "flex",
   flexDirection: "column"
+})
+
+const SummarySide = styled.div({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
 })
 
 const Description = styled.div({

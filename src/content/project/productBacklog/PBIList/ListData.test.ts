@@ -9,6 +9,7 @@ import { IssueDataWithOrder, PBIListData, PBIListDataHandler, PBIListMovedEvent 
 const fakeVersion = (id: number): Version => ({
   id,
   name: `MS ${id}`,
+  projectId: 1,
   description: "",
   startDate: `2023-01-${id} 00:00:00Z`,
   releaseDueDate: `2023-01-${id + 10} 00:00:00Z`,
@@ -24,7 +25,7 @@ const fakeIssue = (id: number, versionId: number | null, order: number | null): 
   issueKey: `FAKE-${id}`,
   summary: `Issue ${id}`,
   description: "",
-  status: { id: 1, name: "Open", color: "#ff0000" },
+  status: { id: 1, projectId: 1, name: "Open", color: "#ff0000", displayOrder: 10 },
   milestone: versionId ? [versions[versionId]] : [],
   customFields: [],
   estimatedHours: null,

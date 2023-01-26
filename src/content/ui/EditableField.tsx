@@ -14,11 +14,12 @@ export type EditableFieldProps = {
   readonly viewStyle?: React.CSSProperties
   readonly onFix?: (value: string) => void
   readonly onCancel?: () => void
+  readonly defaultEditing?: boolean
 }
 
 export const EditableField: React.FC<EditableFieldProps> = (props) => {
-  const { onFix, multiline, markdown, disabled, placeholder, defaultValue } = props
-  const [editing, setEditing] = React.useState(false)
+  const { onFix, multiline, markdown, disabled, placeholder, defaultValue, defaultEditing } = props
+  const [editing, setEditing] = React.useState(defaultEditing)
   const editor = React.useRef<(HTMLInputElement & HTMLTextAreaElement) | null>(null)
   const endEdit = () => {
     editor.current = null

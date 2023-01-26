@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import React from "react"
 import { cnu } from "../../../ui/cnu"
 import { Draggable } from "../../../ui/DragAndDrop"
+import { Estimated } from "../Estimated"
 import { usePBIItemModel } from "./ItemModel"
 import { IssueDataWithOrder } from "./ListData"
 
@@ -46,7 +47,7 @@ export const PBIItemView: React.FC<PBIItemViewProps> = (props) => {
           </CellHeader>
           <Summary>{issue.summary}</Summary>
         </Body>
-        <Side>{issue.estimatedHours && <Estimated>{issue.estimatedHours}</Estimated>}</Side>
+        <Side>{issue.estimatedHours && <Estimated issue={issue} />}</Side>
       </Cell>
     </Draggable>
   )
@@ -74,7 +75,9 @@ const Body = styled.div({
 })
 
 const Side = styled.div({
-  flexShrink: 1
+  flexShrink: 1,
+  display: "flex",
+  alignItems: "center"
 })
 
 const CellHeader = styled.div({ display: "flex" })
@@ -100,14 +103,3 @@ const StatusIcon = styled.div({
 })
 
 const Summary = styled.div({ overflow: "hidden" })
-
-const Estimated = styled.div({
-  width: 30,
-  height: 30,
-  borderRadius: 15,
-  backgroundColor: "#c0c0c0",
-  color: "white",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center"
-})

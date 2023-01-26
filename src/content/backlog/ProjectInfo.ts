@@ -2,36 +2,39 @@ import { Immutable } from "immer"
 import { DateUtil } from "../../util/DateUtil"
 import { BacklogApiRequest, ParamsType } from "./BacklogApiRequest"
 
-export type Status = {
-  readonly id: number
-  readonly name: string
-  readonly color: string
-}
+export type Status = Immutable<{
+  id: number
+  projectId: number
+  name: string
+  color: string
+  displayOrder: number
+}>
 
-export type Version = {
-  readonly id: number
-  readonly name: string
-  readonly description: string | null
-  readonly startDate: string | null
-  readonly releaseDueDate: string | null
-  readonly archived: boolean
-  readonly displayOrder: number
-}
+export type Version = Immutable<{
+  id: number
+  projectId: number
+  name: string
+  description: string | null
+  releaseDueDate: string | null
+  archived: boolean
+  displayOrder: number
+  startDate: string | null
+}>
 
-export type Project = {
-  readonly id: number
-  readonly projectKey: string
-  readonly name: string
-  readonly textFormattingRule: "markdown" | "backlog"
-  readonly chartEnabled: boolean
-  readonly useDevAttributes: boolean
-}
+export type Project = Immutable<{
+  id: number
+  projectKey: string
+  name: string
+  textFormattingRule: "markdown" | "backlog"
+  chartEnabled: boolean
+  useDevAttributes: boolean
+}>
 
-export type ProjectInfoWithMilestones = {
-  readonly project: Project
-  readonly versions: ReadonlyArray<Version>
-  readonly statuses: ReadonlyArray<Status>
-}
+export type ProjectInfoWithMilestones = Immutable<{
+  project: Project
+  versions: ReadonlyArray<Version>
+  statuses: ReadonlyArray<Status>
+}>
 
 const getProjectInfoWithMilestones = async (projectKey: string): Promise<ProjectInfoWithMilestones> => {
   const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
@@ -45,15 +48,15 @@ const getProjectInfoWithMilestones = async (projectKey: string): Promise<Project
   }
 }
 
-export type IssueType = {
+export type IssueType = Immutable<{
   id: number
   projectId: number
   name: string
   color: string
   displayOrder: number
-  templateSummary: string
-  templateDescription: string
-}
+  templateSummary: string | null
+  templateDescription: string | null
+}>
 
 export enum CustomFieldTypes {
   Text = 1,
