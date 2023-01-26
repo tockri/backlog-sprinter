@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
+import { cnu } from "../../../ui/cnu"
 import { Droppable } from "../../../ui/DragAndDrop"
 import { PBIItemView } from "./ItemView"
 import { PBIListData } from "./ListData"
@@ -49,7 +50,7 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
             canDrop={canDropOn(index, subList.id)}
             hoverStateChanged={(h) => model.setHovered(index, h)}
           >
-            <DropArea className={model.isHovered(index) ? "hover" : ""}>
+            <DropArea className={cnu({ hover: model.isHovered(index) })}>
               <PBIItemView issue={issue} key={index} index={index} subListId={subList.id} />
             </DropArea>
           </Droppable>
@@ -59,7 +60,7 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
           canDrop={canDropOn(lastIdx, subList.id)}
           hoverStateChanged={(h) => model.setHovered(lastIdx, h)}
         >
-          <DropArea className={model.isHovered(lastIdx) ? "hover empty" : "empty"} />
+          <DropArea className={cnu("empty", { hover: model.isHovered(lastIdx) })} />
         </Droppable>
       </SLBody>
     </SL>

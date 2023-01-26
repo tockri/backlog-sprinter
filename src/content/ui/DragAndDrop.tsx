@@ -1,4 +1,3 @@
-import styled from "@emotion/styled"
 import React, { PropsWithChildren } from "react"
 import { ObjectUtil } from "../../util/ObjectUtil"
 
@@ -96,38 +95,33 @@ export const Droppable = <T,>(props: DropPointProps<T>): React.ReactElement => {
 
 type DraggableProps<T> = PropsWithChildren & {
   readonly item: T
-  readonly onDragEnd: (dropped: T) => void
+  readonly onDragEnd: (dropped: T | null) => void
+  readonly onDragStart?: () => void
 }
 
 export const Draggable = <T,>(props: DraggableProps<T>): React.ReactElement => {
-  const { item, onDragEnd } = props
+  const { item, onDragEnd, onDragStart } = props
   const context = React.useContext<DragContext<T>>(dragContext)
   return (
-    <DraggableView
+    <div
       draggable={true}
       onDragStart={(e) => {
         e.dataTransfer.dropEffect = "move"
         context.setDragging(item)
+        onDragStart && onDragStart()
       }}
       onDragEnd={() => {
         const hp = context.getHoverring()
         if (hp) {
-          onDragEnd(hp)
           context.setDragging(null)
           context.setHoverring(null)
           context.executeEndFunc()
           context.setEndFunc(null)
         }
+        onDragEnd(hp)
       }}
     >
       {props.children}
-    </DraggableView>
+    </div>
   )
 }
-
-const DraggableView = styled.div({
-  // cursor: "default",
-  // ":active *": {
-  //   cursor: "move"
-  // }
-})

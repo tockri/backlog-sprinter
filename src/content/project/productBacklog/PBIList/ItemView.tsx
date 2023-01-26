@@ -1,5 +1,6 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { cnu } from "../../../ui/cnu"
 import { Draggable } from "../../../ui/DragAndDrop"
 import { usePBIItemModel } from "./ItemModel"
 import { IssueDataWithOrder } from "./ListData"
@@ -14,27 +15,38 @@ export const PBIItemView: React.FC<PBIItemViewProps> = (props) => {
   const { issue, subListId, index } = props
   const model = usePBIItemModel()
   const item = { subListId, index }
+  const [dragging, setDragging] = React.useState(false)
 
   return (
     <Draggable
       item={item}
       onDragEnd={(where) => {
-        model.move({ src: item, dst: where })
+        if (where) {
+          model.move({ src: item, dst: where })
+        }
+        setDragging(false)
       }}
+      onDragStart={() => setDragging(true)}
     >
-      <Cell onClick={() => model.selectItem(issue.id)} className={model.isSelected(issue.id) ? "selected" : ""}>
-        <CellHeader>
-          <IssueKey>
-            <a href={`/view/${issue.issueKey}`} target="_blank" rel="noreferrer">
-              {issue.issueKey}
-            </a>
-          </IssueKey>
-          <StatusView>
-            <StatusIcon style={{ backgroundColor: issue.status.color }} />
-            {issue.status.name}
-          </StatusView>
-        </CellHeader>
-        <Summary>{issue.summary}</Summary>
+      <Cell
+        onClick={() => model.selectItem(issue.id)}
+        className={cnu({ selected: model.isSelected(issue.id), dragging: dragging })}
+      >
+        <Body>
+          <CellHeader>
+            <IssueKey>
+              <a href={`/view/${issue.issueKey}`} target="_blank" rel="noreferrer">
+                {issue.issueKey}
+              </a>
+            </IssueKey>
+            <StatusView>
+              <StatusIcon style={{ backgroundColor: issue.status.color }} />
+              {issue.status.name}
+            </StatusView>
+          </CellHeader>
+          <Summary>{issue.summary}</Summary>
+        </Body>
+        <Side>{issue.estimatedHours && <Estimated>{issue.estimatedHours}</Estimated>}</Side>
       </Cell>
     </Draggable>
   )
@@ -47,9 +59,22 @@ const Cell = styled.div({
   color: "#404040",
   margin: "4px 0",
   backgroundColor: "#ffffff",
+  display: "flex",
   "&.selected": {
     border: "2px solid #e0c0c0"
+  },
+  "&.dragging": {
+    opacity: 0.5,
+    backgroundColor: "#ffeedd"
   }
+})
+
+const Body = styled.div({
+  flexGrow: 1
+})
+
+const Side = styled.div({
+  flexShrink: 1
 })
 
 const CellHeader = styled.div({ display: "flex" })
@@ -75,3 +100,14 @@ const StatusIcon = styled.div({
 })
 
 const Summary = styled.div({ overflow: "hidden" })
+
+const Estimated = styled.div({
+  width: 30,
+  height: 30,
+  borderRadius: 15,
+  backgroundColor: "#c0c0c0",
+  color: "white",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+})
