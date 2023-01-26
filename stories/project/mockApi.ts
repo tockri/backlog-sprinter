@@ -1,7 +1,7 @@
 import produce from "immer"
-import { BacklogApi, FakeBacklogApi } from "../../../src/content/backlog/BacklogApiForReact"
-import { IssueData } from "../../../src/content/backlog/Issue"
-import { CustomNumberField } from "../../../src/content/backlog/ProjectInfo"
+import { BacklogApi, FakeBacklogApi } from "../../src/content/backlog/BacklogApiForReact"
+import { IssueData } from "../../src/content/backlog/Issue"
+import { CustomNumberField } from "../../src/content/backlog/ProjectInfo"
 import { productBacklogBT, projectInfoBT } from "./mockApiData"
 
 export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {

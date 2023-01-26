@@ -30,29 +30,30 @@ const commonStyles: Parameters<typeof styled.div>[number] = {
   alignItems: "center",
   justifyContent: "center",
   "&.light": {
-    backgroundColor: "#A8DA7D",
+    backgroundColor: "#BCEAD5",
     color: "white"
   },
   "&.medium": {
-    backgroundColor: "#91C4D9",
+    backgroundColor: "#9ED5C5",
     color: "white"
   },
   "&.heavy": {
-    backgroundColor: "#CE66D9",
+    backgroundColor: "#8EC3B0",
     color: "white"
   },
   "&.hell": {
-    backgroundColor: "black",
+    backgroundColor: "#333333",
     color: "white"
   }
 }
 
 const EditView = styled.div({
   width: 40,
-  height: 20,
+  height: 30,
+  margin: "4px 0",
   borderRadius: 3,
   "&.empty": {
-    backgroundColor: "#d0d0d0",
+    backgroundColor: "#c0c0c0",
     color: "303030"
   },
   ...commonStyles

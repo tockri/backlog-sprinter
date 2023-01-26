@@ -1,5 +1,5 @@
-import { IssueData } from "../../../src/content/backlog/Issue"
-import { ProjectInfoWithCustomFields } from "../../../src/content/backlog/ProjectInfo"
+import { IssueData } from "../../src/content/backlog/Issue"
+import { ProjectInfoWithCustomFields } from "../../src/content/backlog/ProjectInfo"
 
 export const projectInfoBT: ProjectInfoWithCustomFields = {
   project: {
