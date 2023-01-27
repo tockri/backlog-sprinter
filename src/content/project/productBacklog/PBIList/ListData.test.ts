@@ -29,6 +29,7 @@ const fakeIssue = (id: number, versionId: number | null, order: number | null): 
   milestone: versionId ? [versions[versionId]] : [],
   customFields: [],
   estimatedHours: null,
+  actualHours: null,
   order
 })
 const makeFakeBacklog = (
