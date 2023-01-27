@@ -24,12 +24,9 @@ export const InfoAreaView: React.FC = () => {
             </Summary>
             <SummarySide>
               <Estimated
-                issue={issue}
+                estimatedHours={issue.estimatedHours}
                 variant="edit"
-                onFix={(value) => {
-                  console.log("Estimated event", value)
-                  model.changeIssue("estimatedHours", value)
-                }}
+                onFix={(value) => model.changeIssue("estimatedHours", value)}
               />
             </SummarySide>
           </Head>

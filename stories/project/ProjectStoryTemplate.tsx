@@ -33,7 +33,7 @@ export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ init
       ]}
     >
       <React.Suspense fallback={<Loading />}>
-        <div style={{ height: 480, display: "flex" }}>{children}</div>
+        <div style={{ height: 480, width: 800, display: "flex" }}>{children}</div>
       </React.Suspense>
     </Provider>
   )

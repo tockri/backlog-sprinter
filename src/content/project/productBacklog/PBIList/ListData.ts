@@ -181,6 +181,9 @@ const mutateByChangeAction = (data: WritableDraft<PBIListData>, action: PBIChang
     if (input.description !== undefined) {
       item.description = input.description
     }
+    if (input.estimatedHours !== undefined) {
+      item.estimatedHours = input.estimatedHours
+    }
   }
 }
 

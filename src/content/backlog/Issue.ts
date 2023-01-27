@@ -84,17 +84,20 @@ const changeMilestoneAndCustomFieldValue = async (
 export type IssueChangeInput = {
   summary?: string
   description?: string
-  estimatedHours?: number
+  estimatedHours?: number | null
 }
 
 const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<IssueData> => {
-  const { summary, description } = input
+  const { summary, description, estimatedHours } = input
   const params: Record<string, string> = {}
   if (summary !== undefined) {
     params["summary"] = summary
   }
   if (description !== undefined) {
     params["description"] = description
+  }
+  if (estimatedHours !== undefined) {
+    params["estimatedHours"] = estimatedHours !== null ? String(estimatedHours) : ""
   }
   return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
 }

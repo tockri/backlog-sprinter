@@ -1,23 +1,23 @@
 import styled from "@emotion/styled"
 import React from "react"
-import { IssueData } from "../../backlog/Issue"
 import { cnu } from "../../ui/cnu"
 
 type EstimatedProps = {
-  issue: IssueData
+  estimatedHours: number | null
   variant?: "view" | "edit"
   onFix?: (value: number) => void
 }
 
-export const Estimated: React.FC<EstimatedProps> = ({ issue, variant, onFix }) => {
+export const Estimated: React.FC<EstimatedProps> = ({ estimatedHours, variant, onFix }) => {
   if (variant === "edit") {
     return (
       <EditView
-        className={cnu("edit", estimatedClass(issue.estimatedHours))}
-        defaultValue={issue.estimatedHours || ""}
+        className={cnu("edit", estimatedClass(estimatedHours))}
+        value={estimatedHours || ""}
         onChange={(e) => {
-          const value = e.currentTarget.value
-          onFix && onFix(parseInt(value))
+          const newValue = parseInt(e.currentTarget.value)
+          // setValue(newValue)
+          onFix && onFix(newValue)
         }}
       >
         <EditOption value="" className="empty"></EditOption>
@@ -41,8 +41,8 @@ export const Estimated: React.FC<EstimatedProps> = ({ issue, variant, onFix }) =
         </EditOption>
       </EditView>
     )
-  } else if (issue.estimatedHours) {
-    return <View className={estimatedClass(issue.estimatedHours)}>{issue.estimatedHours}</View>
+  } else if (estimatedHours) {
+    return <View className={estimatedClass(estimatedHours)}>{estimatedHours}</View>
   } else {
     return <></>
   }
@@ -57,15 +57,15 @@ const commonStyles: Parameters<typeof styled.div>[number] = {
     color: "white"
   },
   "&.medium": {
-    backgroundColor: "#9ED5C5",
+    backgroundColor: "#8EC5B5",
     color: "white"
   },
   "&.heavy": {
-    backgroundColor: "#8EC3B0",
+    backgroundColor: "#6E9380",
     color: "white"
   },
   "&.hell": {
-    backgroundColor: "#333333",
+    backgroundColor: "#555555",
     color: "white"
   }
 }
