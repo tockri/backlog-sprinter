@@ -12,7 +12,8 @@ import { ProjectFormInfo } from "../types"
 export enum Tabs {
   Backlog = 0,
   //  Velocity = 1,
-  Settings = 1
+  Stat = 1,
+  Settings = 2
 }
 
 export type AppSetting = Immutable<{

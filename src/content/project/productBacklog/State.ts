@@ -1,6 +1,7 @@
 import produce from "immer"
 import { atom } from "jotai"
 import { ArrayUtil } from "../../../util/ArrayUtil"
+import { DateUtil } from "../../../util/DateUtil"
 import { NLMoveAction } from "../../../util/NestedList"
 import { BacklogApi } from "../../backlog/BacklogApiForReact"
 import { IssueData } from "../../backlog/Issue"
@@ -22,9 +23,13 @@ export const productBacklogAtom = atom<Promise<PBIListData>, NLMoveAction, Promi
         const api = get(backlogApiAtom)
         const setting = get(appSettingAtom)
         const milestones = get(milestonesAtom)
-        const today = new Date().getTime()
+        const today = new Date()
         const milestoneFilter = milestones.filter(
-          (ms) => !ms.archived && ms.startDate && ms.releaseDueDate && Date.parse(ms.releaseDueDate) > today
+          (ms) =>
+            !ms.archived &&
+            ms.startDate &&
+            ms.releaseDueDate &&
+            DateUtil.diffDays(today, new Date(ms.releaseDueDate)) > -3
         )
         const list = await api.issue.searchInIssueTypeAndMilestones(project, setting.pbiIssueTypeId, milestoneFilter)
         return PBIListDataHandler.nestIssues(list, orderCustomField)
