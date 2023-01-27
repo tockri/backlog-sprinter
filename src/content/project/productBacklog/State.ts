@@ -6,7 +6,14 @@ import { NLMoveAction } from "../../../util/NestedList"
 import { BacklogApi } from "../../backlog/BacklogApiForReact"
 import { IssueData } from "../../backlog/Issue"
 import { CustomNumberField } from "../../backlog/ProjectInfo"
-import { appSettingAtom, backlogApiAtom, milestonesAtom, orderCustomFieldAtom, projectAtom } from "../app/State"
+import {
+  appSettingAtom,
+  backlogApiAtom,
+  milestonesAtom,
+  orderCustomFieldAtom,
+  projectAtom,
+  statusesAtom
+} from "../app/State"
 import { PBIChangeAction, PBIListData, PBIListDataHandler, PBIListMovedEvent } from "./PBIList/ListData"
 
 const pbiListDataStoreAtom = atom<PBIListData | null>(null)
@@ -93,8 +100,9 @@ export const selectedIssueAtom = atom<IssueData | null, PBIChangeAction, Promise
   async (get, set, action) => {
     set(pbiListDataStoreAtom, (data) => {
       data = data || get(productBacklogAtom)
+      const statuses = get(statusesAtom)
       return produce(data, (draft) => {
-        PBIListDataHandler.mutateByChangeAction(draft, action)
+        PBIListDataHandler.mutateByChangeAction(draft, statuses, action)
       })
     })
     const api = get(backlogApiAtom)

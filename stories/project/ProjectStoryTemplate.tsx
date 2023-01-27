@@ -3,6 +3,7 @@ import React from "react"
 
 import { appSettingAtom, backlogApiAtom, formInfoAtom } from "../../src/content/project/app/State"
 
+import styled from "@emotion/styled"
 import { Loading } from "../../src/content/ui/Loading"
 import { mockApi } from "./mockApi"
 
@@ -33,8 +34,14 @@ export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ init
       ]}
     >
       <React.Suspense fallback={<Loading />}>
-        <div style={{ height: 480, width: 800, display: "flex" }}>{children}</div>
+        <Root style={{ height: 480, width: 800, display: "flex" }}>{children}</Root>
       </React.Suspense>
     </Provider>
   )
 }
+
+const Root = styled.div({
+  " *": {
+    fontSize: 13
+  }
+})

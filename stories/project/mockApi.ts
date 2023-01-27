@@ -1,7 +1,6 @@
 import produce from "immer"
 import { BacklogApi, FakeBacklogApi } from "../../src/content/backlog/BacklogApiForReact"
 import { IssueChangeInput, IssueData } from "../../src/content/backlog/Issue"
-import { CustomNumberField } from "../../src/content/backlog/ProjectInfo"
 import { productBacklogBT, projectInfoBT } from "./mockApiData"
 
 export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
@@ -10,8 +9,7 @@ export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
   draft.issue.changeMilestoneAndCustomFieldValue = async (
     issueId: number,
     milestoneId: number | null,
-    customFieldValue: number | null,
-    customField: CustomNumberField
+    customFieldValue: number | null
   ) => {
     const issue = productBacklogBT.find((i) => i.id === issueId) as IssueData
     return produce(issue, (d) => {
@@ -34,6 +32,13 @@ export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
       }
       if (input.estimatedHours !== undefined) {
         d.estimatedHours = input.estimatedHours
+      }
+      if (input.statusId !== undefined) {
+        const statuses = projectInfoBT.statuses
+        const newStatus = statuses.find((st) => st.id === input.statusId)
+        if (newStatus) {
+          d.status = newStatus
+        }
       }
     })
   }

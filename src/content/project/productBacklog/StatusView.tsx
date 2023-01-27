@@ -1,0 +1,71 @@
+import styled from "@emotion/styled"
+import { useAtomValue } from "jotai"
+import React from "react"
+import { Status } from "../../backlog/ProjectInfo"
+import { statusesAtom } from "../app/State"
+
+type StatusViewProps = {
+  status: Status
+  variant?: "view" | "edit"
+  onFix?: (statusId: number) => void
+}
+export const StatusView: React.FC<StatusViewProps> = (props) => {
+  const { status, variant } = props
+  return (
+    <Root>
+      {variant === "edit" ? (
+        <StatusEditView {...props} />
+      ) : (
+        <>
+          <StatusIcon style={{ backgroundColor: status.color }} />
+          {status.name}
+        </>
+      )}
+    </Root>
+  )
+}
+
+const StatusEditView: React.FC<StatusViewProps> = (props) => {
+  const { status, onFix } = props
+  const statuses = useAtomValue(statusesAtom)
+  return (
+    <StatusSelect
+      style={{ backgroundColor: status.color }}
+      value={status.id}
+      onChange={(e) => {
+        const newValue = parseInt(e.target.value)
+        onFix && onFix(newValue)
+      }}
+    >
+      {statuses.map((st) => (
+        <option key={st.id} value={st.id}>
+          {st.name}
+        </option>
+      ))}
+    </StatusSelect>
+  )
+}
+
+const Root = styled.div({
+  display: "inline-block",
+  marginLeft: "1em"
+})
+
+const StatusIcon = styled.div({
+  display: "inline-block",
+  width: "1em",
+  height: "1em",
+  borderRadius: "0.5em",
+  marginRight: "0.5em",
+  position: "relative",
+  top: 1
+})
+
+const StatusSelect = styled.select({
+  appearance: "none",
+  padding: "0 6px",
+  textAlign: "center",
+  borderRadius: 12,
+  borderWidth: 0,
+  color: "white"
+})

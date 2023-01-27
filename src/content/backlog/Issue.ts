@@ -1,23 +1,25 @@
+import { Immutable } from "immer"
 import { BacklogApiRequest } from "./BacklogApiRequest"
 import { CustomNumberField, Project, Status, Version } from "./ProjectInfo"
 
-export type CustomFieldData = {
+export type CustomFieldData = Immutable<{
   id: number
   name: string
   value: string | number | null
   fieldTypeId: number
-}
+}>
 
-export type IssueData = {
-  readonly id: number
-  readonly issueKey: string
-  readonly summary: string
-  readonly status: Status
-  readonly milestone: ReadonlyArray<Version>
-  readonly customFields: ReadonlyArray<CustomFieldData>
-  readonly description: string
-  readonly estimatedHours: number | null
-}
+export type IssueData = Immutable<{
+  id: number
+  issueKey: string
+  summary: string
+  status: Status
+  milestone: ReadonlyArray<Version>
+  customFields: ReadonlyArray<CustomFieldData>
+  description: string
+  estimatedHours: number | null
+  actualHours: number | null
+}>
 
 const searchUnclosedInMilestone = async (
   project: Project,
@@ -85,10 +87,11 @@ export type IssueChangeInput = {
   summary?: string
   description?: string
   estimatedHours?: number | null
+  statusId?: number
 }
 
 const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<IssueData> => {
-  const { summary, description, estimatedHours } = input
+  const { summary, description, estimatedHours, statusId } = input
   const params: Record<string, string> = {}
   if (summary !== undefined) {
     params["summary"] = summary
@@ -98,6 +101,9 @@ const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<Iss
   }
   if (estimatedHours !== undefined) {
     params["estimatedHours"] = estimatedHours !== null ? String(estimatedHours) : ""
+  }
+  if (statusId !== undefined) {
+    params["statusId"] = String(statusId)
   }
   return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
 }

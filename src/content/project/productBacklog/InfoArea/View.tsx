@@ -1,7 +1,9 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { HBox, VBox } from "../../../ui/Box"
 import { EditableField } from "../../../ui/EditableField"
-import { Estimated } from "../Estimated"
+import { StatusView } from "../StatusView"
+import { StoryPointView } from "../StoryPointView"
 import { useInfoAreaModel } from "./Model"
 
 export const InfoAreaView: React.FC = () => {
@@ -12,23 +14,40 @@ export const InfoAreaView: React.FC = () => {
       <Area>
         <Float>
           <Head>
-            <Summary>
-              <EditableField
-                defaultValue={issue.summary}
-                onFix={(value) => model.changeIssue("summary", value)}
-                blurAction="cancel"
-                editStyle={{
-                  flexGrow: 1
-                }}
-              />
-            </Summary>
-            <SummarySide>
-              <Estimated
+            <VBox>
+              <HBox>
+                <IssueKey>
+                  <a href={`/view/${issue.issueKey}`} target="_blank" rel="noreferrer">
+                    {issue.issueKey}
+                  </a>
+                </IssueKey>
+                <div>
+                  <StatusView
+                    status={issue.status}
+                    variant="edit"
+                    onFix={(value) => model.changeIssue("statusId", value)}
+                  />
+                </div>
+              </HBox>
+              <Summary>
+                <EditableField
+                  defaultValue={issue.summary}
+                  onFix={(value) => model.changeIssue("summary", value)}
+                  blurAction="cancel"
+                  editStyle={{
+                    flexGrow: 1
+                  }}
+                />
+              </Summary>
+            </VBox>
+            <HeadSide>
+              <StoryPointView
                 estimatedHours={issue.estimatedHours}
+                actualHours={issue.actualHours}
                 variant="edit"
-                onFix={(value) => model.changeIssue("estimatedHours", value)}
+                onEstimateFix={(value) => model.changeIssue("estimatedHours", value)}
               />
-            </SummarySide>
+            </HeadSide>
           </Head>
           <Description>
             <EditableField
@@ -56,39 +75,37 @@ export const InfoAreaView: React.FC = () => {
 }
 
 const Area = styled.div({
-  width: "75%"
+  width: "50%"
 })
 
-const Float = styled.div({
+const Float = styled(VBox)({
   padding: 8,
   boxShadow: "-2px 0 3px #c0c0c0",
-  height: "calc(100% - 24px)",
-  margin: 12,
-  display: "flex",
-  flexDirection: "column"
+  height: "calc(100% - 12px)",
+  margin: 12
 })
 
-const Head = styled.div({
-  display: "flex"
+const Head = styled(HBox)({
+  flexGrow: 0
 })
 
-const Summary = styled.div({
-  padding: 4,
-  flexGrow: 1,
-  display: "flex",
-  flexDirection: "column"
+const IssueKey = styled.div({
+  display: "inline-block",
+  marginRight: 8,
+  whiteSpace: "nowrap"
 })
 
-const SummarySide = styled.div({
-  display: "flex",
+const Summary = styled(VBox)({
+  padding: 4
+})
+
+const HeadSide = styled(VBox)({
+  flexGrow: 0,
   alignItems: "center",
   justifyContent: "center"
 })
 
-const Description = styled.div({
-  padidng: 4,
-  flexGrow: 1,
-  display: "flex",
+const Description = styled(HBox)({
   " h1": {
     fontSize: "1.4rem"
   },

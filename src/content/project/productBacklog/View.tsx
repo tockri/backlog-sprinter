@@ -14,5 +14,6 @@ export const ProductBacklogView: React.FC = () => {
 
 const Root = styled.div({
   display: "flex",
-  height: "100%"
+  height: "100%",
+  flexGrow: 1
 })

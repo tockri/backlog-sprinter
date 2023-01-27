@@ -2,7 +2,8 @@ import styled from "@emotion/styled"
 import React from "react"
 import { cnu } from "../../../ui/cnu"
 import { Draggable } from "../../../ui/DragAndDrop"
-import { Estimated } from "../Estimated"
+import { StatusView } from "../StatusView"
+import { StoryPointView } from "../StoryPointView"
 import { usePBIItemModel } from "./ItemModel"
 import { IssueDataWithOrder } from "./ListData"
 
@@ -40,14 +41,13 @@ export const PBIItemView: React.FC<PBIItemViewProps> = (props) => {
                 {issue.issueKey}
               </a>
             </IssueKey>
-            <StatusView>
-              <StatusIcon style={{ backgroundColor: issue.status.color }} />
-              {issue.status.name}
-            </StatusView>
+            <StatusView status={issue.status} />
           </CellHeader>
           <Summary>{issue.summary}</Summary>
         </Body>
-        <Side>{issue.estimatedHours && <Estimated estimatedHours={issue.estimatedHours} />}</Side>
+        <Side>
+          <StoryPointView actualHours={issue.actualHours} estimatedHours={issue.estimatedHours} />
+        </Side>
       </Cell>
     </Draggable>
   )
@@ -84,22 +84,8 @@ const CellHeader = styled.div({ display: "flex" })
 
 const IssueKey = styled.div({
   display: "inline-block",
-  marginRight: "1em"
-})
-
-const StatusView = styled.div({
-  display: "inline-block",
-  marginLeft: "1em"
-})
-
-const StatusIcon = styled.div({
-  display: "inline-block",
-  width: "1em",
-  height: "1em",
-  borderRadius: "0.5em",
-  marginRight: "0.5em",
-  position: "relative",
-  top: 1
+  marginRight: 8,
+  whiteSpace: "nowrap"
 })
 
 const Summary = styled.div({ overflow: "hidden" })

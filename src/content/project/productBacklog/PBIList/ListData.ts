@@ -2,7 +2,7 @@ import { Immutable } from "immer"
 import { WritableDraft } from "immer/dist/internal"
 import { NestedList, NestedListData, NestMethods, NLLocation } from "../../../../util/NestedList"
 import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
-import { CustomNumberField, Version } from "../../../backlog/ProjectInfo"
+import { CustomNumberField, Status, Version } from "../../../backlog/ProjectInfo"
 
 export type IssueDataWithOrder = IssueData & { readonly order: number | null }
 export type PBIListData = NestedListData<Version, IssueDataWithOrder>
@@ -171,7 +171,11 @@ export type PBIChangeAction = {
   input: IssueChangeInput
 }
 
-const mutateByChangeAction = (data: WritableDraft<PBIListData>, action: PBIChangeAction) => {
+const mutateByChangeAction = (
+  data: WritableDraft<PBIListData>,
+  statuses: ReadonlyArray<Status>,
+  action: PBIChangeAction
+) => {
   const { issueId, input } = action
   const [item] = findIssue(data, issueId)
   if (item) {
@@ -183,6 +187,12 @@ const mutateByChangeAction = (data: WritableDraft<PBIListData>, action: PBIChang
     }
     if (input.estimatedHours !== undefined) {
       item.estimatedHours = input.estimatedHours
+    }
+    if (input.statusId !== undefined) {
+      const newStatus = statuses.find((s) => s.id === input.statusId)
+      if (newStatus) {
+        item.status = newStatus
+      }
     }
   }
 }
