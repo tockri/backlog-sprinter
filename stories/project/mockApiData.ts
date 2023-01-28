@@ -376,7 +376,7 @@ export const productBacklogBT = [
       "課題の詳細\n\n- リスト\n- リスト\n\n\n# 見出し123\n\n## 見出し2\n\n* [リンク](https://nulab.com/)\n* リスト\n* リスト\n\n1. 順序付きリスト\n2. 順序付き\n\n詳細も編集できる！！",
     resolution: null,
     priority: { id: 3, name: "中" },
-    status: { id: 1, projectId: 78386, name: "未対応", color: "#ed8077", displayOrder: 1000 },
+    status: { id: 4, projectId: 78386, name: "完了", color: "#b0be3c", displayOrder: 4000 },
     assignee: null,
     category: [],
     versions: [],
@@ -395,7 +395,7 @@ export const productBacklogBT = [
     startDate: null,
     dueDate: null,
     estimatedHours: 13,
-    actualHours: null,
+    actualHours: 8,
     parentIssueId: null,
     createdUser: {
       id: 13775,

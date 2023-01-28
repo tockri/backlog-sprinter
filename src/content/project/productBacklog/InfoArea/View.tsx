@@ -44,8 +44,10 @@ export const InfoAreaView: React.FC = () => {
               <StoryPointView
                 estimatedHours={issue.estimatedHours}
                 actualHours={issue.actualHours}
+                status={issue.status}
                 variant="edit"
                 onEstimateFix={(value) => model.changeIssue("estimatedHours", value)}
+                onActualFix={(value) => model.changeIssue("actualHours", value)}
               />
             </HeadSide>
           </Head>

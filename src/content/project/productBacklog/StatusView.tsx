@@ -38,7 +38,7 @@ const StatusEditView: React.FC<StatusViewProps> = (props) => {
       }}
     >
       {statuses.map((st) => (
-        <option key={st.id} value={st.id}>
+        <option key={st.id} value={st.id} style={{ backgroundColor: st.color }}>
           {st.name}
         </option>
       ))}

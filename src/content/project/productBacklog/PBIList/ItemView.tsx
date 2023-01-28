@@ -46,7 +46,7 @@ export const PBIItemView: React.FC<PBIItemViewProps> = (props) => {
           <Summary>{issue.summary}</Summary>
         </Body>
         <Side>
-          <StoryPointView actualHours={issue.actualHours} estimatedHours={issue.estimatedHours} />
+          <StoryPointView status={issue.status} actualHours={issue.actualHours} estimatedHours={issue.estimatedHours} />
         </Side>
       </Cell>
     </Draggable>

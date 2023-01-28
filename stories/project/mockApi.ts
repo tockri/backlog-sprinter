@@ -1,6 +1,6 @@
 import produce from "immer"
 import { BacklogApi, FakeBacklogApi } from "../../src/content/backlog/BacklogApiForReact"
-import { IssueChangeInput, IssueData } from "../../src/content/backlog/Issue"
+import { IssueChangeInput, IssueData, IssueDataUtil } from "../../src/content/backlog/Issue"
 import { productBacklogBT, projectInfoBT } from "./mockApiData"
 
 export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
@@ -23,23 +23,9 @@ export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
   }
   draft.issue.changeInfo = async (issueId: number, input: IssueChangeInput) => {
     const issue = productBacklogBT.find((i) => i.id === issueId) as IssueData
+    const statuses = projectInfoBT.statuses
     return produce(issue, (d) => {
-      if (input.description !== undefined) {
-        d.description = input.description
-      }
-      if (input.summary !== undefined) {
-        d.summary = input.summary
-      }
-      if (input.estimatedHours !== undefined) {
-        d.estimatedHours = input.estimatedHours
-      }
-      if (input.statusId !== undefined) {
-        const statuses = projectInfoBT.statuses
-        const newStatus = statuses.find((st) => st.id === input.statusId)
-        if (newStatus) {
-          d.status = newStatus
-        }
-      }
+      IssueDataUtil.mutateByIssueInput(d, input, statuses)
     })
   }
 })

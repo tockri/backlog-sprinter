@@ -1,7 +1,7 @@
 import { Immutable } from "immer"
 import { WritableDraft } from "immer/dist/internal"
 import { NestedList, NestedListData, NestMethods, NLLocation } from "../../../../util/NestedList"
-import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
+import { IssueChangeInput, IssueData, IssueDataUtil } from "../../../backlog/Issue"
 import { CustomNumberField, Status, Version } from "../../../backlog/ProjectInfo"
 
 export type IssueDataWithOrder = IssueData & { readonly order: number | null }
@@ -179,21 +179,7 @@ const mutateByChangeAction = (
   const { issueId, input } = action
   const [item] = findIssue(data, issueId)
   if (item) {
-    if (input.summary !== undefined) {
-      item.summary = input.summary
-    }
-    if (input.description !== undefined) {
-      item.description = input.description
-    }
-    if (input.estimatedHours !== undefined) {
-      item.estimatedHours = input.estimatedHours
-    }
-    if (input.statusId !== undefined) {
-      const newStatus = statuses.find((s) => s.id === input.statusId)
-      if (newStatus) {
-        item.status = newStatus
-      }
-    }
+    IssueDataUtil.mutateByIssueInput(item, input, statuses)
   }
 }
 

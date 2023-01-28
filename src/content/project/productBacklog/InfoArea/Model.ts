@@ -23,7 +23,7 @@ export const useInfoAreaModel = (): InfoAreaModel => {
 
 const changeIssue =
   (issueId: number, dispatch: (action: PBIChangeAction) => Promise<void>) =>
-  async (key: keyof IssueChangeInput, value: string | number) => {
+  async (key: keyof IssueChangeInput, value: IssueChangeInput[typeof key]) => {
     const input = {
       [key]: value
     }

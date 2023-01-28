@@ -1,10 +1,13 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { Status } from "../../backlog/ProjectInfo"
+import { HBox } from "../../ui/Box"
 import { cnu } from "../../ui/cnu"
 
 type StoryPointViewProps = {
   estimatedHours: number | null
   actualHours: number | null
+  status: Status
   variant?: "view" | "edit"
   onEstimateFix?: (value: number) => void
   onActualFix?: (value: number) => void
@@ -15,15 +18,30 @@ export const StoryPointView: React.FC<StoryPointViewProps> = (props) => {
 }
 
 const Editor: React.FC<StoryPointViewProps> = (props) => {
-  const { estimatedHours, onEstimateFix } = props
+  const { estimatedHours, actualHours, onEstimateFix, onActualFix, status } = props
   return (
-    <EditView
-      className={cnu("edit", estimatedClass(estimatedHours))}
-      value={estimatedHours || ""}
+    <HBox>
+      <HoursSelector hours={estimatedHours} onFix={onEstimateFix} />
+      {status.id === 4 && <HoursSelector hours={actualHours} onFix={onActualFix} />}
+    </HBox>
+  )
+}
+
+type HoursSelectorProps = {
+  hours: number | null
+  onFix?: (value: number) => void
+}
+
+const HoursSelector: React.FC<HoursSelectorProps> = (props) => {
+  const { hours, onFix } = props
+  return (
+    <SelectView
+      className={cnu("edit", estimatedClass(hours))}
+      value={hours || ""}
       onChange={(e) => {
         const newValue = parseInt(e.currentTarget.value)
         // setValue(newValue)
-        onEstimateFix && onEstimateFix(newValue)
+        onFix && onFix(newValue)
       }}
     >
       <EditOption value="" className="empty"></EditOption>
@@ -45,7 +63,7 @@ const Editor: React.FC<StoryPointViewProps> = (props) => {
       <EditOption value="13" className="hell">
         13
       </EditOption>
-    </EditView>
+    </SelectView>
   )
 }
 
@@ -96,7 +114,7 @@ const editCommonStyles: Parameters<typeof styled.div>[number] = {
   }
 }
 
-const EditView = styled.select({
+const SelectView = styled.select({
   appearance: "none",
   flexGrow: 1,
   borderWidth: 0,
