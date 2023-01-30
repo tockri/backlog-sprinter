@@ -52,6 +52,16 @@ const searchInIssueTypeAndMilestones = async (
   ])
 }
 
+const searchChildren = async (project: Project, parentIssueId: number): Promise<ReadonlyArray<IssueData>> => {
+  return await BacklogApiRequest.get<ReadonlyArray<IssueData>>("/api/v2/issues", [
+    {
+      "projectId[]": "" + project.id,
+      "parentIssueId[]": "" + parentIssueId,
+      count: "100"
+    }
+  ])
+}
+
 export type IssueIdCallback = (issueId: number) => void
 
 const bulkChangeMilestone = async (
@@ -141,6 +151,7 @@ const mutateByIssueInput = (
 const Issue = {
   searchUnclosedInMilestone,
   searchInIssueTypeAndMilestones,
+  searchChildren,
   bulkChangeMilestone,
   changeMilestoneAndCustomFieldValue,
   changeInfo

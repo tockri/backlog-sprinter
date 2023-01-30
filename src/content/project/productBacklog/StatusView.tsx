@@ -63,6 +63,7 @@ const StatusIcon = styled.div({
 
 const StatusSelect = styled.select({
   appearance: "none",
+  cursor: "pointer",
   padding: "0 6px",
   textAlign: "center",
   borderRadius: 12,

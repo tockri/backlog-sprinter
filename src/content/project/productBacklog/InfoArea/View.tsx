@@ -42,9 +42,7 @@ export const InfoAreaView: React.FC = () => {
             </VBox>
             <HeadSide>
               <StoryPointView
-                estimatedHours={issue.estimatedHours}
-                actualHours={issue.actualHours}
-                status={issue.status}
+                issue={issue}
                 variant="edit"
                 onEstimateFix={(value) => model.changeIssue("estimatedHours", value)}
                 onActualFix={(value) => model.changeIssue("actualHours", value)}

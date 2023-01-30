@@ -15,6 +15,7 @@ const rejectFunc = () => {
 const fakeIssueApi: IssueApi = {
   searchUnclosedInMilestone: rejectFunc,
   searchInIssueTypeAndMilestones: rejectFunc,
+  searchChildren: rejectFunc,
   bulkChangeMilestone: rejectFunc,
   changeMilestoneAndCustomFieldValue: rejectFunc,
   changeInfo: rejectFunc

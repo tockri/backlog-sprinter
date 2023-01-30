@@ -1,13 +1,16 @@
 import styled from "@emotion/styled"
+import { useAtomValue } from "jotai"
 import React from "react"
-import { Status } from "../../backlog/ProjectInfo"
+import { Tooltip } from "react-tooltip"
+import "react-tooltip/dist/react-tooltip.min.css"
+import { IssueData } from "../../backlog/Issue"
 import { HBox } from "../../ui/Box"
 import { cnu } from "../../ui/cnu"
+import { formInfoAtom } from "../app/State"
+import { i18n } from "./i18n"
 
 type StoryPointViewProps = {
-  estimatedHours: number | null
-  actualHours: number | null
-  status: Status
+  issue: IssueData
   variant?: "view" | "edit"
   onEstimateFix?: (value: number) => void
   onActualFix?: (value: number) => void
@@ -18,57 +21,73 @@ export const StoryPointView: React.FC<StoryPointViewProps> = (props) => {
 }
 
 const Editor: React.FC<StoryPointViewProps> = (props) => {
-  const { estimatedHours, actualHours, onEstimateFix, onActualFix, status } = props
+  const { issue, onEstimateFix, onActualFix } = props
+  const formInfo = useAtomValue(formInfoAtom)
+  const t = i18n(formInfo.lang)
+  const { actualHours, estimatedHours, status } = issue
   return (
     <HBox>
-      <HoursSelector hours={estimatedHours} onFix={onEstimateFix} />
-      {status.id === 4 && <HoursSelector hours={actualHours} onFix={onActualFix} />}
+      <HoursSelector id={`est-${issue.id}`} hours={estimatedHours} onFix={onEstimateFix} toolTip={t.estimatedHours} />
+      {status.id === 4 && (
+        <>
+          <HBox style={{ alignItems: "center" }}>→</HBox>
+          <HoursSelector id={`act-${issue.id}`} hours={actualHours} onFix={onActualFix} toolTip={t.actualHours} />
+        </>
+      )}
     </HBox>
   )
 }
 
 type HoursSelectorProps = {
+  id: string
   hours: number | null
   onFix?: (value: number) => void
+  toolTip: string
 }
 
 const HoursSelector: React.FC<HoursSelectorProps> = (props) => {
-  const { hours, onFix } = props
+  const { id, hours, onFix, toolTip } = props
   return (
-    <SelectView
-      className={cnu("edit", estimatedClass(hours))}
-      value={hours || ""}
-      onChange={(e) => {
-        const newValue = parseInt(e.currentTarget.value)
-        // setValue(newValue)
-        onFix && onFix(newValue)
-      }}
-    >
-      <EditOption value="" className="empty"></EditOption>
-      <EditOption value="1" className="light">
-        1
-      </EditOption>
-      <EditOption value="2" className="light">
-        2
-      </EditOption>
-      <EditOption value="3" className="medium">
-        3
-      </EditOption>
-      <EditOption value="5" className="medium">
-        5
-      </EditOption>
-      <EditOption value="8" className="heavy">
-        8
-      </EditOption>
-      <EditOption value="13" className="hell">
-        13
-      </EditOption>
-    </SelectView>
+    <>
+      <SelectView
+        className={cnu("edit", estimatedClass(hours))}
+        value={hours || ""}
+        onChange={(e) => {
+          const newValue = parseInt(e.currentTarget.value)
+          // setValue(newValue)
+          onFix && onFix(newValue)
+        }}
+        id={id}
+        data-tooltip-content={toolTip}
+      >
+        <EditOption value="" className="empty"></EditOption>
+        <EditOption value="1" className="light">
+          1
+        </EditOption>
+        <EditOption value="2" className="light">
+          2
+        </EditOption>
+        <EditOption value="3" className="medium">
+          3
+        </EditOption>
+        <EditOption value="5" className="medium">
+          5
+        </EditOption>
+        <EditOption value="8" className="heavy">
+          8
+        </EditOption>
+        <EditOption value="13" className="hell">
+          13
+        </EditOption>
+      </SelectView>
+      <Tooltip place="bottom" anchorId={id} />
+    </>
   )
 }
 
 const Viewer: React.FC<StoryPointViewProps> = (props) => {
-  const { estimatedHours, actualHours } = props
+  const { issue } = props
+  const { actualHours, estimatedHours } = issue
   if (estimatedHours && actualHours) {
     return (
       <Overwrapping>
@@ -116,6 +135,7 @@ const editCommonStyles: Parameters<typeof styled.div>[number] = {
 
 const SelectView = styled.select({
   appearance: "none",
+  cursor: "pointer",
   flexGrow: 1,
   borderWidth: 0,
   width: 30,
@@ -130,7 +150,7 @@ const EditOption = styled.option({
 })
 
 const Overwrapping = styled.div({
-  width: 50,
+  width: 44,
   height: 30,
   position: "relative"
 })
@@ -145,11 +165,11 @@ const ViewerPane = styled.div({
     height: 26,
     top: 2,
     zIndex: 1,
-    opacity: 0.5
+    opacity: 0.4
   },
   "&.above": {
     position: "absolute",
-    left: 20,
+    left: 14,
     zIndex: 2
   },
   ...commonStyles
