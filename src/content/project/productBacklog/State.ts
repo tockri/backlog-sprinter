@@ -1,10 +1,12 @@
 import produce from "immer"
+import { WritableDraft } from "immer/dist/types/types-external"
 import { atom } from "jotai"
+import { atomFamily } from "jotai/utils"
 import { ArrayUtil } from "../../../util/ArrayUtil"
 import { DateUtil } from "../../../util/DateUtil"
 import { NLMoveAction } from "../../../util/NestedList"
 import { BacklogApi } from "../../backlog/BacklogApiForReact"
-import { IssueData } from "../../backlog/Issue"
+import { IssueCreateInput, IssueData } from "../../backlog/Issue"
 import { CustomNumberField } from "../../backlog/ProjectInfo"
 import {
   appSettingAtom,
@@ -109,4 +111,73 @@ export const selectedIssueAtom = atom<IssueData | null, PBIChangeAction, Promise
     const { issueId, input } = action
     await api.issue.changeInfo(issueId, input)
   }
+)
+
+enum ChildIssueActionTypes {
+  Move = "Move",
+  Create = "Create"
+}
+
+type ChildIssueCreate = {
+  type: ChildIssueActionTypes.Create
+  input: IssueCreateInput
+}
+type ChildIssueMove = {
+  type: ChildIssueActionTypes.Move
+  issue: IssueData
+  destinationIssueId: number
+}
+
+export type ChildIssueActionType = ChildIssueCreate | ChildIssueMove
+
+export const ChildIssueAction = {
+  Create: (input: IssueCreateInput): ChildIssueCreate => ({
+    type: ChildIssueActionTypes.Create,
+    input
+  }),
+  Move: (issue: IssueData, destinationIssueId: number): ChildIssueMove => ({
+    type: ChildIssueActionTypes.Move,
+    issue,
+    destinationIssueId
+  })
+}
+
+const childIssueStoreAtom = atomFamily((parentIssueId: number) => atom<ReadonlyArray<IssueData> | null>(null))
+export const childIssueAtom = atomFamily((parentIssueId: number) =>
+  atom(
+    async (get) => {
+      const stored = get(childIssueStoreAtom(parentIssueId))
+      if (stored !== null) {
+        return stored
+      } else {
+        const api = get(backlogApiAtom)
+        const project = get(projectAtom)
+        return await api.issue.searchChildren(project, parentIssueId)
+      }
+    },
+    async (get, set, action: ChildIssueActionType) => {
+      if (action.type === ChildIssueActionTypes.Move) {
+        const { issue, destinationIssueId } = action
+        const api = get(backlogApiAtom)
+        const updated = await api.issue.changeInfo(issue.id, { parentIssueId: destinationIssueId })
+        const currSrc = get(childIssueAtom(parentIssueId))
+        set(
+          childIssueStoreAtom(parentIssueId),
+          produce(currSrc, (draft) => {
+            const idx = draft.findIndex((i) => i.id === issue.id)
+            if (idx >= 0) {
+              draft.splice(idx, 1)
+            }
+          })
+        )
+        const currDst = get(childIssueAtom(destinationIssueId))
+        set(
+          childIssueStoreAtom(destinationIssueId),
+          produce(currDst, (draft) => {
+            draft.push(updated as WritableDraft<IssueData>)
+          })
+        )
+      }
+    }
+  )
 )

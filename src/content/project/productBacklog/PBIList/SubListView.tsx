@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
+import { IssueData } from "../../../backlog/Issue"
 import { cnu } from "../../../ui/cnu"
 import { Droppable } from "../../../ui/DragAndDrop"
 import { PBIItemView } from "./ItemView"
@@ -18,7 +19,7 @@ type DragItem = {
   subListId: string
 }
 
-const canDropOn =
+const canArrange =
   (index: number, subListId: string) =>
   (dragging: DragItem): boolean => {
     if (dragging.subListId === subListId) {
@@ -28,6 +29,15 @@ const canDropOn =
       }
     }
     return true
+  }
+
+const canMove =
+  (issue: IssueData) =>
+  (dragging: IssueData): boolean => {
+    if (dragging.parentIssueId !== issue.id) {
+      return true
+    }
+    return false
   }
 
 export const PBISubList: React.FC<PBISubListProps> = (props) => {
@@ -46,21 +56,35 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
         {subList.items.map((issue, index) => (
           <Droppable
             key={issue.id}
-            item={{ index, subListId: subList.id }}
-            canDrop={canDropOn(index, subList.id)}
-            hoverStateChanged={(h) => model.setHovered(index, h)}
+            type="moveParent"
+            item={issue}
+            canDrop={canMove(issue)}
+            hoverStateChanged={(h) => model.setMoveHovered(issue.id, h)}
           >
-            <DropArea className={cnu({ hover: model.isHovered(index) })}>
-              <PBIItemView issue={issue} key={index} index={index} subListId={subList.id} />
-            </DropArea>
+            <Droppable
+              type="arrange"
+              item={{ index, subListId: subList.id }}
+              canDrop={canArrange(index, subList.id)}
+              hoverStateChanged={(h) => model.setArrangeHovered(index, h)}
+            >
+              <DropArea
+                className={cnu({
+                  arrangeHover: model.isArrangeHovered(index),
+                  moveHover: model.isMoveHovered(issue.id)
+                })}
+              >
+                <PBIItemView issue={issue} key={index} index={index} subListId={subList.id} />
+              </DropArea>
+            </Droppable>
           </Droppable>
         ))}
         <Droppable
+          type="arrange"
           item={{ index: lastIdx, subListId: subList.id }}
-          canDrop={canDropOn(lastIdx, subList.id)}
-          hoverStateChanged={(h) => model.setHovered(lastIdx, h)}
+          canDrop={canArrange(lastIdx, subList.id)}
+          hoverStateChanged={(h) => model.setArrangeHovered(lastIdx, h)}
         >
-          <DropArea className={cnu("empty", { hover: model.isHovered(lastIdx) })} />
+          <DropArea className={cnu("empty", { arrangeHover: model.isArrangeHovered(lastIdx) })} />
         </Droppable>
       </SLBody>
     </SL>
@@ -72,8 +96,11 @@ const DropArea = styled.div({
   "&.empty": {
     paddingBottom: 20
   },
-  "&.hover": {
+  "&.arrangeHover": {
     paddingTop: 12
+  },
+  "&.moveHover": {
+    backgroundColor: "#c0e0e0"
   }
 })
 

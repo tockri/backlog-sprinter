@@ -2,8 +2,10 @@ import styled from "@emotion/styled"
 import React from "react"
 import { HBox, VBox } from "../../../ui/Box"
 import { EditableField } from "../../../ui/EditableField"
+import { Loading } from "../../../ui/Loading"
 import { StatusView } from "../StatusView"
 import { StoryPointView } from "../StoryPointView"
+import { ChildIssueListView } from "./ChildIssueListView"
 import { useInfoAreaModel } from "./Model"
 
 export const InfoAreaView: React.FC = () => {
@@ -66,6 +68,9 @@ export const InfoAreaView: React.FC = () => {
               blurAction="cancel"
             />
           </Description>
+          <React.Suspense fallback={<Loading />}>
+            <ChildIssueListView parentIssueId={issue.id} />
+          </React.Suspense>
         </Float>
       </Area>
     )

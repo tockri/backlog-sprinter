@@ -885,3 +885,224 @@ export const productBacklogBT = [
     stars: []
   }
 ] as IssueData[]
+
+export const childIssuesBT = [
+  {
+    id: 20641035,
+    projectId: 78386,
+    issueKey: "BT-12",
+    keyId: 12,
+    issueType: { id: 389286, projectId: 78386, name: "タスク", color: "#7ea800", displayOrder: 0 },
+    summary: "もっとあたらしいやっつーができとるやんあ",
+    description: "どやこれ\n\nこないなっとんんえん\n\n更新するで",
+    resolution: null,
+    priority: { id: 3, name: "中" },
+    status: { id: 1, projectId: 78386, name: "未対応", color: "#ed8077", displayOrder: 1000 },
+    assignee: null,
+    category: [],
+    versions: [],
+    milestone: [
+      {
+        id: 245742,
+        projectId: 78386,
+        name: "01-24 ~ 01-30 sprint",
+        description: null,
+        startDate: "2023-01-24T00:00:00Z",
+        releaseDueDate: "2023-01-30T00:00:00Z",
+        archived: false,
+        displayOrder: 0
+      }
+    ],
+    startDate: null,
+    dueDate: null,
+    estimatedHours: null,
+    actualHours: null,
+    parentIssueId: null,
+    createdUser: {
+      id: 13775,
+      userId: "*lXwIJXqbRE",
+      name: "fujita@nulab-inc.com",
+      roleType: 1,
+      lang: "ja",
+      mailAddress: "fujita@nulab.com",
+      nulabAccount: {
+        nulabId: "E82Ng469EldR5eDeAvqZdwUPfcxc6YS6VWl4uMuxKTGWIqtRrH",
+        name: "fujitama",
+        uniqueId: "fujitama"
+      },
+      keyword: "fujita@nulab-inc.com fujita@nulab-inc.com",
+      lastLoginTime: "2023-01-26T06:34:06Z"
+    },
+    created: "2023-01-18T02:55:43Z",
+    updatedUser: {
+      id: 13775,
+      userId: "*lXwIJXqbRE",
+      name: "fujita@nulab-inc.com",
+      roleType: 1,
+      lang: "ja",
+      mailAddress: "fujita@nulab.com",
+      nulabAccount: {
+        nulabId: "E82Ng469EldR5eDeAvqZdwUPfcxc6YS6VWl4uMuxKTGWIqtRrH",
+        name: "fujitama",
+        uniqueId: "fujitama"
+      },
+      keyword: "fujita@nulab-inc.com fujita@nulab-inc.com",
+      lastLoginTime: "2023-01-26T06:34:06Z"
+    },
+    updated: "2023-01-25T00:33:59Z",
+    customFields: [{ id: 71491, fieldTypeId: 3, name: "__PBI_ORDER__389286__", value: -665 }],
+    attachments: [],
+    sharedFiles: [],
+    stars: []
+  },
+  {
+    id: 20640945,
+    projectId: 78386,
+    issueKey: "BT-11",
+    keyId: 11,
+    issueType: { id: 389286, projectId: 78386, name: "タスク", color: "#7ea800", displayOrder: 0 },
+    summary: "あたらしいかだいだよ",
+    description: "# 見出し\n\n- りすと\n- りすと\n- りすと",
+    resolution: null,
+    priority: { id: 3, name: "中" },
+    status: { id: 1, projectId: 78386, name: "未対応", color: "#ed8077", displayOrder: 1000 },
+    assignee: null,
+    category: [],
+    versions: [],
+    milestone: [
+      {
+        id: 245742,
+        projectId: 78386,
+        name: "01-24 ~ 01-30 sprint",
+        description: null,
+        startDate: "2023-01-24T00:00:00Z",
+        releaseDueDate: "2023-01-30T00:00:00Z",
+        archived: false,
+        displayOrder: 0
+      }
+    ],
+    startDate: null,
+    dueDate: null,
+    estimatedHours: null,
+    actualHours: null,
+    parentIssueId: null,
+    createdUser: {
+      id: 13775,
+      userId: "*lXwIJXqbRE",
+      name: "fujita@nulab-inc.com",
+      roleType: 1,
+      lang: "ja",
+      mailAddress: "fujita@nulab.com",
+      nulabAccount: {
+        nulabId: "E82Ng469EldR5eDeAvqZdwUPfcxc6YS6VWl4uMuxKTGWIqtRrH",
+        name: "fujitama",
+        uniqueId: "fujitama"
+      },
+      keyword: "fujita@nulab-inc.com fujita@nulab-inc.com",
+      lastLoginTime: "2023-01-26T06:34:06Z"
+    },
+    created: "2023-01-18T02:52:31Z",
+    updatedUser: {
+      id: 13775,
+      userId: "*lXwIJXqbRE",
+      name: "fujita@nulab-inc.com",
+      roleType: 1,
+      lang: "ja",
+      mailAddress: "fujita@nulab.com",
+      nulabAccount: {
+        nulabId: "E82Ng469EldR5eDeAvqZdwUPfcxc6YS6VWl4uMuxKTGWIqtRrH",
+        name: "fujitama",
+        uniqueId: "fujitama"
+      },
+      keyword: "fujita@nulab-inc.com fujita@nulab-inc.com",
+      lastLoginTime: "2023-01-26T06:34:06Z"
+    },
+    updated: "2023-01-24T23:48:49Z",
+    customFields: [{ id: 71491, fieldTypeId: 3, name: "__PBI_ORDER__389286__", value: -765 }],
+    attachments: [],
+    sharedFiles: [],
+    stars: []
+  },
+  {
+    id: 12323249,
+    projectId: 78386,
+    issueKey: "BT-10",
+    keyId: 10,
+    issueType: { id: 389286, projectId: 78386, name: "タスク", color: "#7ea800", displayOrder: 0 },
+    summary: "M1 Added from web",
+    description: "",
+    resolution: null,
+    priority: { id: 3, name: "中" },
+    status: { id: 2, projectId: 78386, name: "処理中", color: "#4488c5", displayOrder: 2000 },
+    assignee: {
+      id: 13775,
+      userId: "*lXwIJXqbRE",
+      name: "fujita@nulab-inc.com",
+      roleType: 1,
+      lang: "ja",
+      mailAddress: "fujita@nulab.com",
+      nulabAccount: {
+        nulabId: "E82Ng469EldR5eDeAvqZdwUPfcxc6YS6VWl4uMuxKTGWIqtRrH",
+        name: "fujitama",
+        uniqueId: "fujitama"
+      },
+      keyword: "fujita@nulab-inc.com fujita@nulab-inc.com",
+      lastLoginTime: "2023-01-26T06:34:06Z"
+    },
+    category: [],
+    versions: [],
+    milestone: [
+      {
+        id: 245742,
+        projectId: 78386,
+        name: "01-24 ~ 01-30 sprint",
+        description: null,
+        startDate: "2023-01-24T00:00:00Z",
+        releaseDueDate: "2023-01-30T00:00:00Z",
+        archived: false,
+        displayOrder: 0
+      }
+    ],
+    startDate: null,
+    dueDate: "2021-06-30T00:00:00Z",
+    estimatedHours: null,
+    actualHours: null,
+    parentIssueId: null,
+    createdUser: {
+      id: 13775,
+      userId: "*lXwIJXqbRE",
+      name: "fujita@nulab-inc.com",
+      roleType: 1,
+      lang: "ja",
+      mailAddress: "fujita@nulab.com",
+      nulabAccount: {
+        nulabId: "E82Ng469EldR5eDeAvqZdwUPfcxc6YS6VWl4uMuxKTGWIqtRrH",
+        name: "fujitama",
+        uniqueId: "fujitama"
+      },
+      keyword: "fujita@nulab-inc.com fujita@nulab-inc.com",
+      lastLoginTime: "2023-01-26T06:34:06Z"
+    },
+    created: "2021-06-15T02:23:44Z",
+    updatedUser: {
+      id: 13775,
+      userId: "*lXwIJXqbRE",
+      name: "fujita@nulab-inc.com",
+      roleType: 1,
+      lang: "ja",
+      mailAddress: "fujita@nulab.com",
+      nulabAccount: {
+        nulabId: "E82Ng469EldR5eDeAvqZdwUPfcxc6YS6VWl4uMuxKTGWIqtRrH",
+        name: "fujitama",
+        uniqueId: "fujitama"
+      },
+      keyword: "fujita@nulab-inc.com fujita@nulab-inc.com",
+      lastLoginTime: "2023-01-26T06:34:06Z"
+    },
+    updated: "2023-01-25T00:27:16Z",
+    customFields: [{ id: 71491, fieldTypeId: 3, name: "__PBI_ORDER__389286__", value: -965 }],
+    attachments: [],
+    sharedFiles: [],
+    stars: []
+  } as IssueData
+] as IssueData[]

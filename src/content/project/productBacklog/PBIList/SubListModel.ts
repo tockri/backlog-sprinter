@@ -1,21 +1,32 @@
 import React from "react"
 
 type PBISubListModel = {
-  setHovered: (index: number, hover: boolean) => void
-  isHovered: (index: number) => boolean
+  setArrangeHovered: (index: number, hover: boolean) => void
+  isArrangeHovered: (index: number) => boolean
+  setMoveHovered: (issueId: number, hover: boolean) => void
+  isMoveHovered: (issueId: number) => boolean
 }
 
 export const usePBISubListModel = (): PBISubListModel => {
   const [hoverIndex, setHoverIndex] = React.useState(-1)
+  const [moveHoverId, setMoveHoverId] = React.useState<number | null>(null)
 
   return {
-    setHovered: (index: number, hover: boolean) => {
+    setArrangeHovered: (index: number, hover: boolean) => {
       if (hover) {
         setHoverIndex(index)
       } else {
         setHoverIndex((hi) => (hi === index ? -1 : hi))
       }
     },
-    isHovered: (index) => index === hoverIndex
+    isArrangeHovered: (index) => index === hoverIndex,
+    setMoveHovered: (issueId: number, hover: boolean) => {
+      if (hover) {
+        setMoveHoverId(issueId)
+      } else {
+        setMoveHoverId((i) => (i === issueId ? null : i))
+      }
+    },
+    isMoveHovered: (issueId: number) => moveHoverId === issueId
   }
 }

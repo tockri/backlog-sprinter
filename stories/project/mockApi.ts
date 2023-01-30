@@ -1,7 +1,7 @@
 import produce from "immer"
 import { BacklogApi, FakeBacklogApi } from "../../src/content/backlog/BacklogApiForReact"
 import { IssueChangeInput, IssueData, IssueDataUtil } from "../../src/content/backlog/Issue"
-import { productBacklogBT, projectInfoBT } from "./mockApiData"
+import { childIssuesBT, productBacklogBT, projectInfoBT } from "./mockApiData"
 
 export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
   draft.projectInfo.getProjectInfoWithCustomFields = () => Promise.resolve(projectInfoBT)
@@ -28,4 +28,5 @@ export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
       IssueDataUtil.mutateByIssueInput(d, input, statuses)
     })
   }
+  draft.issue.searchChildren = () => Promise.resolve(childIssuesBT)
 })

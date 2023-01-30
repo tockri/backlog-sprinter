@@ -1,7 +1,7 @@
 import { Immutable } from "immer"
 import { WritableDraft } from "immer/dist/internal"
 import { BacklogApiRequest } from "./BacklogApiRequest"
-import { CustomNumberField, Project, Status, Version } from "./ProjectInfo"
+import { CustomNumberField, IssueType, Project, Status, Version } from "./ProjectInfo"
 
 export type CustomFieldData = Immutable<{
   id: number
@@ -20,6 +20,7 @@ export type IssueData = Immutable<{
   description: string
   estimatedHours: number | null
   actualHours: number | null
+  parentIssueId: number | null
 }>
 
 const searchUnclosedInMilestone = async (
@@ -94,16 +95,17 @@ const changeMilestoneAndCustomFieldValue = async (
   return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
 }
 
-export type IssueChangeInput = {
+export type IssueChangeInput = Immutable<{
   summary?: string
   description?: string
   estimatedHours?: number | null
   actualHours?: number | null
   statusId?: number
-}
+  parentIssueId?: number | null
+}>
 
 const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<IssueData> => {
-  const { summary, description, estimatedHours, actualHours, statusId } = input
+  const { summary, description, estimatedHours, actualHours, statusId, parentIssueId } = input
   const params: Record<string, string> = {}
   if (summary !== undefined) {
     params["summary"] = summary
@@ -119,6 +121,9 @@ const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<Iss
   }
   if (statusId !== undefined) {
     params["statusId"] = String(statusId)
+  }
+  if (parentIssueId !== undefined) {
+    params["parentIssueId"] = String(parentIssueId)
   }
   return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
 }
@@ -140,6 +145,9 @@ const mutateByIssueInput = (
   if (input.actualHours !== undefined) {
     issue.actualHours = input.actualHours
   }
+  if (input.parentIssueId !== undefined) {
+    issue.parentIssueId = input.parentIssueId
+  }
   if (input.statusId !== undefined) {
     const newStatus = statuses.find((s) => s.id === input.statusId)
     if (newStatus) {
@@ -147,6 +155,12 @@ const mutateByIssueInput = (
     }
   }
 }
+
+export type IssueCreateInput = Immutable<{
+  issueType: IssueType
+  summary: string
+  parentIssueId?: number | null
+}>
 
 const Issue = {
   searchUnclosedInMilestone,

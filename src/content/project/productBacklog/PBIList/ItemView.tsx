@@ -21,6 +21,7 @@ export const PBIItemView: React.FC<PBIItemViewProps> = (props) => {
 
   return (
     <Draggable
+      type="arrange"
       item={item}
       onDragEnd={(where) => {
         if (where) {
@@ -59,7 +60,6 @@ const Cell = styled.div({
   borderRadius: 2,
   color: "#404040",
   margin: "4px 0",
-  backgroundColor: "#ffffff",
   display: "flex",
   "&.selected": {
     border: "2px solid #e0c0c0"

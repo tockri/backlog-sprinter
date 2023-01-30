@@ -30,6 +30,7 @@ const fakeIssue = (id: number, versionId: number | null, order: number | null): 
   customFields: [],
   estimatedHours: null,
   actualHours: null,
+  parentIssueId: null,
   order
 })
 const makeFakeBacklog = (
