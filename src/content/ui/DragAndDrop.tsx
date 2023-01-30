@@ -1,30 +1,35 @@
-import styled from "@emotion/styled"
 import React, { PropsWithChildren } from "react"
 import { ObjectUtil } from "../../util/ObjectUtil"
 
+type DragItem = {
+  type: string
+  item: unknown
+}
+
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-class DragContext<T = any> {
-  private dragging: T | null = null
-  private hoverring: T | null = null
+class DragContext {
+  private dragging: DragItem | null = null
+  private hoverring: DragItem | null = null
   private endFunc: (() => void) | null = null
-  setDragging(t: T | null) {
-    this.dragging = t
+  setDragging<T>(type: string, item: T | null) {
+    this.dragging = { type, item }
   }
-  getDragging(): T | null {
-    return this.dragging
+  getDragging<T>(type: string): T | null {
+    return (this.dragging?.type === type && (this.dragging?.item as T)) || null
   }
-  setHoverring(t: T | null) {
-    this.hoverring = t
+  setHoverring<T>(type: string, item: T | null) {
+    this.hoverring = { type, item }
   }
-  getHoverring(): T | null {
-    return this.hoverring
+  getHoverring<T>(type: string): T | null {
+    return (this.hoverring?.type == type && (this.hoverring?.item as T)) || null
   }
   setEndFunc(func: (() => void) | null) {
     this.endFunc = func
   }
   executeEndFunc() {
-    if (this.endFunc) {
-      this.endFunc()
+    const func = this.endFunc
+    if (func) {
+      func()
     }
   }
 }
@@ -40,20 +45,21 @@ export const DragAndDropProvider = (props: DragAndDropProviderProps): React.Reac
 }
 
 type DropPointProps<T> = React.PropsWithChildren & {
+  readonly type: string
   readonly item: T
   readonly canDrop?: (dragging: T) => boolean
   readonly hoverStateChanged?: (hover: boolean) => void
 }
 
 export const Droppable = <T,>(props: DropPointProps<T>): React.ReactElement => {
-  const { item, children, canDrop, hoverStateChanged } = props
-  const context: DragContext<T> = React.useContext(dragContext)
+  const { type, item, children, canDrop, hoverStateChanged } = props
+  const context: DragContext = React.useContext(dragContext)
 
   const timer = React.useRef<number>(0)
   const hover = React.useRef<boolean>(false)
 
   const acceptable = () => {
-    const dragging = context.getDragging()
+    const dragging = context.getDragging<T>(type)
     if (dragging) {
       return canDrop ? canDrop(dragging) : true
     } else {
@@ -64,8 +70,8 @@ export const Droppable = <T,>(props: DropPointProps<T>): React.ReactElement => {
   const onEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     window.clearTimeout(timer.current)
-    if (acceptable() && context.getHoverring() !== item) {
-      context.setHoverring(item)
+    if (acceptable() && context.getHoverring(type) !== item) {
+      context.setHoverring(type, item)
       context.setEndFunc(onLeave)
       if (!hover.current) {
         hover.current = true
@@ -77,8 +83,8 @@ export const Droppable = <T,>(props: DropPointProps<T>): React.ReactElement => {
   const onLeave = () => {
     timer.current = window.setTimeout(() => {
       timer.current = 0
-      if (ObjectUtil.isStrictEqual(context.getHoverring(), item)) {
-        context.setHoverring(null)
+      if (ObjectUtil.isStrictEqual(context.getHoverring(type), item)) {
+        context.setHoverring(type, null)
       }
       if (hover.current) {
         hover.current = false
@@ -95,39 +101,35 @@ export const Droppable = <T,>(props: DropPointProps<T>): React.ReactElement => {
 }
 
 type DraggableProps<T> = PropsWithChildren & {
+  readonly type: string
   readonly item: T
-  readonly onDragEnd: (dropped: T) => void
+  readonly onDragEnd: (dropped: T | null) => void
+  readonly onDragStart?: () => void
 }
 
 export const Draggable = <T,>(props: DraggableProps<T>): React.ReactElement => {
-  const { item, onDragEnd } = props
-  const context = React.useContext<DragContext<T>>(dragContext)
+  const { type, item, onDragEnd, onDragStart } = props
+  const context = React.useContext<DragContext>(dragContext)
   return (
-    <DraggableView
+    <div
       draggable={true}
       onDragStart={(e) => {
         e.dataTransfer.dropEffect = "move"
-        context.setDragging(item)
+        context.setDragging(type, item)
+        onDragStart && onDragStart()
       }}
       onDragEnd={() => {
-        const hp = context.getHoverring()
+        const hp = context.getHoverring<T>(type)
         if (hp) {
-          onDragEnd(hp)
-          context.setDragging(null)
-          context.setHoverring(null)
+          context.setDragging(type, null)
+          context.setHoverring(type, null)
           context.executeEndFunc()
           context.setEndFunc(null)
         }
+        onDragEnd(hp)
       }}
     >
       {props.children}
-    </DraggableView>
+    </div>
   )
 }
-
-const DraggableView = styled.div({
-  // cursor: "default",
-  // ":active *": {
-  //   cursor: "move"
-  // }
-})

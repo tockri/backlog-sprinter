@@ -7,31 +7,38 @@ export type BacklogApi = {
   projectInfo: ProjectInfoApi
 }
 
-const rejector = () => Promise.reject()
+const rejectFunc = () => {
+  console.warn("not implemented")
+  return Promise.reject()
+}
 
 const fakeIssueApi: IssueApi = {
-  searchUnclosedInMilestone: rejector,
-  searchInIssueTypeAndMilestones: rejector,
-  bulkChangeMilestone: rejector,
-  changeMilestoneAndCustomFieldValue: rejector,
-  changeInfo: rejector
+  searchUnclosedInMilestone: rejectFunc,
+  searchInIssueTypeAndMilestones: rejectFunc,
+  searchChildren: rejectFunc,
+  bulkChangeMilestone: rejectFunc,
+  changeMilestoneAndCustomFieldValue: rejectFunc,
+  editIssue: rejectFunc,
+  createIssue: rejectFunc
 }
 
 const fakeProjectInfoApi: ProjectInfoApi = {
-  getProjectInfoWithMilestones: rejector,
-  getProjectInfoWithCustomFields: rejector,
-  createCustomField: rejector,
-  deleteCustomField: rejector,
-  createMilestone: rejector,
-  archiveMilestone: rejector
+  getProjectInfoWithMilestones: rejectFunc,
+  getProjectInfoWithCustomFields: rejectFunc,
+  createCustomField: rejectFunc,
+  deleteCustomField: rejectFunc,
+  createMilestone: rejectFunc,
+  archiveMilestone: rejectFunc
 }
 
-export const BacklogApiContext = React.createContext<BacklogApi>({
+export const FakeBacklogApi: BacklogApi = {
   issue: fakeIssueApi,
   projectInfo: fakeProjectInfoApi
-})
+}
 
 export const RealBacklogApi: BacklogApi = {
   issue: RealIssue,
   projectInfo: RealProjectInfo
 }
+
+export const BacklogApiContext = React.createContext<BacklogApi>(FakeBacklogApi)

@@ -6,6 +6,7 @@ import { Modal } from "../../ui/Modal"
 import { TabPanel } from "../../ui/TabPanel"
 import { ProductBacklogView } from "../productBacklog/View"
 import { ProjectSettings } from "../settings/View"
+import { StatView } from "../stat/View"
 import { ProjectFormInfo } from "../types"
 import { i18n } from "./i18n"
 import { useAppModel, useInnerModel } from "./Model"
@@ -41,16 +42,12 @@ const Inner: React.FC = () => {
       tabs={[
         {
           label: t.productBacklog,
-          component: () => (
-            <React.Suspense fallback={<Loading />}>
-              <ProductBacklogView />
-            </React.Suspense>
-          )
+          component: () => <ProductBacklogView />
         },
-        // {
-        //   label: "ベロシティ",
-        //   component: () => <DndTestView />
-        // },
+        {
+          label: t.stat,
+          component: () => <StatView />
+        },
         {
           label: t.setting,
           component: () => <ProjectSettings />

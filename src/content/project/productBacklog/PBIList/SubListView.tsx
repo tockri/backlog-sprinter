@@ -1,7 +1,12 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
+import { IssueData } from "../../../backlog/Issue"
+import { VBox } from "../../../ui/Box"
+import { cnu } from "../../../ui/cnu"
 import { Droppable } from "../../../ui/DragAndDrop"
+import { EditableField } from "../../../ui/EditableField"
+import { i18n } from "../i18n"
 import { PBIItemView } from "./ItemView"
 import { PBIListData } from "./ListData"
 import { usePBISubListModel } from "./SubListModel"
@@ -17,7 +22,7 @@ type DragItem = {
   subListId: string
 }
 
-const canDropOn =
+const canArrange =
   (index: number, subListId: string) =>
   (dragging: DragItem): boolean => {
     if (dragging.subListId === subListId) {
@@ -29,12 +34,22 @@ const canDropOn =
     return true
   }
 
+const canMove =
+  (issue: IssueData) =>
+  (dragging: IssueData): boolean => {
+    if (dragging.parentIssueId !== issue.id) {
+      return true
+    }
+    return false
+  }
+
 export const PBISubList: React.FC<PBISubListProps> = (props) => {
   const { subList } = props
   const milestone = subList.head
   const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
-  const model = usePBISubListModel()
+  const model = React.useCallback(usePBISubListModel, [])(subList)
   const lastIdx = subList.items.length
+  const t = i18n(model.lang)
   return (
     <SL>
       <SLTitle>
@@ -45,21 +60,55 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
         {subList.items.map((issue, index) => (
           <Droppable
             key={issue.id}
-            item={{ index, subListId: subList.id }}
-            canDrop={canDropOn(index, subList.id)}
-            hoverStateChanged={(h) => model.setHovered(index, h)}
+            type="moveParent"
+            item={issue}
+            canDrop={canMove(issue)}
+            hoverStateChanged={(h) => {
+              model.setMoveHovered(issue.id, h)
+            }}
           >
-            <DropArea className={model.isHovered(index) ? "hover" : ""}>
-              <PBIItemView issue={issue} key={index} index={index} subListId={subList.id} />
-            </DropArea>
+            <Droppable
+              type="arrange"
+              item={{ index, subListId: subList.id }}
+              canDrop={canArrange(index, subList.id)}
+              hoverStateChanged={(h) => {
+                model.setArrangeHovered(issue.id, h)
+              }}
+            >
+              <DropArea
+                className={cnu({
+                  arrangeHover: model.isArrangeHovered(issue.id),
+                  moveHover: model.isMoveHovered(issue.id)
+                })}
+              >
+                <PBIItemView issue={issue} key={index} index={index} subListId={subList.id} />
+              </DropArea>
+            </Droppable>
           </Droppable>
         ))}
         <Droppable
+          type="arrange"
           item={{ index: lastIdx, subListId: subList.id }}
-          canDrop={canDropOn(lastIdx, subList.id)}
-          hoverStateChanged={(h) => model.setHovered(lastIdx, h)}
+          canDrop={canArrange(lastIdx, subList.id)}
+          hoverStateChanged={(h) => model.setArrangeHovered(-1, h)}
         >
-          <DropArea className={model.isHovered(lastIdx) ? "hover empty" : "empty"} />
+          <DropArea className={cnu("empty", { arrangeHover: model.isArrangeHovered(-1) })}>
+            <VBox>
+              <EditableField
+                placeholder={t.addNewItem}
+                onFix={(summary) => {
+                  model.createNewIssue(summary)
+                }}
+                viewStyle={{
+                  padding: 4
+                }}
+                editStyle={{
+                  flexGrow: 1
+                }}
+                blurAction="cancel"
+              />
+            </VBox>
+          </DropArea>
         </Droppable>
       </SLBody>
     </SL>
@@ -71,8 +120,11 @@ const DropArea = styled.div({
   "&.empty": {
     paddingBottom: 20
   },
-  "&.hover": {
+  "&.arrangeHover": {
     paddingTop: 12
+  },
+  "&.moveHover": {
+    backgroundColor: "#c0e0e0"
   }
 })
 

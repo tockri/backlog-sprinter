@@ -1,5 +1,6 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { Loading } from "./Loading"
 
 export type TabPanelTabInfo = {
   label: string
@@ -30,7 +31,9 @@ export const TabPanel: React.FC<TabPanelProps> = (props) => {
           </Tab>
         ))}
       </TabBar>
-      <Body>{tabs[index].component()}</Body>
+      <Body>
+        <React.Suspense fallback={<Loading />}>{tabs[index].component()}</React.Suspense>
+      </Body>
     </Panel>
   )
 }

@@ -1,18 +1,22 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { DragAndDropProvider } from "../../ui/DragAndDrop"
 import { InfoAreaView } from "./InfoArea/View"
 import { PBIListView } from "./PBIList/ListView"
 
 export const ProductBacklogView: React.FC = () => {
   return (
     <Root>
-      <PBIListView />
-      <InfoAreaView />
+      <DragAndDropProvider>
+        <PBIListView />
+        <InfoAreaView />
+      </DragAndDropProvider>
     </Root>
   )
 }
 
 const Root = styled.div({
   display: "flex",
-  height: "100%"
+  height: "100%",
+  flexGrow: 1
 })

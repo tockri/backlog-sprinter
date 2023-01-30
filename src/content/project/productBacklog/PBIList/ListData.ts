@@ -1,8 +1,7 @@
-import { Immutable } from "immer"
 import { WritableDraft } from "immer/dist/internal"
-import { NestedList, NestedListData, NestMethods, NLLocation } from "../../../../util/NestedList"
-import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
-import { CustomNumberField, Version } from "../../../backlog/ProjectInfo"
+import { NestedList, NestedListData, NestMethods, NLMoveAction } from "../../../../util/NestedList"
+import { IssueChangeInput, IssueData, IssueDataUtil } from "../../../backlog/Issue"
+import { CustomNumberField, Status, Version } from "../../../backlog/ProjectInfo"
 
 export type IssueDataWithOrder = IssueData & { readonly order: number | null }
 export type PBIListData = NestedListData<Version, IssueDataWithOrder>
@@ -28,12 +27,11 @@ const nest = (items: ReadonlyArray<IssueDataWithOrder>): PBIListData => {
 }
 
 const nestIssues = (issues: ReadonlyArray<IssueData>, orderCustomField: CustomNumberField): PBIListData =>
-  nest(
-    issues.map((issue) => ({
-      ...issue,
-      order: getOrderValue(orderCustomField, issue)
-    }))
-  )
+  nest(issues.map(withOrder(orderCustomField)))
+
+const withOrder =
+  (orderCustomField: CustomNumberField) =>
+  (issue: IssueData): IssueDataWithOrder => ({ ...issue, order: getOrderValue(orderCustomField, issue) })
 
 const getOrderValue = (orderCustomField: CustomNumberField, issue: IssueData): number | null => {
   const field = issue.customFields.find((cf) => cf.id === orderCustomField.id)
@@ -123,12 +121,7 @@ const patchIndex = (eventStore: EventStore, works: Work[], index: number) => {
   }
 }
 
-export type MoveAction = Immutable<{
-  src: NLLocation
-  dst: NLLocation
-}>
-
-const indexAfterMove = (action: MoveAction): number => {
+const indexAfterMove = (action: NLMoveAction): number => {
   const { src, dst } = action
   if (src.subListId === dst.subListId && src.index < dst.index) {
     return dst.index - 1
@@ -137,7 +130,7 @@ const indexAfterMove = (action: MoveAction): number => {
   }
 }
 
-const mutateByMoveAction = (data: WritableDraft<PBIListData>, action: MoveAction): PBIListMovedEvent[] => {
+const mutateByMoveAction = (data: WritableDraft<PBIListData>, action: NLMoveAction): PBIListMovedEvent[] => {
   NestedList.mutateMove(data, action)
   const eventStore = new EventStore()
   const subList = data.subLists.find((sl) => sl.id === action.dst.subListId)
@@ -166,21 +159,45 @@ const mutateByMoveAction = (data: WritableDraft<PBIListData>, action: MoveAction
   return eventStore.values()
 }
 
+const mutateByIssueCreation = (
+  data: WritableDraft<PBIListData>,
+  created: IssueData,
+  orderCustomField: CustomNumberField
+) => {
+  const subList = data.subLists.find((sl) => sl.head?.id === created.milestone[0]?.id)
+  if (subList) {
+    subList.items.push(withOrder(orderCustomField)(created) as WritableDraft<IssueDataWithOrder>)
+  }
+}
+
 export type PBIChangeAction = {
   issueId: number
   input: IssueChangeInput
 }
 
-const mutateByChangeAction = (data: WritableDraft<PBIListData>, action: PBIChangeAction) => {
+const getNewOrder = (data: PBIListData, milestone: Version | null): number => {
+  const subList = data.subLists.find((sl) => sl.head?.id === milestone?.id)
+  if (subList) {
+    const newValue = (subList.items[subList.items.length - 1].order || 0) + 100
+    console.log({
+      orders: subList.items.map((it) => it.order),
+      newValue
+    })
+    return newValue
+  } else {
+    return 0
+  }
+}
+
+const mutateByChangeAction = (
+  data: WritableDraft<PBIListData>,
+  statuses: ReadonlyArray<Status>,
+  action: PBIChangeAction
+) => {
   const { issueId, input } = action
   const [item] = findIssue(data, issueId)
   if (item) {
-    if (input.summary !== undefined) {
-      item.summary = input.summary
-    }
-    if (input.description !== undefined) {
-      item.description = input.description
-    }
+    IssueDataUtil.mutateByIssueInput(item, input, statuses)
   }
 }
 
@@ -201,6 +218,8 @@ const findIssue = <T extends PBIListData | WritableDraft<PBIListData>>(
 export const PBIListDataHandler = {
   mutateByChangeAction,
   mutateByMoveAction,
+  mutateByIssueCreation,
+  getNewOrder,
   findIssue,
   nest,
   nestIssues

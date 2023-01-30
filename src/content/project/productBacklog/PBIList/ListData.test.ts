@@ -9,6 +9,7 @@ import { IssueDataWithOrder, PBIListData, PBIListDataHandler, PBIListMovedEvent 
 const fakeVersion = (id: number): Version => ({
   id,
   name: `MS ${id}`,
+  projectId: 1,
   description: "",
   startDate: `2023-01-${id} 00:00:00Z`,
   releaseDueDate: `2023-01-${id + 10} 00:00:00Z`,
@@ -24,9 +25,12 @@ const fakeIssue = (id: number, versionId: number | null, order: number | null): 
   issueKey: `FAKE-${id}`,
   summary: `Issue ${id}`,
   description: "",
-  status: { id: 1, name: "Open", color: "#ff0000" },
+  status: { id: 1, projectId: 1, name: "Open", color: "#ff0000", displayOrder: 10 },
   milestone: versionId ? [versions[versionId]] : [],
   customFields: [],
+  estimatedHours: null,
+  actualHours: null,
+  parentIssueId: null,
   order
 })
 const makeFakeBacklog = (
@@ -56,6 +60,7 @@ const issues = makeFakeBacklog(
 const nested = PBIListDataHandler.nest(Object.values(issues))
 const toLoc = (subListId: string, index: number): NLLocation => ({ subListId, index })
 const toAction = (src: [subListId: string, index: number], dst: [subListId: string, index: number]): NLMoveAction => ({
+  type: "NLMove",
   src: toLoc(src[0], src[1]),
   dst: toLoc(dst[0], dst[1])
 })
@@ -115,7 +120,7 @@ test("preparations are correct", () => {
 })
 
 test("Move to the top of another subList", () => {
-  const action = { src: toLoc("1", 2), dst: toLoc("2", 0) }
+  const action = toAction(["1", 2], ["2", 0])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
     events = PBIListDataHandler.mutateByMoveAction(draft, action)
@@ -130,7 +135,7 @@ test("Move to the top of another subList", () => {
 })
 
 test("Move to the inside of another subList", () => {
-  const action = { src: toLoc("1", 2), dst: toLoc("2", 1) }
+  const action = toAction(["1", 2], ["2", 1])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
     events = PBIListDataHandler.mutateByMoveAction(draft, action)
@@ -146,7 +151,7 @@ test("Move to the inside of another subList", () => {
 })
 
 test("Move within a subList", () => {
-  const action = { src: toLoc("1", 2), dst: toLoc("1", 0) }
+  const action = toAction(["1", 2], ["1", 0])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
     events = PBIListDataHandler.mutateByMoveAction(draft, action)
@@ -160,7 +165,7 @@ test("Move within a subList", () => {
 })
 
 test("Move to the last", () => {
-  const action = { src: toLoc("1", 2), dst: toLoc("1", 4) }
+  const action = toAction(["1", 2], ["1", 4])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
     events = PBIListDataHandler.mutateByMoveAction(draft, action)
@@ -174,7 +179,7 @@ test("Move to the last", () => {
 })
 
 test("Move and cause rebalance", () => {
-  const action = { src: toLoc("1", 2), dst: toLoc("3", 1) }
+  const action = toAction(["1", 2], ["3", 1])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
     events = PBIListDataHandler.mutateByMoveAction(draft, action)
@@ -205,7 +210,7 @@ test("Move and cause rebalance", () => {
 })
 
 test("Move and make order between null and some", () => {
-  const action = { src: toLoc("1", 2), dst: toLoc("--", 1) }
+  const action = toAction(["1", 2], ["--", 1])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
     events = PBIListDataHandler.mutateByMoveAction(draft, action)
@@ -228,7 +233,7 @@ test("Move and make order between null and some", () => {
 })
 
 test("Move and cause rebalance on existing issues", () => {
-  const action = { src: toLoc("1", 2), dst: toLoc("--", 2) }
+  const action = toAction(["1", 2], ["--", 2])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
     events = PBIListDataHandler.mutateByMoveAction(draft, action)

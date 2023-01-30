@@ -1,19 +1,16 @@
 import styled from "@emotion/styled"
 import React from "react"
-import { DragAndDropProvider } from "../../../ui/DragAndDrop"
 import { usePBIListModel } from "./ListModel"
 import { PBISubList } from "./SubListView"
 
 export const PBIListView: React.FC = () => {
   const model = usePBIListModel()
   return (
-    <DragAndDropProvider>
-      <Root>
-        {model.data.subLists.map((sl) => (
-          <PBISubList subList={sl} key={sl.id} />
-        ))}
-      </Root>
-    </DragAndDropProvider>
+    <Root>
+      {model.data.subLists.map((sl) => (
+        <PBISubList subList={sl} key={sl.id} />
+      ))}
+    </Root>
   )
 }
 

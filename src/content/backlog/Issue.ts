@@ -1,22 +1,27 @@
+import { Immutable } from "immer"
+import { WritableDraft } from "immer/dist/internal"
 import { BacklogApiRequest } from "./BacklogApiRequest"
-import { CustomNumberField, Project, Status, Version } from "./ProjectInfo"
+import { CustomNumberField, IssueType, Project, Status, Version } from "./ProjectInfo"
 
-export type CustomFieldData = {
+export type CustomFieldData = Immutable<{
   id: number
   name: string
   value: string | number | null
   fieldTypeId: number
-}
+}>
 
-export type IssueData = {
-  readonly id: number
-  readonly issueKey: string
-  readonly summary: string
-  readonly status: Status
-  readonly milestone: ReadonlyArray<Version>
-  readonly customFields: ReadonlyArray<CustomFieldData>
-  readonly description: string
-}
+export type IssueData = Immutable<{
+  id: number
+  issueKey: string
+  summary: string
+  status: Status
+  milestone: ReadonlyArray<Version>
+  customFields: ReadonlyArray<CustomFieldData>
+  description: string
+  estimatedHours: number | null
+  actualHours: number | null
+  parentIssueId: number | null
+}>
 
 const searchUnclosedInMilestone = async (
   project: Project,
@@ -45,6 +50,16 @@ const searchInIssueTypeAndMilestones = async (
       count: "100"
     },
     ...milestones.map((v) => ({ "milestoneId[]": "" + v.id }))
+  ])
+}
+
+const searchChildren = async (project: Project, parentIssueId: number): Promise<ReadonlyArray<IssueData>> => {
+  return await BacklogApiRequest.get<ReadonlyArray<IssueData>>("/api/v2/issues", [
+    {
+      "projectId[]": "" + project.id,
+      "parentIssueId[]": "" + parentIssueId,
+      count: "100"
+    }
   ])
 }
 
@@ -80,13 +95,17 @@ const changeMilestoneAndCustomFieldValue = async (
   return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
 }
 
-export type IssueChangeInput = {
+export type IssueChangeInput = Immutable<{
   summary?: string
   description?: string
-}
+  estimatedHours?: number | null
+  actualHours?: number | null
+  statusId?: number
+  parentIssueId?: number | null
+}>
 
-const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<IssueData> => {
-  const { summary, description } = input
+const editIssue = async (issueId: number, input: IssueChangeInput): Promise<IssueData> => {
+  const { summary, description, estimatedHours, actualHours, statusId, parentIssueId } = input
   const params: Record<string, string> = {}
   if (summary !== undefined) {
     params["summary"] = summary
@@ -94,15 +113,92 @@ const changeInfo = async (issueId: number, input: IssueChangeInput): Promise<Iss
   if (description !== undefined) {
     params["description"] = description
   }
+  if (estimatedHours !== undefined) {
+    params["estimatedHours"] = estimatedHours !== null ? String(estimatedHours) : ""
+  }
+  if (actualHours !== undefined) {
+    params["actualHours"] = actualHours !== null ? String(actualHours) : ""
+  }
+  if (statusId !== undefined) {
+    params["statusId"] = String(statusId)
+  }
+  if (parentIssueId !== undefined) {
+    params["parentIssueId"] = String(parentIssueId)
+  }
   return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
+}
+
+const mutateByIssueInput = (
+  issue: WritableDraft<IssueData>,
+  input: IssueChangeInput,
+  statuses: ReadonlyArray<Status>
+) => {
+  if (input.summary !== undefined) {
+    issue.summary = input.summary
+  }
+  if (input.description !== undefined) {
+    issue.description = input.description
+  }
+  if (input.estimatedHours !== undefined) {
+    issue.estimatedHours = input.estimatedHours
+  }
+  if (input.actualHours !== undefined) {
+    issue.actualHours = input.actualHours
+  }
+  if (input.parentIssueId !== undefined) {
+    issue.parentIssueId = input.parentIssueId
+  }
+  if (input.statusId !== undefined) {
+    const newStatus = statuses.find((s) => s.id === input.statusId)
+    if (newStatus) {
+      issue.status = newStatus
+    }
+  }
+}
+
+export type IssueCreateInput = Immutable<{
+  project: Project
+  issueType: IssueType
+  summary: string
+  parentIssueId?: number
+  milestoneId?: number | null
+  customField?: {
+    id: number
+    value: number
+  }
+}>
+
+const createIssue = async (input: IssueCreateInput): Promise<IssueData> => {
+  const params: Record<string, string> = {}
+  params["projectId"] = String(input.project.id)
+  params["issueTypeId"] = String(input.issueType.id)
+  params["priorityId"] = "3"
+  params["summary"] = input.summary
+  const { parentIssueId, milestoneId, customField } = input
+  if (parentIssueId !== undefined) {
+    params["parentIssueId"] = String(parentIssueId)
+  }
+  if (milestoneId !== undefined) {
+    params["milestoneId[]"] = String(milestoneId)
+  }
+  if (customField !== undefined) {
+    params[`customField_${customField.id}`] = String(customField.value)
+  }
+  return await BacklogApiRequest.post("/api/v2/issues", params)
 }
 
 const Issue = {
   searchUnclosedInMilestone,
   searchInIssueTypeAndMilestones,
+  searchChildren,
   bulkChangeMilestone,
   changeMilestoneAndCustomFieldValue,
-  changeInfo
+  editIssue,
+  createIssue
+}
+
+export const IssueDataUtil = {
+  mutateByIssueInput
 }
 
 export type IssueApi = typeof Issue
