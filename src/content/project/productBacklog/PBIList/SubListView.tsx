@@ -44,7 +44,7 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
   const { subList } = props
   const milestone = subList.head
   const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
-  const model = usePBISubListModel()
+  const model = React.useCallback(usePBISubListModel, [])()
   const lastIdx = subList.items.length
   return (
     <SL>
@@ -84,7 +84,15 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
           canDrop={canArrange(lastIdx, subList.id)}
           hoverStateChanged={(h) => model.setArrangeHovered(lastIdx, h)}
         >
-          <DropArea className={cnu("empty", { arrangeHover: model.isArrangeHovered(lastIdx) })} />
+          <DropArea className={cnu("empty", { arrangeHover: model.isArrangeHovered(lastIdx) })}>
+            <AddButton
+              onClick={() => {
+                console.log("clicked")
+              }}
+            >
+              Create new
+            </AddButton>
+          </DropArea>
         </Droppable>
       </SLBody>
     </SL>
@@ -124,4 +132,12 @@ const ReleaseDate = styled.span({
 
 const SLBody = styled.div({
   padding: 0
+})
+
+const AddButton = styled.button({
+  appearance: "none",
+  color: "gray",
+  fontWeight: "bold",
+  borderWidth: 0,
+  backgroundColor: "transparent"
 })

@@ -6,7 +6,7 @@ import { statusesAtom } from "../app/State"
 
 type StatusViewProps = {
   status: Status
-  variant?: "view" | "edit"
+  variant?: "view" | "edit" | "tiny"
   onFix?: (statusId: number) => void
 }
 export const StatusView: React.FC<StatusViewProps> = (props) => {
@@ -15,6 +15,8 @@ export const StatusView: React.FC<StatusViewProps> = (props) => {
     <Root>
       {variant === "edit" ? (
         <StatusEditView {...props} />
+      ) : variant === "tiny" ? (
+        <StatusIcon style={{ backgroundColor: status.color }} />
       ) : (
         <>
           <StatusIcon style={{ backgroundColor: status.color }} />

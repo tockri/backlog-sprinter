@@ -61,11 +61,10 @@ export const InfoAreaView: React.FC = () => {
               }}
               viewStyle={{
                 flexGrow: 1,
-                overflow: "scroll",
                 backgroundColor: "#f0f0f0"
               }}
               onFix={(value) => model.changeIssue("description", value)}
-              blurAction="cancel"
+              blurAction="none"
             />
           </Description>
           <React.Suspense fallback={<Loading />}>
@@ -80,13 +79,14 @@ export const InfoAreaView: React.FC = () => {
 }
 
 const Area = styled.div({
-  width: "50%"
+  width: "50%",
+  height: "calc(100% - 12px)"
 })
 
 const Float = styled(VBox)({
   padding: 8,
   boxShadow: "-2px 0 3px #c0c0c0",
-  height: "calc(100% - 12px)",
+  height: "100%",
   margin: 12
 })
 
@@ -110,7 +110,7 @@ const HeadSide = styled(VBox)({
   justifyContent: "center"
 })
 
-const Description = styled(HBox)({
+const Description = styled(VBox)({
   " h1": {
     fontSize: "1.4rem"
   },

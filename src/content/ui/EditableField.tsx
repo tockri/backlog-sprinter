@@ -105,16 +105,14 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
           />
         )
       ) : (
-        <Viewer tabIndex={0} className={cnu({ disabled })} style={props.viewStyle} onFocus={onFocus}>
+        <Viewer tabIndex={0} className={cnu({ disabled, multiline })} style={props.viewStyle} onFocus={onFocus}>
           {defaultValue ? (
             markdown ? (
               <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget={"_blank"}>
                 {defaultValue}
               </ReactMarkdown>
-            ) : multiline ? (
-              <Show className="multiline">{defaultValue}</Show>
             ) : (
-              <Show>{defaultValue}</Show>
+              <>{defaultValue}</>
             )
           ) : (
             <Placeholder>{placeholder || ""}</Placeholder>
@@ -146,12 +144,7 @@ const TextAreaBase = styled.textarea({
   minHeight: "3em"
 })
 
-const Show = styled.div({
-  color: "#606060",
-  "&.multiline": {
-    whiteSpace: "pre-wrap"
-  }
-})
+const Show = styled.div({})
 
 const Placeholder = styled.div({
   color: "#c0c0c0"
@@ -159,6 +152,14 @@ const Placeholder = styled.div({
 
 const Viewer = styled.div({
   cursor: "pointer",
+  color: "#606060",
+  "&.multiline": {
+    whiteSpace: "pre-wrap",
+    overflow: "scroll",
+    height: "3em",
+    flexGrow: 1
+  },
+
   "&.disabled": {
     cursor: "default",
     color: "#909090"
