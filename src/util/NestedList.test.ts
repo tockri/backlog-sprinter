@@ -33,6 +33,7 @@ const origData: TestState = {
 
 const toLoc = (subListId: string, index: number): NLLocation => ({ subListId, index })
 const toAction = (src: [subListId: string, index: number], dst: [subListId: string, index: number]): NLMoveAction => ({
+  type: "NLMove",
   src: toLoc(src[0], src[1]),
   dst: toLoc(dst[0], dst[1])
 })

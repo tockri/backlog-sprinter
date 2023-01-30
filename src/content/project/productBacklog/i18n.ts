@@ -1,11 +1,13 @@
 const ja = {
   estimatedHours: "予定",
-  actualHours: "実績"
+  actualHours: "実績",
+  addNewItem: "新規登録"
 }
 
 const en: typeof ja = {
   estimatedHours: "Estimation",
-  actualHours: "Result"
+  actualHours: "Result",
+  addNewItem: "Add a new item"
 }
 
 const resources = { ja, en }

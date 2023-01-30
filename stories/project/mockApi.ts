@@ -21,7 +21,7 @@ export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
       }
     })
   }
-  draft.issue.changeInfo = async (issueId: number, input: IssueChangeInput) => {
+  draft.issue.editIssue = async (issueId: number, input: IssueChangeInput) => {
     const issue = productBacklogBT.find((i) => i.id === issueId) as IssueData
     const statuses = projectInfoBT.statuses
     return produce(issue, (d) => {

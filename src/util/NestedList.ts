@@ -55,6 +55,7 @@ export type NLLocation = Immutable<{
 }>
 
 export type NLMoveAction = Immutable<{
+  type: "NLMove"
   src: NLLocation
   dst: NLLocation
 }>

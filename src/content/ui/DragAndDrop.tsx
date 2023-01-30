@@ -1,28 +1,33 @@
 import React, { PropsWithChildren } from "react"
 import { ObjectUtil } from "../../util/ObjectUtil"
 
+type DragItem = {
+  type: string
+  item: unknown
+}
+
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-class DragContext<T = any> {
-  private dragging: Record<string, T | null> = {}
-  private hoverring: Record<string, T | null> = {}
-  private endFunc: Record<string, (() => void) | null> = {}
-  setDragging(type: string, t: T | null) {
-    this.dragging[type] = t
+class DragContext {
+  private dragging: DragItem | null = null
+  private hoverring: DragItem | null = null
+  private endFunc: (() => void) | null = null
+  setDragging<T>(type: string, item: T | null) {
+    this.dragging = { type, item }
   }
-  getDragging(type: string): T | null {
-    return this.dragging[type]
+  getDragging<T>(type: string): T | null {
+    return (this.dragging?.type === type && (this.dragging?.item as T)) || null
   }
-  setHoverring(type: string, t: T | null) {
-    this.hoverring[type] = t
+  setHoverring<T>(type: string, item: T | null) {
+    this.hoverring = { type, item }
   }
-  getHoverring(type: string): T | null {
-    return this.hoverring[type]
+  getHoverring<T>(type: string): T | null {
+    return (this.hoverring?.type == type && (this.hoverring?.item as T)) || null
   }
-  setEndFunc(type: string, func: (() => void) | null) {
-    this.endFunc[type] = func
+  setEndFunc(func: (() => void) | null) {
+    this.endFunc = func
   }
-  executeEndFunc(type: string) {
-    const func = this.endFunc[type]
+  executeEndFunc() {
+    const func = this.endFunc
     if (func) {
       func()
     }
@@ -48,13 +53,13 @@ type DropPointProps<T> = React.PropsWithChildren & {
 
 export const Droppable = <T,>(props: DropPointProps<T>): React.ReactElement => {
   const { type, item, children, canDrop, hoverStateChanged } = props
-  const context: DragContext<T> = React.useContext(dragContext)
+  const context: DragContext = React.useContext(dragContext)
 
   const timer = React.useRef<number>(0)
   const hover = React.useRef<boolean>(false)
 
   const acceptable = () => {
-    const dragging = context.getDragging(type)
+    const dragging = context.getDragging<T>(type)
     if (dragging) {
       return canDrop ? canDrop(dragging) : true
     } else {
@@ -67,7 +72,7 @@ export const Droppable = <T,>(props: DropPointProps<T>): React.ReactElement => {
     window.clearTimeout(timer.current)
     if (acceptable() && context.getHoverring(type) !== item) {
       context.setHoverring(type, item)
-      context.setEndFunc(type, onLeave)
+      context.setEndFunc(onLeave)
       if (!hover.current) {
         hover.current = true
         hoverStateChanged && hoverStateChanged(true)
@@ -104,7 +109,7 @@ type DraggableProps<T> = PropsWithChildren & {
 
 export const Draggable = <T,>(props: DraggableProps<T>): React.ReactElement => {
   const { type, item, onDragEnd, onDragStart } = props
-  const context = React.useContext<DragContext<T>>(dragContext)
+  const context = React.useContext<DragContext>(dragContext)
   return (
     <div
       draggable={true}
@@ -114,12 +119,12 @@ export const Draggable = <T,>(props: DraggableProps<T>): React.ReactElement => {
         onDragStart && onDragStart()
       }}
       onDragEnd={() => {
-        const hp = context.getHoverring(type)
+        const hp = context.getHoverring<T>(type)
         if (hp) {
           context.setDragging(type, null)
           context.setHoverring(type, null)
-          context.executeEndFunc(type)
-          context.setEndFunc(type, null)
+          context.executeEndFunc()
+          context.setEndFunc(null)
         }
         onDragEnd(hp)
       }}

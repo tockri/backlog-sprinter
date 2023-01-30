@@ -7,10 +7,11 @@ import { DateUtil } from "../../../util/DateUtil"
 import { NLMoveAction } from "../../../util/NestedList"
 import { BacklogApi } from "../../backlog/BacklogApiForReact"
 import { IssueCreateInput, IssueData } from "../../backlog/Issue"
-import { CustomNumberField } from "../../backlog/ProjectInfo"
+import { CustomNumberField, Version } from "../../backlog/ProjectInfo"
 import {
   appSettingAtom,
   backlogApiAtom,
+  issueTypesAtom,
   milestonesAtom,
   orderCustomFieldAtom,
   projectAtom,
@@ -20,7 +21,15 @@ import { PBIChangeAction, PBIListData, PBIListDataHandler, PBIListMovedEvent } f
 
 const pbiListDataStoreAtom = atom<PBIListData | null>(null)
 
-export const productBacklogAtom = atom<Promise<PBIListData>, NLMoveAction, Promise<void> | void>(
+export type ProductBacklogCreateActionType = {
+  type: "ProductBacklogCreate"
+  summary: string
+  milestone: Version | null
+}
+
+export type ProductBacklogAction = NLMoveAction | ProductBacklogCreateActionType
+
+export const productBacklogAtom = atom<Promise<PBIListData>, ProductBacklogAction, Promise<void> | void>(
   async (get) => {
     const orderCustomField = get(orderCustomFieldAtom)
     if (orderCustomField) {
@@ -47,20 +56,45 @@ export const productBacklogAtom = atom<Promise<PBIListData>, NLMoveAction, Promi
       throw new Error("orderCustomField is not set.")
     }
   },
-  async (get, set, moveAction) => {
+  async (get, set, action) => {
     const prev = get(productBacklogAtom)
-    const events: PBIListMovedEvent[] = []
-    const updated = produce(prev, (draft) => {
-      events.push(...PBIListDataHandler.mutateByMoveAction(draft, moveAction))
-    })
-    if (events.length) {
-      const api = get(backlogApiAtom)
+    if (action.type === "NLMove") {
+      const events: PBIListMovedEvent[] = []
+      const updated = produce(prev, (draft) => {
+        events.push(...PBIListDataHandler.mutateByMoveAction(draft, action))
+      })
+      if (events.length) {
+        const api = get(backlogApiAtom)
+        const orderCustomField = get(orderCustomFieldAtom)
+        if (orderCustomField) {
+          await updateIssues(orderCustomField, events, api).then()
+        }
+      }
+      set(pbiListDataStoreAtom, updated)
+    } else if (action.type === "ProductBacklogCreate") {
+      const setting = get(appSettingAtom)
+      const issueType = get(issueTypesAtom).find((it) => it.id === setting.pbiIssueTypeId)
       const orderCustomField = get(orderCustomFieldAtom)
-      if (orderCustomField) {
-        await updateIssues(orderCustomField, events, api).then()
+      if (issueType && orderCustomField) {
+        const project = get(projectAtom)
+        const api = get(backlogApiAtom)
+        const order = PBIListDataHandler.getNewOrder(prev, action.milestone)
+        const created = await api.issue.createIssue({
+          project,
+          issueType,
+          summary: action.summary,
+          milestoneId: action.milestone?.id,
+          customField: {
+            id: orderCustomField.id,
+            value: order
+          }
+        })
+        const updated = produce(prev, (draft) => {
+          PBIListDataHandler.mutateByIssueCreation(draft, created, orderCustomField)
+        })
+        set(pbiListDataStoreAtom, updated)
       }
     }
-    set(pbiListDataStoreAtom, updated)
   }
 )
 
@@ -109,7 +143,7 @@ export const selectedIssueAtom = atom<IssueData | null, PBIChangeAction, Promise
     })
     const api = get(backlogApiAtom)
     const { issueId, input } = action
-    await api.issue.changeInfo(issueId, input)
+    await api.issue.editIssue(issueId, input)
   }
 )
 
@@ -142,7 +176,9 @@ export const ChildIssueAction = {
   })
 }
 
-const childIssueStoreAtom = atomFamily((parentIssueId: number) => atom<ReadonlyArray<IssueData> | null>(null))
+/* eslint @typescript-eslint/no-unused-vars: 0 */
+const childIssueStoreAtom = atomFamily((_parentIssueId: number) => atom<ReadonlyArray<IssueData> | null>(null))
+
 export const childIssueAtom = atomFamily((parentIssueId: number) =>
   atom(
     async (get) => {
@@ -159,7 +195,7 @@ export const childIssueAtom = atomFamily((parentIssueId: number) =>
       if (action.type === ChildIssueActionTypes.Move) {
         const { issue, destinationIssueId } = action
         const api = get(backlogApiAtom)
-        const updated = await api.issue.changeInfo(issue.id, { parentIssueId: destinationIssueId })
+        const updated = await api.issue.editIssue(issue.id, { parentIssueId: destinationIssueId })
         const currSrc = get(childIssueAtom(parentIssueId))
         set(
           childIssueStoreAtom(parentIssueId),

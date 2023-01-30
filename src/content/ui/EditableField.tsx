@@ -144,8 +144,6 @@ const TextAreaBase = styled.textarea({
   minHeight: "3em"
 })
 
-const Show = styled.div({})
-
 const Placeholder = styled.div({
   color: "#c0c0c0"
 })

@@ -66,7 +66,11 @@ const ChildIssueView: React.FC<ChildIssueViewProps> = (props) => {
 
 const Heading = styled.div({
   fontSize: "0.9em",
-  color: "#666"
+  color: "#666",
+  " svg": {
+    width: 14,
+    height: 14
+  }
 })
 
 const ItemView = styled(HBox)({

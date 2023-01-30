@@ -2,8 +2,11 @@ import styled from "@emotion/styled"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
 import { IssueData } from "../../../backlog/Issue"
+import { VBox } from "../../../ui/Box"
 import { cnu } from "../../../ui/cnu"
 import { Droppable } from "../../../ui/DragAndDrop"
+import { EditableField } from "../../../ui/EditableField"
+import { i18n } from "../i18n"
 import { PBIItemView } from "./ItemView"
 import { PBIListData } from "./ListData"
 import { usePBISubListModel } from "./SubListModel"
@@ -44,8 +47,9 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
   const { subList } = props
   const milestone = subList.head
   const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
-  const model = React.useCallback(usePBISubListModel, [])()
+  const model = React.useCallback(usePBISubListModel, [])(subList)
   const lastIdx = subList.items.length
+  const t = i18n(model.lang)
   return (
     <SL>
       <SLTitle>
@@ -59,17 +63,21 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
             type="moveParent"
             item={issue}
             canDrop={canMove(issue)}
-            hoverStateChanged={(h) => model.setMoveHovered(issue.id, h)}
+            hoverStateChanged={(h) => {
+              model.setMoveHovered(issue.id, h)
+            }}
           >
             <Droppable
               type="arrange"
               item={{ index, subListId: subList.id }}
               canDrop={canArrange(index, subList.id)}
-              hoverStateChanged={(h) => model.setArrangeHovered(index, h)}
+              hoverStateChanged={(h) => {
+                model.setArrangeHovered(issue.id, h)
+              }}
             >
               <DropArea
                 className={cnu({
-                  arrangeHover: model.isArrangeHovered(index),
+                  arrangeHover: model.isArrangeHovered(issue.id),
                   moveHover: model.isMoveHovered(issue.id)
                 })}
               >
@@ -82,16 +90,24 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
           type="arrange"
           item={{ index: lastIdx, subListId: subList.id }}
           canDrop={canArrange(lastIdx, subList.id)}
-          hoverStateChanged={(h) => model.setArrangeHovered(lastIdx, h)}
+          hoverStateChanged={(h) => model.setArrangeHovered(-1, h)}
         >
-          <DropArea className={cnu("empty", { arrangeHover: model.isArrangeHovered(lastIdx) })}>
-            <AddButton
-              onClick={() => {
-                console.log("clicked")
-              }}
-            >
-              Create new
-            </AddButton>
+          <DropArea className={cnu("empty", { arrangeHover: model.isArrangeHovered(-1) })}>
+            <VBox>
+              <EditableField
+                placeholder={t.addNewItem}
+                onFix={(summary) => {
+                  model.createNewIssue(summary)
+                }}
+                viewStyle={{
+                  padding: 4
+                }}
+                editStyle={{
+                  flexGrow: 1
+                }}
+                blurAction="cancel"
+              />
+            </VBox>
           </DropArea>
         </Droppable>
       </SLBody>
@@ -132,12 +148,4 @@ const ReleaseDate = styled.span({
 
 const SLBody = styled.div({
   padding: 0
-})
-
-const AddButton = styled.button({
-  appearance: "none",
-  color: "gray",
-  fontWeight: "bold",
-  borderWidth: 0,
-  backgroundColor: "transparent"
 })

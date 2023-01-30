@@ -21,7 +21,7 @@ const send = async <T extends object>(
       method,
       body
     })
-    if (resp.status === 200) {
+    if (200 <= resp.status && resp.status < 300) {
       return Either.right((await resp.json()) as T)
     } else {
       return Either.left((await resp.json()) as ErrorData)
@@ -36,7 +36,7 @@ const send = async <T extends object>(
       },
       body
     })
-    if (resp.status === 200) {
+    if (200 <= resp.status && resp.status < 300) {
       return Either.right((await resp.json()) as T)
     } else if (resp.status === 401) {
       const message = resp.headers.get("WWW-Authenticate") || "unknown error"

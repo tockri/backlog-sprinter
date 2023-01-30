@@ -64,7 +64,7 @@ export const InfoAreaView: React.FC = () => {
                 backgroundColor: "#f0f0f0"
               }}
               onFix={(value) => model.changeIssue("description", value)}
-              blurAction="none"
+              blurAction="cancel"
             />
           </Description>
           <React.Suspense fallback={<Loading />}>

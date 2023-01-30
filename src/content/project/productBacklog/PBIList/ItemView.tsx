@@ -25,7 +25,7 @@ export const PBIItemView: React.FC<PBIItemViewProps> = (props) => {
       item={item}
       onDragEnd={(where) => {
         if (where) {
-          model.move({ src: item, dst: where })
+          model.move({ type: "NLMove", src: item, dst: where })
         }
         setDragging(false)
       }}
