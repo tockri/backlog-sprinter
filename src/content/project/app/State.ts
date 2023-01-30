@@ -3,7 +3,14 @@ import { atom } from "jotai"
 import { atomWithImmer, withImmer } from "jotai-immer"
 import { atomWithStorage } from "jotai/utils"
 import { BacklogApi, RealBacklogApi } from "../../backlog/BacklogApiForReact"
-import { CustomField, CustomFieldTypes, CustomNumberField, isNumberField } from "../../backlog/ProjectInfo"
+import {
+  CustomField,
+  CustomFieldTypes,
+  CustomNumberField,
+  isNumberField,
+  IssueType,
+  IssueTypeColor
+} from "../../backlog/ProjectInfo"
 import { JotaiUtil } from "../../util/JotaiUtil"
 
 import { WritableDraft } from "immer/dist/types/types-external"
@@ -42,18 +49,57 @@ const projectInfoAtom = atom(async (get) => {
 })
 
 export const projectAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.project)
-export const issueTypesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes)
+export const issueTypesStoreAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes))
 export const statusesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.statuses)
 export const milestonesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.milestones)
 export const customFieldsAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.customFields))
+
+enum IssueTypesActionTypes {
+  Create = "CreateIssueType"
+}
+
+export type IssueTypeCreateAction = Immutable<{
+  type: IssueTypesActionTypes.Create
+  name: string
+  color: IssueTypeColor
+}>
+
+type IssueTypesActionType = IssueTypeCreateAction
+
+export const IssueTypesAction = {
+  Create: (name: string, color: IssueTypeColor): IssueTypeCreateAction => ({
+    type: IssueTypesActionTypes.Create,
+    name,
+    color
+  })
+}
+
+export const issueTypesAtom = atom(
+  (get) => get(issueTypesStoreAtom),
+  async (get, set, action: IssueTypesActionType) => {
+    if (action.type === IssueTypesActionTypes.Create) {
+      const api = get(backlogApiAtom)
+      const project = get(projectAtom)
+      const created = await api.projectInfo.createIssueType({
+        projectId: project.id,
+        name: action.name,
+        color: action.color
+      })
+      set(issueTypesStoreAtom, (draft) => {
+        draft.push(created as WritableDraft<IssueType>)
+      })
+    }
+  }
+)
 
 enum OrderCustomFieldActionTypes {
   Create = "CreateCustomFieldAction",
   Delete = "DeleteCustomFieldAction"
 }
-export type OrderCustomFieldActionType = {
+export type OrderCustomFieldActionType = Immutable<{
   type: OrderCustomFieldActionTypes
-}
+}>
+
 export const CustomFieldAction = {
   Create: () => ({
     type: OrderCustomFieldActionTypes.Create

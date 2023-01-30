@@ -200,13 +200,40 @@ const archiveMilestone = async (projectId: number, milestone: Version) => {
   })
 }
 
+export enum IssueTypeColor {
+  Scarlet = "#e30000",
+  DarkRed = "#990000",
+  Magenta = "#934981",
+  Purple = "#814fbc",
+  Blue = "#2779ca",
+  Marine = "#007e9a",
+  Green = "#7ea800",
+  Orange = "#ff9200",
+  Pink = "#ff3265",
+  Gray = "#666665"
+}
+
+export type IssueTypeInput = Immutable<{
+  projectId: number
+  name: string
+  color: IssueTypeColor
+}>
+
+const createIssueType = async (input: IssueTypeInput): Promise<IssueType> => {
+  return await BacklogApiRequest.post<IssueType>(`/api/v2/projects/${input.projectId}/issueTypes`, {
+    name: input.name,
+    color: input.color
+  })
+}
+
 const ProjectInfo = {
   getProjectInfoWithMilestones,
   getProjectInfoWithCustomFields,
   createCustomField,
   deleteCustomField,
   createMilestone,
-  archiveMilestone
+  archiveMilestone,
+  createIssueType
 }
 
 export type ProjectInfoApi = typeof ProjectInfo

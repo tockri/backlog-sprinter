@@ -31,7 +31,7 @@ export const useSettingModel = (): SettingModel => {
   const [setting, setSetting] = useAtom(appSettingAtom)
   const formInfo = useAtomValue(formInfoAtom)
   const issueTypes = useAtomValue(issueTypesAtom)
-  const [orderCustomField, setOrderCustomFields] = useAtom(orderCustomFieldAtom)
+  const [orderCustomField, orderCustomFieldsDispatch] = useAtom(orderCustomFieldAtom)
   const [errorMessage, setErrorMessage] = React.useState("")
   return {
     lang: formInfo.lang,
@@ -39,8 +39,8 @@ export const useSettingModel = (): SettingModel => {
     issueTypes,
     selectIssueType: selectIssueType(setSetting),
     orderCustomField,
-    createCustomField: createCustomField(formInfo, setOrderCustomFields, setErrorMessage),
-    deleteCustomField: deleteCustomField(formInfo, setOrderCustomFields, setErrorMessage),
+    createCustomField: createCustomField(formInfo, orderCustomFieldsDispatch, setErrorMessage),
+    deleteCustomField: deleteCustomField(formInfo, orderCustomFieldsDispatch, setErrorMessage),
     errorMessageOnCustomField: errorMessage
   }
 }
@@ -54,12 +54,12 @@ const selectIssueType = (set: ImmerAtomSetter<AppSetting>) => (issueTypeId: numb
 const createCustomField =
   (
     formInfo: ProjectFormInfo,
-    setCustomFields: (action: OrderCustomFieldActionType) => Promise<void>,
+    orderCustomFieldsDispatch: (action: OrderCustomFieldActionType) => Promise<void>,
     setErrorMessage: (message: string) => void
   ) =>
   async () => {
     try {
-      await setCustomFields(CustomFieldAction.Create())
+      await orderCustomFieldsDispatch(CustomFieldAction.Create())
     } catch (e) {
       const errorData = e as ErrorData
       const t = i18n(formInfo.lang)
@@ -77,12 +77,12 @@ const createCustomField =
 const deleteCustomField =
   (
     formInfo: ProjectFormInfo,
-    setCustomFields: (action: OrderCustomFieldActionType) => Promise<void>,
+    orderCustomFieldsDispatch: (action: OrderCustomFieldActionType) => Promise<void>,
     setErrorMessage: (message: string) => void
   ) =>
   async () => {
     try {
-      await setCustomFields(CustomFieldAction.Delete())
+      await orderCustomFieldsDispatch(CustomFieldAction.Delete())
       setErrorMessage("")
     } catch (e) {
       const errorData = e as ErrorData

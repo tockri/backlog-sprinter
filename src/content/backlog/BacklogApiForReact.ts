@@ -28,7 +28,8 @@ const fakeProjectInfoApi: ProjectInfoApi = {
   createCustomField: rejectFunc,
   deleteCustomField: rejectFunc,
   createMilestone: rejectFunc,
-  archiveMilestone: rejectFunc
+  archiveMilestone: rejectFunc,
+  createIssueType: rejectFunc
 }
 
 export const FakeBacklogApi: BacklogApi = {
