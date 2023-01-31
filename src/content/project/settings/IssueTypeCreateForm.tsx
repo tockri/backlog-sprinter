@@ -1,37 +1,85 @@
+import styled from "@emotion/styled"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
-import { useForm } from "react-hook-form"
 import { IssueTypeColor } from "../../backlog/ProjectInfo"
-import { issueTypesAtom } from "../app/State"
+import { formInfoAtom, issueTypesAtom } from "../app/State"
+import { i18n } from "./i18n"
 import { issueTypeCreateAtom } from "./State"
 
 export const IssueTypeCreateForm: React.FC = () => {
-  const [formValue, setForm] = useAtom(issueTypeCreateAtom)
+  const [values, setValues] = useAtom(issueTypeCreateAtom)
+  const formInfo = useAtomValue(formInfoAtom)
   const issueTypes = useAtomValue(issueTypesAtom)
-  const { register, handleSubmit } = useForm()
+  const t = i18n(formInfo.lang)
 
   return (
-    formValue && (
-      <div>
-        <form
-          onSubmit={handleSubmit((data) => {
-            console.log({ data })
-          })}
+    <div>
+      <form
+        onSubmit={() => {
+          console.log("submit", values)
+        }}
+      >
+        <div>{t.creatingIssueType}</div>
+        <div>
+          <label htmlFor="create-issue-type-name">{t.createIssueTypeName}</label>
+          <input
+            id="create-issue-type-name"
+            type="text"
+            onChange={(e) => {
+              setValues((draft) => {
+                draft.name = e.target.value
+              })
+            }}
+            maxLength={20}
+            size={10}
+            value={values.name}
+          />
+        </div>
+        <div>
+          {Object.entries(IssueTypeColor).map(([cls, color], idx) => (
+            <span key={idx}>
+              <input
+                type="radio"
+                value={color}
+                id={`color-${idx}`}
+                name="color"
+                checked={color === values.color}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setValues((c) => {
+                      c.color = e.target.value as IssueTypeColor
+                    })
+                  }
+                }}
+              />
+              <ColorPill htmlFor={`color-${idx}`} className={cls.replace(/_/g, "-")}>
+                {values.name || t.createIssueTypeName}
+              </ColorPill>
+              {idx % 5 === 4 ? <br /> : null}
+            </span>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() =>
+            setValues((c) => {
+              c.creating = false
+            })
+          }
         >
-          <div>
-            <input type="text" {...register("name")} />
-          </div>
-          <div>
-            {Object.entries(IssueTypeColor).map(([color, hex], idx) => (
-              <label key={idx} htmlFor={color} style={{ backgroundColor: hex, padding: "0 3em 0 0", color: "white" }}>
-                <input type="radio" value={color} id={color} />
-                {color}
-              </label>
-            ))}
-          </div>
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    )
+          Cancel
+        </button>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
   )
 }
+
+const ColorPill = styled.label({
+  borderRadius: 8,
+  height: 16,
+  color: "white",
+  paddingLeft: 8,
+  paddingRight: 8,
+  marginRight: 16
+})

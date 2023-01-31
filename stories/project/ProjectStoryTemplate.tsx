@@ -15,7 +15,6 @@ export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ init
   return (
     <Provider
       initialValues={[
-        ...initialValues,
         [
           appSettingAtom,
           {
@@ -30,7 +29,8 @@ export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ init
             lang: "ja"
           }
         ],
-        [backlogApiAtom, mockApi]
+        [backlogApiAtom, mockApi],
+        ...initialValues
       ]}
     >
       <React.Suspense fallback={<Loading />}>

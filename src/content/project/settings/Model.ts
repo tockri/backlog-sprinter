@@ -2,7 +2,7 @@ import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
-import { CustomNumberField, IssueType, IssueTypeColor } from "../../backlog/ProjectInfo"
+import { CustomNumberField, IssueType } from "../../backlog/ProjectInfo"
 import { ImmerAtomSetter } from "../../util/JotaiUtil"
 import {
   AppSetting,
@@ -48,11 +48,10 @@ export const useSettingModel = (): SettingModel => {
     deleteCustomField: deleteCustomField(formInfo, orderCustomFieldsDispatch, setErrorMessage),
     errorMessageOnCustomField: errorMessage,
     startCreatingIssueType: () =>
-      setForm({
-        name: "",
-        color: IssueTypeColor.Scarlet
+      setForm((c) => {
+        c.creating = true
       }),
-    isCreatingIssueType: form !== null
+    isCreatingIssueType: form.creating
   }
 }
 

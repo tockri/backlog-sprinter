@@ -10,7 +10,9 @@ const ja = {
   storeOrderOn: (name: string) => `カスタム属性「${name}」に格納します。`,
   setIssueType: "まず課題種別を決めてください。",
   errorNoRightForCreateCustomField: "このプロジェクトでカスタム属性を操作する権限がありません。",
-  errorInsufficientLicense: "お使いのプランではカスタム属性を作成できません。"
+  errorInsufficientLicense: "お使いのプランではカスタム属性を作成できません。",
+  creatingIssueType: "新しくプロダクトバックログアイテムのための課題種別を作成します。",
+  createIssueTypeName: "種別名"
 }
 
 const en: typeof ja = {
@@ -23,7 +25,9 @@ const en: typeof ja = {
   storeOrderOn: (name: string) => `Store data in the field "${name}"`,
   setIssueType: "Please set IssueType first.",
   errorNoRightForCreateCustomField: "You are not authorized to manage a custom attribute.",
-  errorInsufficientLicense: "The payment plan of this space doesn't allow to create a custom attribute."
+  errorInsufficientLicense: "The payment plan of this space doesn't allow to create a custom attribute.",
+  creatingIssueType: "Creating a new issue type for PBI.",
+  createIssueTypeName: "Name"
 }
 
 const resources = { ja, en }

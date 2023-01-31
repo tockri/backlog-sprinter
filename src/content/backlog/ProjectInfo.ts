@@ -201,16 +201,16 @@ const archiveMilestone = async (projectId: number, milestone: Version) => {
 }
 
 export enum IssueTypeColor {
-  Scarlet = "#e30000",
-  DarkRed = "#990000",
-  Magenta = "#934981",
-  Purple = "#814fbc",
-  Blue = "#2779ca",
-  Marine = "#007e9a",
-  Green = "#7ea800",
-  Orange = "#ff9200",
-  Pink = "#ff3265",
-  Gray = "#666665"
+  pill__issue_type_1 = "#e30000",
+  pill__issue_type_2 = "#990000",
+  pill__issue_type_3 = "#934981",
+  pill__issue_type_4 = "#814fbc",
+  pill__issue_type_5 = "#2779ca",
+  pill__issue_type_6 = "#007e9a",
+  pill__issue_type_7 = "#7ea800",
+  pill__issue_type_8 = "#ff9200",
+  pill__issue_type_9 = "#ff3265",
+  pill__issue_type_10 = "#666665"
 }
 
 export type IssueTypeInput = Immutable<{

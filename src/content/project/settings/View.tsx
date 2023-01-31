@@ -10,10 +10,8 @@ export const ProjectSettings: React.FC = () => {
   const id = (key: string) => `project.settingsForm.${key}`
   return (
     <Root>
+      <H2>{t.issueTypeLabel}</H2>
       <div className="form-element__item">
-        <label className="form-element__label" htmlFor={id("issueType")}>
-          {t.issueTypeLabel}
-        </label>
         {vm.isCreatingIssueType ? (
           <IssueTypeCreateForm />
         ) : (
@@ -42,10 +40,8 @@ export const ProjectSettings: React.FC = () => {
           </>
         )}
       </div>
+      <H2>{t.customFieldTitle}</H2>
       <div className="form-element__item">
-        <label className="form-element__label" htmlFor={id("customField")}>
-          {t.customFieldTitle}
-        </label>
         {vm.pbiIssueTypeId ? (
           vm.orderCustomField ? (
             <div>
@@ -77,4 +73,10 @@ export const ProjectSettings: React.FC = () => {
 
 const Root = styled.div({
   padding: 12
+})
+
+const H2 = styled.h2({
+  fontSize: 16,
+  padding: "4px 0",
+  fontWeight: "normal"
 })
