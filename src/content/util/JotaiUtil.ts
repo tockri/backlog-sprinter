@@ -1,5 +1,5 @@
 import { WritableDraft } from "immer/dist/types/types-external"
-import { atom, Atom, Getter, WritableAtom } from "jotai"
+import { atom, Atom } from "jotai"
 
 export type ImmerAtomSetter<T> = (draft: (update: WritableDraft<T>) => void) => void
 
@@ -18,25 +18,7 @@ const atomFromParent = <T, U>(parentAtom: Atom<Promise<T>>, relation: (t: T) => 
   )
 }
 
-type Read<T> = (get: Getter) => Promise<T>
-
-const atomWithAsync = <T>(read: Read<T>): WritableAtom<T, ValueOrUpdater<T>, Promise<void> | void> => {
-  const store = atom<T | null>(null)
-  const getAtom = atom(read)
-  return atom<T, ValueOrUpdater<T>>(
-    (get) => get(store) || get(getAtom),
-    async (get, set, update) => {
-      if (isValue(update)) {
-        set(store, update)
-      } else {
-        set(store, await update(get(store) || get(getAtom)))
-      }
-    }
-  )
-}
-
 export const JotaiUtil = {
   isValue,
-  atomFromParent,
-  atomWithAsync
+  atomFromParent
 }

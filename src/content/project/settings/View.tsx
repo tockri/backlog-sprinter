@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { i18n } from "./i18n"
+import { IssueTypeCreateForm } from "./IssueTypeCreateForm"
 import { useSettingModel } from "./Model"
 
 export const ProjectSettings: React.FC = () => {
@@ -13,24 +14,33 @@ export const ProjectSettings: React.FC = () => {
         <label className="form-element__label" htmlFor={id("issueType")}>
           {t.issueTypeLabel}
         </label>
-        <select
-          id={id("issueType")}
-          onChange={(e) => {
-            const elem = e.currentTarget
-            if (elem.selectedIndex > 0) {
-              const issueType = vm.issueTypes[elem.selectedIndex - 1]
-              vm.selectIssueType(issueType.id)
-            }
-          }}
-          value={vm.pbiIssueTypeId || ""}
-        >
-          <option value=""></option>
-          {vm.issueTypes.map((it) => (
-            <option key={it.id} value={it.id}>
-              {it.name}
-            </option>
-          ))}
-        </select>
+        {vm.isCreatingIssueType ? (
+          <IssueTypeCreateForm />
+        ) : (
+          <>
+            <select
+              id={id("issueType")}
+              onChange={(e) => {
+                const elem = e.currentTarget
+                if (elem.selectedIndex > 0) {
+                  const issueType = vm.issueTypes[elem.selectedIndex - 1]
+                  vm.selectIssueType(issueType.id)
+                } else {
+                  vm.selectIssueType(0)
+                }
+              }}
+              value={vm.pbiIssueTypeId || ""}
+            >
+              <option value=""></option>
+              {vm.issueTypes.map((it) => (
+                <option key={it.id} value={it.id}>
+                  {it.name}
+                </option>
+              ))}
+            </select>
+            {!vm.pbiIssueTypeId && <button onClick={() => vm.startCreatingIssueType()}>{t.createLabel}</button>}
+          </>
+        )}
       </div>
       <div className="form-element__item">
         <label className="form-element__label" htmlFor={id("customField")}>

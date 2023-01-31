@@ -2,7 +2,7 @@ import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
-import { CustomNumberField, IssueType } from "../../backlog/ProjectInfo"
+import { CustomNumberField, IssueType, IssueTypeColor } from "../../backlog/ProjectInfo"
 import { ImmerAtomSetter } from "../../util/JotaiUtil"
 import {
   AppSetting,
@@ -15,6 +15,7 @@ import {
 } from "../app/State"
 import { ProjectFormInfo, UserLang } from "../types"
 import { i18n } from "./i18n"
+import { issueTypeCreateAtom } from "./State"
 
 type SettingModel = Immutable<{
   lang: UserLang
@@ -25,6 +26,8 @@ type SettingModel = Immutable<{
   createCustomField: () => void
   deleteCustomField: () => void
   errorMessageOnCustomField: string | null
+  startCreatingIssueType: () => void
+  isCreatingIssueType: boolean
 }>
 
 export const useSettingModel = (): SettingModel => {
@@ -33,6 +36,8 @@ export const useSettingModel = (): SettingModel => {
   const issueTypes = useAtomValue(issueTypesAtom)
   const [orderCustomField, orderCustomFieldsDispatch] = useAtom(orderCustomFieldAtom)
   const [errorMessage, setErrorMessage] = React.useState("")
+  const [form, setForm] = useAtom(issueTypeCreateAtom)
+
   return {
     lang: formInfo.lang,
     pbiIssueTypeId: setting.pbiIssueTypeId,
@@ -41,7 +46,13 @@ export const useSettingModel = (): SettingModel => {
     orderCustomField,
     createCustomField: createCustomField(formInfo, orderCustomFieldsDispatch, setErrorMessage),
     deleteCustomField: deleteCustomField(formInfo, orderCustomFieldsDispatch, setErrorMessage),
-    errorMessageOnCustomField: errorMessage
+    errorMessageOnCustomField: errorMessage,
+    startCreatingIssueType: () =>
+      setForm({
+        name: "",
+        color: IssueTypeColor.Scarlet
+      }),
+    isCreatingIssueType: form !== null
   }
 }
 

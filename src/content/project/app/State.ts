@@ -49,7 +49,7 @@ const projectInfoAtom = atom(async (get) => {
 })
 
 export const projectAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.project)
-export const issueTypesStoreAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes))
+const issueTypesStoreAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes))
 export const statusesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.statuses)
 export const milestonesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.milestones)
 export const customFieldsAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.customFields))
@@ -58,13 +58,13 @@ enum IssueTypesActionTypes {
   Create = "CreateIssueType"
 }
 
-export type IssueTypeCreateAction = Immutable<{
+type IssueTypeCreateAction = Immutable<{
   type: IssueTypesActionTypes.Create
   name: string
   color: IssueTypeColor
 }>
 
-type IssueTypesActionType = IssueTypeCreateAction
+export type IssueTypesActionType = IssueTypeCreateAction
 
 export const IssueTypesAction = {
   Create: (name: string, color: IssueTypeColor): IssueTypeCreateAction => ({
