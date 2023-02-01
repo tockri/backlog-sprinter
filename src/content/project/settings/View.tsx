@@ -1,5 +1,8 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { HBox } from "../../ui/Box"
+import { Button } from "../../ui/Button"
+import { Select } from "../../ui/Select"
 import { i18n } from "./i18n"
 import { IssueTypeCreateForm } from "./IssueTypeCreateForm"
 import { useSettingModel } from "./Model"
@@ -15,8 +18,8 @@ export const ProjectSettings: React.FC = () => {
         {vm.isCreatingIssueType ? (
           <IssueTypeCreateForm />
         ) : (
-          <>
-            <select
+          <HBox style={{ gap: 4 }}>
+            <Select
               id={id("issueType")}
               onChange={(e) => {
                 const elem = e.currentTarget
@@ -35,9 +38,9 @@ export const ProjectSettings: React.FC = () => {
                   {it.name}
                 </option>
               ))}
-            </select>
-            {!vm.pbiIssueTypeId && <button onClick={() => vm.startCreatingIssueType()}>{t.createLabel}</button>}
-          </>
+            </Select>
+            {!vm.pbiIssueTypeId && <Button onClick={() => vm.startCreatingIssueType()}>{t.createLabel}</Button>}
+          </HBox>
         )}
       </div>
       <H2>{t.customFieldTitle}</H2>
@@ -46,7 +49,7 @@ export const ProjectSettings: React.FC = () => {
           vm.orderCustomField ? (
             <div>
               {t.storeOrderOn(vm.orderCustomField.name)}
-              <button
+              <Button
                 onClick={() => {
                   if (window.confirm(t.confirmDelete)) {
                     vm.deleteCustomField()
@@ -54,12 +57,12 @@ export const ProjectSettings: React.FC = () => {
                 }}
               >
                 {t.deleteLabel}
-              </button>
+              </Button>
             </div>
           ) : (
             <div>
               {t.customFieldNotExist}
-              <button onClick={() => vm.createCustomField()}>{t.createLabel}</button>
+              <Button onClick={() => vm.createCustomField()}>{t.createLabel}</Button>
               <div>{vm.errorMessageOnCustomField}</div>
             </div>
           )

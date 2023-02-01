@@ -48,11 +48,31 @@ const getProjectInfoWithMilestones = async (projectKey: string): Promise<Project
   }
 }
 
+export enum IssueTypeColor {
+  pill__issue_type_1 = "#e30000",
+  pill__issue_type_2 = "#990000",
+  pill__issue_type_3 = "#934981",
+  pill__issue_type_4 = "#814fbc",
+  pill__issue_type_5 = "#2779ca",
+  pill__issue_type_6 = "#007e9a",
+  pill__issue_type_7 = "#7ea800",
+  pill__issue_type_8 = "#ff9200",
+  pill__issue_type_9 = "#ff3265",
+  pill__issue_type_10 = "#666665"
+}
+
+const classNameMap: Map<IssueTypeColor, string> = new Map()
+Object.entries(IssueTypeColor).forEach(([cls, hex]) => {
+  classNameMap.set(hex, cls.replace(/_/g, "-"))
+})
+
+export const issueTypeColorClass = (color: IssueTypeColor): string => classNameMap.get(color) || ""
+
 export type IssueType = Immutable<{
   id: number
   projectId: number
   name: string
-  color: string
+  color: IssueTypeColor
   displayOrder: number
   templateSummary: string | null
   templateDescription: string | null
@@ -198,19 +218,6 @@ const archiveMilestone = async (projectId: number, milestone: Version) => {
     name: milestone.name,
     archived: "true"
   })
-}
-
-export enum IssueTypeColor {
-  pill__issue_type_1 = "#e30000",
-  pill__issue_type_2 = "#990000",
-  pill__issue_type_3 = "#934981",
-  pill__issue_type_4 = "#814fbc",
-  pill__issue_type_5 = "#2779ca",
-  pill__issue_type_6 = "#007e9a",
-  pill__issue_type_7 = "#7ea800",
-  pill__issue_type_8 = "#ff9200",
-  pill__issue_type_9 = "#ff3265",
-  pill__issue_type_10 = "#666665"
 }
 
 export type IssueTypeInput = Immutable<{

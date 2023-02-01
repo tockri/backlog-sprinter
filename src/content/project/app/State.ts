@@ -85,8 +85,11 @@ export const issueTypesAtom = atom(
         name: action.name,
         color: action.color
       })
+      set(appSettingAtom, (c) => {
+        c.pbiIssueTypeId = created.id
+      })
       set(issueTypesStoreAtom, (draft) => {
-        draft.push(created as WritableDraft<IssueType>)
+        draft.splice(0, 0, created as WritableDraft<IssueType>)
       })
     }
   }

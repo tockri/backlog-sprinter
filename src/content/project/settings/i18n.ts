@@ -12,7 +12,10 @@ const ja = {
   errorNoRightForCreateCustomField: "このプロジェクトでカスタム属性を操作する権限がありません。",
   errorInsufficientLicense: "お使いのプランではカスタム属性を作成できません。",
   creatingIssueType: "新しくプロダクトバックログアイテムのための課題種別を作成します。",
-  createIssueTypeName: "種別名"
+  createIssueTypeName: "種別名",
+  createIssueTypeColor: "背景色",
+  cancelLabel: "キャンセル",
+  existing: "登録済み"
 }
 
 const en: typeof ja = {
@@ -27,7 +30,10 @@ const en: typeof ja = {
   errorNoRightForCreateCustomField: "You are not authorized to manage a custom attribute.",
   errorInsufficientLicense: "The payment plan of this space doesn't allow to create a custom attribute.",
   creatingIssueType: "Creating a new issue type for PBI.",
-  createIssueTypeName: "Name"
+  createIssueTypeName: "Name",
+  createIssueTypeColor: "Color",
+  cancelLabel: "Cancel",
+  existing: "Existing"
 }
 
 const resources = { ja, en }

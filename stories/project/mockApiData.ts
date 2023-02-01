@@ -1,5 +1,10 @@
 import { IssueData } from "../../src/content/backlog/Issue"
-import { CustomField, Project, ProjectInfoWithCustomFields } from "../../src/content/backlog/ProjectInfo"
+import {
+  CustomField,
+  IssueTypeColor,
+  Project,
+  ProjectInfoWithCustomFields
+} from "../../src/content/backlog/ProjectInfo"
 
 export const projectInfoBT: ProjectInfoWithCustomFields = {
   project: {
@@ -26,7 +31,7 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
       id: 389286,
       projectId: 78386,
       name: "タスク",
-      color: "#7ea800",
+      color: IssueTypeColor.pill__issue_type_3,
       displayOrder: 0,
       templateSummary: null,
       templateDescription: null
@@ -35,7 +40,7 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
       id: 389285,
       projectId: 78386,
       name: "バグ",
-      color: "#990000",
+      color: IssueTypeColor.pill__issue_type_2,
       displayOrder: 1,
       templateSummary: null,
       templateDescription: null
@@ -44,7 +49,7 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
       id: 389287,
       projectId: 78386,
       name: "要望",
-      color: "#ff9200",
+      color: IssueTypeColor.pill__issue_type_4,
       displayOrder: 2,
       templateSummary: null,
       templateDescription: null
@@ -53,7 +58,7 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
       id: 389288,
       projectId: 78386,
       name: "その他",
-      color: "#2779ca",
+      color: IssueTypeColor.pill__issue_type_7,
       displayOrder: 3,
       templateSummary: null,
       templateDescription: null

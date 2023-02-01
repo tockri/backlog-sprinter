@@ -3,6 +3,7 @@ import React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { cnu } from "./cnu"
+import { TextArea, TextInput } from "./TextInput"
 
 export type EditableFieldProps = {
   readonly placeholder?: string
@@ -85,7 +86,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
     <>
       {editing ? (
         multiline ? (
-          <TextAreaBase
+          <TextArea
             ref={editor}
             style={props.editStyle}
             placeholder={placeholder}
@@ -128,21 +129,6 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
 // (keyCode === 229) is the only way to know composing status.
 const isComposing = (e: React.KeyboardEvent): boolean =>
   (e as React.KeyboardEvent & { isComposing: boolean }).isComposing || e.keyCode === 229 || false
-
-const inputStyle: React.CSSProperties = {
-  padding: 6,
-  borderRadius: 3,
-  border: "1px solid #d0d0d0"
-}
-
-const TextInput = styled.input({
-  ...inputStyle
-})
-
-const TextAreaBase = styled.textarea({
-  ...inputStyle,
-  minHeight: "3em"
-})
 
 const Placeholder = styled.div({
   color: "#c0c0c0"
