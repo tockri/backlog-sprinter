@@ -1,30 +1,24 @@
 import styled from "@emotion/styled"
-import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { IssueTypeColor, issueTypeColorClass } from "../../backlog/ProjectInfo"
 import { HBox, VBox } from "../../ui/Box"
 import { Button } from "../../ui/Button"
 import { cnu } from "../../ui/cnu"
 import { TextInput } from "../../ui/TextInput"
-import { formInfoAtom, IssueTypesAction, issueTypesAtom } from "../app/State"
 import { i18n } from "./i18n"
-import { issueTypeCreateAtom } from "./State"
+import { useIssueTypeCreateModel } from "./Model"
 
 export const IssueTypeCreateForm: React.FC = () => {
-  const [values, setValues] = useAtom(issueTypeCreateAtom)
-  const formInfo = useAtomValue(formInfoAtom)
-  const [issueTypes, dispatch] = useAtom(issueTypesAtom)
-  const t = i18n(formInfo.lang)
+  const model = React.useCallback(useIssueTypeCreateModel, [])()
+  const { lang, issueTypes, values } = model
+  const t = i18n(lang)
 
   return (
     <Root>
       <form
         onSubmit={async (e) => {
           e.preventDefault()
-          await dispatch(IssueTypesAction.Create(values.name, values.color))
-          setValues((c) => {
-            c.creating = false
-          })
+          await model.onSubmit()
         }}
       >
         <div>{t.creatingIssueType}</div>
@@ -34,9 +28,7 @@ export const IssueTypeCreateForm: React.FC = () => {
             id="create-issue-type-name"
             type="text"
             onChange={(e) => {
-              setValues((draft) => {
-                draft.name = e.target.value
-              })
+              model.onChangeName(e.target.value)
             }}
             maxLength={20}
             size={15}
@@ -56,9 +48,7 @@ export const IssueTypeCreateForm: React.FC = () => {
                   checked={color === values.color}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setValues((c) => {
-                        c.color = e.target.value as IssueTypeColor
-                      })
+                      model.onChangeColor(e.target.value)
                     }
                   }}
                 />
@@ -80,14 +70,7 @@ export const IssueTypeCreateForm: React.FC = () => {
           </ExistingPane>
         </Row>
         <ButtonBox>
-          <Button
-            type="button"
-            onClick={() =>
-              setValues((c) => {
-                c.creating = false
-              })
-            }
-          >
+          <Button type="button" onClick={() => model.cancel()}>
             {t.cancelLabel}
           </Button>
           <Button type="submit">{t.createLabel}</Button>

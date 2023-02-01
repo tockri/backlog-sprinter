@@ -2,20 +2,21 @@ import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
-import { CustomNumberField, IssueType } from "../../backlog/ProjectInfo"
+import { CustomNumberField, IssueType, IssueTypeColor } from "../../backlog/ProjectInfo"
 import { ImmerAtomSetter } from "../../util/JotaiUtil"
 import {
   AppSetting,
   appSettingAtom,
   CustomFieldAction,
   formInfoAtom,
+  IssueTypesAction,
   issueTypesAtom,
   OrderCustomFieldActionType,
   orderCustomFieldAtom
 } from "../app/State"
 import { ProjectFormInfo, UserLang } from "../types"
 import { i18n } from "./i18n"
-import { issueTypeCreateAtom } from "./State"
+import { issueTypeCreateAtom, IssueTypeCreateForm } from "./State"
 
 type SettingModel = Immutable<{
   lang: UserLang
@@ -105,3 +106,45 @@ const deleteCustomField =
       }
     }
   }
+
+type IssueTypeCreateModel = Immutable<{
+  values: IssueTypeCreateForm
+  lang: UserLang
+  issueTypes: IssueType[]
+  onChangeName: (value: string) => void
+  onChangeColor: (value: string) => void
+  onSubmit: () => Promise<void>
+  cancel: () => void
+}>
+
+export const useIssueTypeCreateModel = (): IssueTypeCreateModel => {
+  const [values, setValues] = useAtom(issueTypeCreateAtom)
+  const formInfo = useAtomValue(formInfoAtom)
+  const [issueTypes, dispatch] = useAtom(issueTypesAtom)
+  return {
+    values,
+    lang: formInfo.lang,
+    issueTypes,
+    onChangeName: (value) => {
+      setValues((c) => {
+        c.name = value
+      })
+    },
+    onChangeColor: (value) => {
+      setValues((c) => {
+        c.color = value as IssueTypeColor
+      })
+    },
+    onSubmit: async () => {
+      await dispatch(IssueTypesAction.Create(values.name, values.color))
+      setValues((c) => {
+        c.creating = false
+      })
+    },
+    cancel: () => {
+      setValues((c) => {
+        c.creating = false
+      })
+    }
+  }
+}

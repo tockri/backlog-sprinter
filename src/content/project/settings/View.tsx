@@ -8,14 +8,14 @@ import { IssueTypeCreateForm } from "./IssueTypeCreateForm"
 import { useSettingModel } from "./Model"
 
 export const ProjectSettings: React.FC = () => {
-  const vm = useSettingModel()
-  const t = i18n(vm.lang)
+  const model = React.useCallback(useSettingModel, [])()
+  const t = i18n(model.lang)
   const id = (key: string) => `project.settingsForm.${key}`
   return (
     <Root>
       <H2>{t.issueTypeLabel}</H2>
       <div className="form-element__item">
-        {vm.isCreatingIssueType ? (
+        {model.isCreatingIssueType ? (
           <IssueTypeCreateForm />
         ) : (
           <HBox style={{ gap: 4 }}>
@@ -24,35 +24,35 @@ export const ProjectSettings: React.FC = () => {
               onChange={(e) => {
                 const elem = e.currentTarget
                 if (elem.selectedIndex > 0) {
-                  const issueType = vm.issueTypes[elem.selectedIndex - 1]
-                  vm.selectIssueType(issueType.id)
+                  const issueType = model.issueTypes[elem.selectedIndex - 1]
+                  model.selectIssueType(issueType.id)
                 } else {
-                  vm.selectIssueType(0)
+                  model.selectIssueType(0)
                 }
               }}
-              value={vm.pbiIssueTypeId || ""}
+              value={model.pbiIssueTypeId || ""}
             >
               <option value=""></option>
-              {vm.issueTypes.map((it) => (
+              {model.issueTypes.map((it) => (
                 <option key={it.id} value={it.id}>
                   {it.name}
                 </option>
               ))}
             </Select>
-            {!vm.pbiIssueTypeId && <Button onClick={() => vm.startCreatingIssueType()}>{t.createLabel}</Button>}
+            {!model.pbiIssueTypeId && <Button onClick={() => model.startCreatingIssueType()}>{t.createLabel}</Button>}
           </HBox>
         )}
       </div>
       <H2>{t.customFieldTitle}</H2>
       <div className="form-element__item">
-        {vm.pbiIssueTypeId ? (
-          vm.orderCustomField ? (
+        {model.pbiIssueTypeId ? (
+          model.orderCustomField ? (
             <div>
-              {t.storeOrderOn(vm.orderCustomField.name)}
+              {t.storeOrderOn(model.orderCustomField.name)}
               <Button
                 onClick={() => {
                   if (window.confirm(t.confirmDelete)) {
-                    vm.deleteCustomField()
+                    model.deleteCustomField()
                   }
                 }}
               >
@@ -62,8 +62,8 @@ export const ProjectSettings: React.FC = () => {
           ) : (
             <div>
               {t.customFieldNotExist}
-              <Button onClick={() => vm.createCustomField()}>{t.createLabel}</Button>
-              <div>{vm.errorMessageOnCustomField}</div>
+              <Button onClick={() => model.createCustomField()}>{t.createLabel}</Button>
+              <div>{model.errorMessageOnCustomField}</div>
             </div>
           )
         ) : (
