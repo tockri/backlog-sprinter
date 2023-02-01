@@ -19,13 +19,12 @@ export const IssueTypeCreateForm: React.FC = () => {
   return (
     <Root>
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
-          dispatch(IssueTypesAction.Create(values.name, values.color))
+          await dispatch(IssueTypesAction.Create(values.name, values.color))
           setValues((c) => {
             c.creating = false
           })
-          console.log("submit", values)
         }}
       >
         <div>{t.creatingIssueType}</div>
