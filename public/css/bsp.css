@@ -10,6 +10,6 @@ div.bsp_milestone-field {
 div.bsp_milestone-field > .bsp_milestone-update {
   position: absolute;
   right: 0;
-  top: calc(50%-16px);
+  top: calc(50% - 16px);
   font-size: inherit;
 }

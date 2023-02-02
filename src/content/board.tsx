@@ -62,4 +62,4 @@ const initialize = () => {
 
 const isReady = (): boolean => !!getButtonPlace()
 
-Waiter.watchInfinitly(isReady, initialize)
+Waiter.watchInfinitely(isReady, initialize)

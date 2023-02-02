@@ -85,15 +85,10 @@
     flex-direction: column;
     border-radius: 4px;
     background-color: var(--backgroundColorSchemeBase);
-    -webkit-box-shadow: var(--shadowModuleMedium);
-    box-shadow: var(--shadowModuleMedium);
     opacity: 1;
-    -webkit-transform: scale(0.7);
     -ms-transform: scale(0.7);
     transform: scale(0.7);
     -webkit-transition-property: visibility, opacity, -webkit-transform;
-    transition-property: visibility, opacity, -webkit-transform;
-    transition-property: transform, visibility, opacity;
     transition-property: transform, visibility, opacity, -webkit-transform;
     -webkit-transition-duration: 0.15s;
     transition-duration: 0.15s;
@@ -107,7 +102,6 @@
     outline: 0;
   }
   .modal--default.is_visible {
-    -webkit-transform: scale(1);
     -ms-transform: scale(1);
     transform: scale(1);
     visibility: visible;
@@ -120,11 +114,8 @@
 
   .modal__header {
     -webkit-box-flex: 0;
-    -ms-flex-positive: 0;
     flex-grow: 0;
-    -ms-flex-negative: 0;
     flex-shrink: 0;
-    -ms-flex-preferred-size: auto;
     flex-basis: auto;
     display: -webkit-box;
     display: -ms-flexbox;
@@ -143,8 +134,6 @@
 
   .modal__title {
     width: 100%;
-    display: -webkit-inline-box;
-    display: -ms-inline-flexbox;
     display: inline-flex;
     -webkit-box-align: center;
     -ms-flex-align: center;

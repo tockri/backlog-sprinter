@@ -48,6 +48,7 @@ const getProjectInfoWithMilestones = async (projectKey: string): Promise<Project
   }
 }
 
+// noinspection JSUnusedGlobalSymbols
 export enum IssueTypeColor {
   pill__issue_type_1 = "#e30000",
   pill__issue_type_2 = "#990000",

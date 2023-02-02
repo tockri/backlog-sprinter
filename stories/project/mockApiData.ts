@@ -1,3 +1,5 @@
+// noinspection SpellCheckingInspection,DuplicatedCode
+
 import { IssueData } from "../../src/content/backlog/Issue"
 import {
   CustomField,

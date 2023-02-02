@@ -154,30 +154,6 @@ test("NestedList.move moves an item to the last in a subList", () => {
   })
 })
 
-test("NestedList.move moves an item in a subList to the end", () => {
-  expect<TestState>(
-    NestedList.move(origData, toAction([heads[0].headId, 1], [heads[0].headId, 4]))
-  ).toStrictEqual<TestState>({
-    subLists: [
-      {
-        head: heads[0],
-        id: heads[0].headId,
-        items: [items[0], items[2], items[3], items[1]]
-      },
-      {
-        head: heads[1],
-        id: heads[1].headId,
-        items: [items[4], items[5], items[6]]
-      },
-      {
-        head: null,
-        id: "--",
-        items: [items[7]]
-      }
-    ]
-  })
-})
-
 test("NestedList.nest makes a NestedList from an Array", () => {
   type Item = { head: TestHead | null; item: TestItem | null }
   const orig: Item[] = [

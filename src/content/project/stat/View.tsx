@@ -1,3 +1,5 @@
+// noinspection SpellCheckingInspection
+
 import styled from "@emotion/styled"
 import React from "react"
 import { useModel } from "./Model"

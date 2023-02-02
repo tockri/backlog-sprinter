@@ -178,7 +178,7 @@ test("Move to the last", () => {
   ])
 })
 
-test("Move and cause rebalance", () => {
+test("Move and cause infection", () => {
   const action = toAction(["1", 2], ["3", 1])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
@@ -232,7 +232,7 @@ test("Move and make order between null and some", () => {
   ])
 })
 
-test("Move and cause rebalance on existing issues", () => {
+test("Move and cause infection on existing issues", () => {
   const action = toAction(["1", 2], ["--", 2])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {

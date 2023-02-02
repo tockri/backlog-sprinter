@@ -37,10 +37,7 @@ const canArrange =
 const canMove =
   (issue: IssueData) =>
   (dragging: IssueData): boolean => {
-    if (dragging.parentIssueId !== issue.id) {
-      return true
-    }
-    return false
+    return dragging.parentIssueId !== issue.id
   }
 
 export const PBISubList: React.FC<PBISubListProps> = (props) => {

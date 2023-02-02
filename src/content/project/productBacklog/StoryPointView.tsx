@@ -90,10 +90,10 @@ const Viewer: React.FC<StoryPointViewProps> = (props) => {
   const { actualHours, estimatedHours } = issue
   if (estimatedHours && actualHours) {
     return (
-      <Overwrapping>
+      <Overlapping>
         <ViewerPane className={cnu(estimatedClass(estimatedHours), "below")}>{estimatedHours}</ViewerPane>
         <ViewerPane className={cnu(estimatedClass(actualHours), "above")}>{actualHours}</ViewerPane>
-      </Overwrapping>
+      </Overlapping>
     )
   } else if (estimatedHours || actualHours) {
     const hours = estimatedHours || actualHours
@@ -149,7 +149,7 @@ const EditOption = styled.option({
   ...editCommonStyles
 })
 
-const Overwrapping = styled.div({
+const Overlapping = styled.div({
   width: 44,
   height: 30,
   position: "relative"

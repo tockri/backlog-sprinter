@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 
 import styled from "@emotion/styled"

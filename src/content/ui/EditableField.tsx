@@ -127,6 +127,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
 // 2023-01-25 "keyCode" is deprecated
 // but since "isComposing" is not exist on Mac chrome,
 // (keyCode === 229) is the only way to know composing status.
+// noinspection JSDeprecatedSymbols
 const isComposing = (e: React.KeyboardEvent): boolean =>
   (e as React.KeyboardEvent & { isComposing: boolean }).isComposing || e.keyCode === 229 || false
 
