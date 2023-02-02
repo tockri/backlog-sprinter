@@ -5,7 +5,7 @@ import { ObjectUtil } from "../../../../util/ObjectUtil"
 import { projectAtom } from "../../app/State"
 import { productBacklogAtom } from "../State"
 
-type MilestoneCreateForm = {
+export type MilestoneCreateForm = {
   creating: boolean
   name: string
   startDate: Date | null

@@ -33,19 +33,19 @@ const Root = styled.div({
 
 const AddButton = styled.button({
   position: "absolute",
-  top: 8,
+  top: 10,
   right: 12,
   padding: 0,
-  height: 28,
-  width: 28,
+  height: 24,
+  width: 24,
   boxShadow: "-3px 3px 4px #e0e0e0",
   backgroundColor: "white",
   borderWidth: 0,
   borderRadius: 4,
   "&:active": {
-    backgroundColor: "#ffffdd",
+    backgroundColor: "#eeffdd",
     boxShadow: "-1px 1px 1px #d0d0d0"
   }
 })
 
-const PlusIcon = () => <PlusIconSVG width={20} height={20} viewBox="0 0 73 73" />
+const PlusIcon = () => <PlusIconSVG width={14} height={14} viewBox="0 0 73 73" />

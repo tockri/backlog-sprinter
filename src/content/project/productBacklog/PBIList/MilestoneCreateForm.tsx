@@ -1,52 +1,58 @@
 import styled from "@emotion/styled"
-import { useAtom } from "jotai"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
+import { HBox, VBox } from "../../../ui/Box"
+import { Button } from "../../../ui/Button"
 import { TextInput } from "../../../ui/TextInput"
-import { MilestoneCreate, milestoneCreateFormAtom } from "./State"
+import { i18n } from "../i18n"
+import { useMilestoneCreateModel } from "./MilestoneCreateModel"
 
 export const MilestoneCreateForm: React.FC = () => {
-  const [values, dispatch] = useAtom(milestoneCreateFormAtom)
+  const model = useMilestoneCreateModel()
+  const { values, lang } = model
+  const t = i18n(lang)
   return (
     <Root>
-      <div>
-        name:
-        <TextInput
-          type="text"
-          value={values.name}
-          onChange={(e) => {
-            dispatch(MilestoneCreate.SetName(e.target.value))
-          }}
-        />
-      </div>
-      <div>
-        start date:
+      <label>{t.milestoneName}</label>
+      <TextInput
+        type="text"
+        value={values.name}
+        onChange={(e) => {
+          model.setName(e.target.value)
+        }}
+      />
+      <label>{t.milestonePeriod}</label>
+      <HBox>
         <TextInput
           type="date"
           value={DateUtil.dateString(values.startDate)}
           onChange={(e) => {
-            dispatch(MilestoneCreate.SetStartDate(e.target.value))
+            model.setStartDate(e.target.value)
           }}
         />
-      </div>
-      <div>
-        end date:
+        ～
         <TextInput
           type="date"
           value={DateUtil.dateString(values.endDate)}
           onChange={(e) => {
-            dispatch(MilestoneCreate.SetEndDate(e.target.value))
+            model.setEndDate(e.target.value)
           }}
         />
-      </div>
-      <div>
-        <button onClick={() => dispatch(MilestoneCreate.Cancel)}>Cancel</button>
-        <button onClick={() => dispatch(MilestoneCreate.Submit)}>Submit</button>
-      </div>
+      </HBox>
+      <Buttons>
+        <Button onClick={() => model.submit()}>Submit</Button>
+        <Button onClick={() => model.cancel()}>Cancel</Button>
+      </Buttons>
     </Root>
   )
 }
 
-const Root = styled.div({
-  margin: 12
+const Root = styled(VBox)({
+  margin: 12,
+  gap: 4
+})
+
+const Buttons = styled(HBox)({
+  marginTop: 8,
+  gap: 8
 })
