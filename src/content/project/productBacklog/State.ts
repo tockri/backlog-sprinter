@@ -7,7 +7,7 @@ import { DateUtil } from "../../../util/DateUtil"
 import { NLMoveAction } from "../../../util/NestedList"
 import { BacklogApi } from "../../backlog/BacklogApiForReact"
 import { IssueCreateInput, IssueData } from "../../backlog/Issue"
-import { CustomNumberField, Version } from "../../backlog/ProjectInfo"
+import { CustomNumberField, MilestoneInput, Version } from "../../backlog/ProjectInfo"
 import {
   appSettingAtom,
   backlogApiAtom,
@@ -21,13 +21,18 @@ import { PBIChangeAction, PBIListData, PBIListDataHandler, PBIListMovedEvent } f
 
 const pbiListDataStoreAtom = atom<PBIListData | null>(null)
 
-export type ProductBacklogCreateActionType = {
+type ProductBacklogCreateActionType = {
   type: "ProductBacklogCreate"
   summary: string
   milestone: Version | null
 }
 
-export type ProductBacklogAction = NLMoveAction | ProductBacklogCreateActionType
+type MilestoneCreateActionType = {
+  type: "MilestoneCreate"
+  input: MilestoneInput
+}
+
+export type ProductBacklogAction = NLMoveAction | ProductBacklogCreateActionType | MilestoneCreateActionType
 
 export const productBacklogAtom = atom<Promise<PBIListData>, ProductBacklogAction, Promise<void> | void>(
   async (get) => {
@@ -94,6 +99,16 @@ export const productBacklogAtom = atom<Promise<PBIListData>, ProductBacklogActio
         })
         set(pbiListDataStoreAtom, updated)
       }
+    } else if (action.type === "MilestoneCreate") {
+      const api = get(backlogApiAtom)
+      const created = await api.projectInfo.createMilestone(action.input)
+      set(milestonesAtom, (c) => {
+        c.push(created as WritableDraft<Version>)
+      })
+      const updated = produce(prev, (draft) => {
+        PBIListDataHandler.mutateByMilestoneCreation(draft, created)
+      })
+      set(pbiListDataStoreAtom, updated)
     }
   }
 )

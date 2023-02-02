@@ -2,6 +2,7 @@
 
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import React from "react"
+import { milestoneCreateFormAtom } from "../../../src/content/project/productBacklog/PBIList/State"
 import { selectedIssueIdAtom } from "../../../src/content/project/productBacklog/State"
 import { ProductBacklogView } from "../../../src/content/project/productBacklog/View"
 import { StoryUtil } from "../../StoryUtil"
@@ -25,4 +26,16 @@ export const Default: Story = {
 
 export const SomeEmptyFields = StoryUtil.produce(Default)((args) => {
   args.initialValues = [[selectedIssueIdAtom, 12323249]]
+})
+
+export const CreatingMilestone = StoryUtil.produce(Default)((args) => {
+  args.initialValues.push([
+    milestoneCreateFormAtom,
+    {
+      creating: true,
+      name: "",
+      startDate: null,
+      endDate: null
+    }
+  ])
 })

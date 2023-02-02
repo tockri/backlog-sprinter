@@ -170,6 +170,15 @@ const mutateByIssueCreation = (
   }
 }
 
+const mutateByMilestoneCreation = (data: WritableDraft<PBIListData>, created: Version) => {
+  data.subLists.push({
+    head: created as WritableDraft<Version>,
+    items: [],
+    id: pbiNestMethods.headId(created)
+  })
+  data.subLists.sort((sl1, sl2) => pbiNestMethods.headComparator(sl1.head, sl2.head))
+}
+
 export type PBIChangeAction = {
   issueId: number
   input: IssueChangeInput
@@ -219,6 +228,7 @@ export const PBIListDataHandler = {
   mutateByChangeAction,
   mutateByMoveAction,
   mutateByIssueCreation,
+  mutateByMilestoneCreation,
   getNewOrder,
   findIssue,
   nest,

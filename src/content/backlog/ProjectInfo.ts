@@ -204,14 +204,13 @@ export type MilestoneInput = Immutable<{
   description: string
 }>
 
-const createMilestone = async (input: MilestoneInput): Promise<number> => {
-  const created = await BacklogApiRequest.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
+const createMilestone = async (input: MilestoneInput): Promise<Version> => {
+  return await BacklogApiRequest.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
     name: input.name,
     startDate: DateUtil.dateString(input.startDate),
     releaseDueDate: DateUtil.dateString(input.endDate),
     description: input.description
   })
-  return created.id
 }
 
 const archiveMilestone = async (projectId: number, milestone: Version) => {

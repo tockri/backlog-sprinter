@@ -1,7 +1,7 @@
 const ja = {
   estimatedHours: "予定",
   actualHours: "実績",
-  addNewItem: "新規登録"
+  addNewItem: "アイテムを追加する"
 }
 
 const en: typeof ja = {

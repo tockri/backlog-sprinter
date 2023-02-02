@@ -1,15 +1,21 @@
 import { Immutable } from "immer"
-import { useAtomValue } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 import { productBacklogAtom } from "../State"
 import { PBIListData } from "./ListData"
+import { MilestoneCreate, milestoneCreateFormAtom } from "./State"
 
 type PBIListModel = Immutable<{
   data: PBIListData
+  creating: boolean
+  startCreating: () => void
 }>
 
 export const usePBIListModel = (): PBIListModel => {
   const data = useAtomValue(productBacklogAtom)
+  const [milestoneForm, dispatch] = useAtom(milestoneCreateFormAtom)
   return {
-    data
+    data,
+    creating: milestoneForm.creating,
+    startCreating: () => dispatch(MilestoneCreate.Start)
   }
 }

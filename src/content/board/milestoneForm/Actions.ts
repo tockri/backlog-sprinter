@@ -22,7 +22,7 @@ const submitForm = async (
     description: ""
   }
   try {
-    const createdMilestoneId = await api.projectInfo.createMilestone(milestoneInput)
+    const createdMilestone = await api.projectInfo.createMilestone(milestoneInput)
     if (state.selectedMilestone) {
       if (state.moveUnclosed) {
         const unclosed = await api.issue.searchUnclosedInMilestone(
@@ -32,7 +32,7 @@ const submitForm = async (
         )
         await api.issue.bulkChangeMilestone(
           unclosed.map((i) => i.id),
-          createdMilestoneId,
+          createdMilestone.id,
           (id) => {
             const issue = unclosed.find((issue) => issue.id === id)
             if (callback && issue) {
@@ -46,7 +46,7 @@ const submitForm = async (
       }
     }
     return {
-      createdMilestoneId,
+      createdMilestoneId: createdMilestone.id,
       errorMessage: null
     }
   } catch (e) {

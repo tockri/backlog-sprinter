@@ -16,6 +16,7 @@ import { JotaiUtil } from "../../util/JotaiUtil"
 import { WritableDraft } from "immer/dist/types/types-external"
 import { ProjectFormInfo } from "../types"
 
+// noinspection JSUnusedGlobalSymbols
 export enum Tabs {
   Backlog = 0,
   //  Velocity = 1,
@@ -51,7 +52,7 @@ const projectInfoAtom = atom(async (get) => {
 export const projectAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.project)
 const issueTypesStoreAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes))
 export const statusesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.statuses)
-export const milestonesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.milestones)
+export const milestonesAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.milestones))
 export const customFieldsAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.customFields))
 
 enum IssueTypesActionTypes {

@@ -1,3 +1,4 @@
+import { Immutable } from "immer"
 import { Atom, useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { MessageBroker } from "../../../util/MessageBroker"
@@ -38,11 +39,12 @@ export const useAppModel = (broker: MessageBroker<ProjectFormInfo>): AppModel =>
   }
 }
 
-type InnerModel = {
+type InnerModel = Immutable<{
   lang: UserLang
   selectedTab: Tabs
   setSelectedTab: (tab: number) => void
-}
+}>
+
 export const useInnerModel = (): InnerModel => {
   const formInfo = useAtomValue(formInfoAtom)
   const [appSetting, setAppSetting] = useAtom(appSettingAtom)

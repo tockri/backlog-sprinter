@@ -36,8 +36,17 @@ const isStrictEqual = (o1: unknown, o2: unknown): boolean => {
   }
 }
 
+const copyContent = (src: unknown, dst: unknown) => {
+  if (isRecord(src) && isRecord(dst)) {
+    for (const key in src) {
+      dst[key] = src[key]
+    }
+  }
+}
+
 export const ObjectUtil = {
   purify,
   isRecord,
-  isStrictEqual
+  isStrictEqual,
+  copyContent
 }
