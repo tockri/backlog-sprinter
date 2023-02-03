@@ -5,7 +5,8 @@ import { IssueData } from "../../../backlog/Issue"
 import { HBox } from "../../../ui/Box"
 import { Draggable } from "../../../ui/DragAndDrop"
 import { formInfoAtom } from "../../app/State"
-import { ChildIssueAction, ChildIssueActionType, childIssueAtom } from "../State"
+
+import { ChildIssue, ChildIssueAction } from "../state/ChildIssue"
 import { StatusView } from "../StatusView"
 import { i18n } from "./i18n"
 
@@ -15,7 +16,7 @@ type ChildIssueListViewProps = {
 
 export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => {
   const { parentIssueId } = props
-  const [children, dispatch] = useAtom(childIssueAtom(parentIssueId))
+  const [children, dispatch] = useAtom(ChildIssue.atom(parentIssueId))
   const formInfo = useAtomValue(formInfoAtom)
   const t = i18n(formInfo.lang)
 
@@ -36,7 +37,7 @@ export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => 
 
 type ChildIssueViewProps = {
   issue: IssueData
-  dispatch: (action: ChildIssueActionType) => void
+  dispatch: (action: ChildIssueAction) => void
 }
 
 const ChildIssueView: React.FC<ChildIssueViewProps> = (props) => {
@@ -47,7 +48,7 @@ const ChildIssueView: React.FC<ChildIssueViewProps> = (props) => {
       item={issue}
       onDragEnd={(where) => {
         if (where) {
-          dispatch(ChildIssueAction.Move(issue, where.id))
+          dispatch(ChildIssue.Action.Move(issue, where.id))
         }
       }}
     >

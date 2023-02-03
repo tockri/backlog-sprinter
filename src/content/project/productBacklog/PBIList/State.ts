@@ -88,6 +88,7 @@ export const MilestoneFormAction = {
   Submit
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const store = atomFamily((_milestoneId: number) => atomWithImmer<MilestoneFormValues>(emptyForm))
 
 export const milestoneFormAtom = atomFamily((milestoneId: number) =>

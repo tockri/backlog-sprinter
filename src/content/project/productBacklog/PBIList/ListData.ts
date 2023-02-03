@@ -130,7 +130,7 @@ const indexAfterMove = (action: NLMoveAction): number => {
   }
 }
 
-const mutateByMoveAction = (data: WritableDraft<PBIListData>, action: NLMoveAction): PBIListMovedEvent[] => {
+const mutateByMovingAction = (data: WritableDraft<PBIListData>, action: NLMoveAction): PBIListMovedEvent[] => {
   NestedList.mutateMove(data, action)
   const eventStore = new EventStore()
   const subList = data.subLists.find((sl) => sl.id === action.dst.subListId)
@@ -159,7 +159,7 @@ const mutateByMoveAction = (data: WritableDraft<PBIListData>, action: NLMoveActi
   return eventStore.values()
 }
 
-const mutateByIssueCreation = (
+const mutateByAddingIssue = (
   data: WritableDraft<PBIListData>,
   created: IssueData,
   orderCustomField: CustomNumberField
@@ -170,18 +170,13 @@ const mutateByIssueCreation = (
   }
 }
 
-const mutateByMilestoneCreation = (data: WritableDraft<PBIListData>, created: Version) => {
+const mutateByAddingMilestone = (data: WritableDraft<PBIListData>, created: Version) => {
   data.subLists.push({
     head: created as WritableDraft<Version>,
     items: [],
     id: pbiNestMethods.headId(created)
   })
   data.subLists.sort((sl1, sl2) => pbiNestMethods.headComparator(sl1.head, sl2.head))
-}
-
-export type PBIChangeAction = {
-  issueId: number
-  input: IssueChangeInput
 }
 
 const getNewOrder = (data: PBIListData, milestone: Version | null): number => {
@@ -198,12 +193,12 @@ const getNewOrder = (data: PBIListData, milestone: Version | null): number => {
   }
 }
 
-const mutateByChangeAction = (
+const mutateByEditingIssue = (
   data: WritableDraft<PBIListData>,
   statuses: ReadonlyArray<Status>,
-  action: PBIChangeAction
+  issueId: number,
+  input: IssueChangeInput
 ) => {
-  const { issueId, input } = action
   const [item] = findIssue(data, issueId)
   if (item) {
     IssueDataUtil.mutateByIssueInput(item, input, statuses)
@@ -225,10 +220,10 @@ const findIssue = <T extends PBIListData | WritableDraft<PBIListData>>(
 }
 
 export const PBIListDataHandler = {
-  mutateByChangeAction,
-  mutateByMoveAction,
-  mutateByIssueCreation,
-  mutateByMilestoneCreation,
+  mutateByEditingIssue,
+  mutateByMovingAction,
+  mutateByAddingIssue,
+  mutateByAddingMilestone,
   getNewOrder,
   findIssue,
   nest,

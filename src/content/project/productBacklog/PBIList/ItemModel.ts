@@ -1,8 +1,8 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { SetAtom } from "jotai/core/atom"
 import { NLMoveAction } from "../../../../util/NestedList"
 import { orderCustomFieldAtom } from "../../app/State"
-import { productBacklogAtom, selectedIssueIdAtom } from "../State"
+import { productBacklogAtom } from "../State"
+import { SelectedItem } from "../state/SelectedItem"
 
 type PBIItemModel = {
   readonly selectItem: (issueId: number) => void
@@ -11,26 +11,26 @@ type PBIItemModel = {
 }
 
 export const usePBIItemModel = (): PBIItemModel => {
-  const [selected, select] = useAtom(selectedIssueIdAtom)
+  const [selected, select] = useAtom(SelectedItem.atom)
   const dispatch = useSetAtom(productBacklogAtom)
   const orderCustomField = useAtomValue(orderCustomFieldAtom)
+  const selectedIssueId = selected?.type === "Issue" ? selected.issueId : null
   if (orderCustomField) {
     return {
-      selectItem: selectItem(selected, select),
-      isSelected: (issueId) => selected === issueId,
+      selectItem: (issueId) => {
+        if (issueId === selectedIssueId) {
+          select(null)
+        } else {
+          select({
+            type: "Issue",
+            issueId
+          })
+        }
+      },
+      isSelected: (issueId) => selectedIssueId === issueId,
       move: dispatch
     }
   } else {
     throw new Error("orderCustomField is not set.")
-  }
-}
-
-type Sel = number | null
-
-const selectItem = (selected: Sel, select: SetAtom<Sel, void>) => (issueId: number) => {
-  if (issueId === selected) {
-    select(null)
-  } else {
-    select(issueId)
   }
 }
