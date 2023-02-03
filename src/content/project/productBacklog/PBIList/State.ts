@@ -2,6 +2,7 @@ import { atom } from "jotai"
 import { atomWithImmer } from "jotai-immer"
 import { DateUtil } from "../../../../util/DateUtil"
 import { ObjectUtil } from "../../../../util/ObjectUtil"
+import { ErrorData } from "../../../backlog/BacklogApiRequest"
 import { projectAtom } from "../../app/State"
 import { productBacklogAtom } from "../State"
 
@@ -10,12 +11,14 @@ export type MilestoneCreateForm = {
   name: string
   startDate: Date | null
   endDate: Date | null
+  errorMessage: string | null
 }
 const emptyForm: MilestoneCreateForm = {
   creating: false,
   name: "",
   startDate: null,
-  endDate: null
+  endDate: null,
+  errorMessage: null
 }
 
 enum ActionTypes {
@@ -85,14 +88,12 @@ export const MilestoneCreate = {
 }
 
 const store = atomWithImmer<MilestoneCreateForm>(emptyForm)
-export const milestoneCreateFormAtom = atom<MilestoneCreateForm, ActionType>(
+
+export const milestoneCreateFormAtom = atom<MilestoneCreateForm, ActionType, Promise<void>>(
   (get) => get(store),
   async (get, set, action) => {
     const curr = get(store)
     if (action.type === ActionTypes.Submit) {
-      set(store, (c) => {
-        ObjectUtil.copyContent(emptyForm, c)
-      })
       const project = get(projectAtom)
       const input = {
         projectId: project.id,
@@ -101,10 +102,21 @@ export const milestoneCreateFormAtom = atom<MilestoneCreateForm, ActionType>(
         endDate: curr.endDate,
         description: ""
       }
-      set(productBacklogAtom, {
-        type: "MilestoneCreate",
-        input
-      })
+      try {
+        await set(productBacklogAtom, {
+          type: "MilestoneCreate",
+          input
+        })
+        set(store, (c) => {
+          ObjectUtil.copyContent(emptyForm, c)
+        })
+      } catch (e) {
+        const err = e as ErrorData
+        console.warn("failed to create milestone", err)
+        set(store, (c) => {
+          c.errorMessage = err.errors[0]?.message || "unknown error"
+        })
+      }
     } else {
       set(store, (c) => {
         switch (action.type) {

@@ -5,5 +5,10 @@ export const Button = styled.button({
   border: "1px solid #a0a0a0",
   backgroundColor: "#eeeeee",
   color: "#666666",
-  borderRadius: 4
+  borderRadius: 4,
+  appearance: "button",
+  "&[disabled]": {
+    backgroundColor: "#cccccc",
+    color: "#999999"
+  }
 })

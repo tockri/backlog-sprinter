@@ -9,50 +9,66 @@ import { useMilestoneCreateModel } from "./MilestoneCreateModel"
 
 export const MilestoneCreateForm: React.FC = () => {
   const model = useMilestoneCreateModel()
-  const { values, lang } = model
+  const { values, lang, submittable } = model
   const t = i18n(lang)
   return (
     <Root>
-      <label>{t.milestoneName}</label>
-      <TextInput
-        type="text"
-        value={values.name}
-        onChange={(e) => {
-          model.setName(e.target.value)
-        }}
-      />
-      <label>{t.milestonePeriod}</label>
-      <HBox>
+      <VBox style={{ flexGrow: 1 }}>
+        <label>{t.milestoneName}</label>
         <TextInput
-          type="date"
-          value={DateUtil.dateString(values.startDate)}
+          type="text"
+          value={values.name}
           onChange={(e) => {
-            model.setStartDate(e.target.value)
+            model.setName(e.target.value)
           }}
         />
-        ～
-        <TextInput
-          type="date"
-          value={DateUtil.dateString(values.endDate)}
-          onChange={(e) => {
-            model.setEndDate(e.target.value)
-          }}
-        />
-      </HBox>
+        {values.errorMessage && <Error>{values.errorMessage}</Error>}
+      </VBox>
+      <VBox>
+        <label>{t.milestonePeriod}</label>
+        <HBox>
+          <TextInput
+            type="date"
+            value={DateUtil.dateString(values.startDate)}
+            onChange={(e) => {
+              model.setStartDate(e.target.value)
+            }}
+          />
+          ～
+          <TextInput
+            type="date"
+            value={DateUtil.dateString(values.endDate)}
+            onChange={(e) => {
+              model.setEndDate(e.target.value)
+            }}
+          />
+        </HBox>
+      </VBox>
       <Buttons>
-        <Button onClick={() => model.submit()}>Submit</Button>
         <Button onClick={() => model.cancel()}>Cancel</Button>
+        <Button onClick={() => model.submit()} disabled={!submittable}>
+          Submit
+        </Button>
       </Buttons>
     </Root>
   )
 }
 
-const Root = styled(VBox)({
+const Root = styled(HBox)({
   margin: 12,
-  gap: 4
+  gap: 4,
+  flexWrap: "wrap",
+  alignItems: "center"
 })
 
 const Buttons = styled(HBox)({
   marginTop: 8,
-  gap: 8
+  gap: 8,
+  alignItems: "center",
+  flexShrink: 1
+})
+
+const Error = styled.div({
+  color: "#ff4444",
+  fontSize: "0.9em"
 })
