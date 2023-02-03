@@ -4,17 +4,11 @@ import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
 import { CustomNumberField, IssueType, IssueTypeColor } from "../../backlog/ProjectInfo"
 import { ImmerAtomSetter } from "../../util/JotaiUtil"
-import {
-  AppSetting,
-  appSettingAtom,
-  CustomFieldAction,
-  formInfoAtom,
-  IssueTypesAction,
-  issueTypesAtom,
-  OrderCustomFieldActionType,
-  orderCustomFieldAtom
-} from "../app/State"
-import { ProjectFormInfo, UserLang } from "../types"
+import { AppConfig, AppConfigValue } from "../app/state/AppConfig"
+import { Environment } from "../app/state/Environment"
+import { OrderCustomField, OrderCustomFieldAction } from "../app/state/OrderCustomField"
+import { IssueTypes } from "../app/state/ProjectInfo"
+import { UserLang } from "../types"
 import { i18n } from "./i18n"
 import { issueTypeCreateAtom, IssueTypeCreateForm } from "./State"
 
@@ -32,21 +26,21 @@ type SettingModel = Immutable<{
 }>
 
 export const useSettingModel = (): SettingModel => {
-  const [setting, setSetting] = useAtom(appSettingAtom)
-  const formInfo = useAtomValue(formInfoAtom)
-  const issueTypes = useAtomValue(issueTypesAtom)
-  const [orderCustomField, orderCustomFieldsDispatch] = useAtom(orderCustomFieldAtom)
+  const [conf, setConf] = useAtom(AppConfig.atom)
+  const { lang } = useAtomValue(Environment.atom)
+  const issueTypes = useAtomValue(IssueTypes.atom)
+  const [orderCustomField, orderCustomFieldsDispatch] = useAtom(OrderCustomField.atom)
   const [errorMessage, setErrorMessage] = React.useState("")
   const [form, setForm] = useAtom(issueTypeCreateAtom)
 
   return {
-    lang: formInfo.lang,
-    pbiIssueTypeId: setting.pbiIssueTypeId,
+    lang,
+    pbiIssueTypeId: conf.pbiIssueTypeId,
     issueTypes,
-    selectIssueType: selectIssueType(setSetting),
+    selectIssueType: selectIssueType(setConf),
     orderCustomField,
-    createCustomField: createCustomField(formInfo, orderCustomFieldsDispatch, setErrorMessage),
-    deleteCustomField: deleteCustomField(formInfo, orderCustomFieldsDispatch, setErrorMessage),
+    createCustomField: createCustomField(lang, orderCustomFieldsDispatch, setErrorMessage),
+    deleteCustomField: deleteCustomField(lang, orderCustomFieldsDispatch, setErrorMessage),
     errorMessageOnCustomField: errorMessage,
     startCreatingIssueType: () =>
       setForm((c) => {
@@ -56,7 +50,7 @@ export const useSettingModel = (): SettingModel => {
   }
 }
 
-const selectIssueType = (set: ImmerAtomSetter<AppSetting>) => (issueTypeId: number) => {
+const selectIssueType = (set: ImmerAtomSetter<AppConfigValue>) => (issueTypeId: number) => {
   set((c) => {
     c.pbiIssueTypeId = issueTypeId
   })
@@ -64,16 +58,16 @@ const selectIssueType = (set: ImmerAtomSetter<AppSetting>) => (issueTypeId: numb
 
 const createCustomField =
   (
-    formInfo: ProjectFormInfo,
-    orderCustomFieldsDispatch: (action: OrderCustomFieldActionType) => Promise<void>,
+    lang: UserLang,
+    orderCustomFieldsDispatch: (action: OrderCustomFieldAction) => Promise<void>,
     setErrorMessage: (message: string) => void
   ) =>
   async () => {
     try {
-      await orderCustomFieldsDispatch(CustomFieldAction.Create())
+      await orderCustomFieldsDispatch(OrderCustomField.Action.Create())
     } catch (e) {
       const errorData = e as ErrorData
-      const t = i18n(formInfo.lang)
+      const t = i18n(lang)
       const first = errorData.errors[0]
       if (first.code === 2) {
         setErrorMessage(t.errorInsufficientLicense)
@@ -87,18 +81,18 @@ const createCustomField =
 
 const deleteCustomField =
   (
-    formInfo: ProjectFormInfo,
-    orderCustomFieldsDispatch: (action: OrderCustomFieldActionType) => Promise<void>,
+    lang: UserLang,
+    orderCustomFieldsDispatch: (action: OrderCustomFieldAction) => Promise<void>,
     setErrorMessage: (message: string) => void
   ) =>
   async () => {
     try {
-      await orderCustomFieldsDispatch(CustomFieldAction.Delete())
+      await orderCustomFieldsDispatch(OrderCustomField.Action.Delete())
       setErrorMessage("")
     } catch (e) {
       const errorData = e as ErrorData
       const first = errorData.errors[0]
-      const t = i18n(formInfo.lang)
+      const t = i18n(lang)
       if (first.code === 5) {
         setErrorMessage(t.errorNoRightForCreateCustomField)
       } else {
@@ -119,11 +113,11 @@ type IssueTypeCreateModel = Immutable<{
 
 export const useIssueTypeCreateModel = (): IssueTypeCreateModel => {
   const [values, setValues] = useAtom(issueTypeCreateAtom)
-  const formInfo = useAtomValue(formInfoAtom)
-  const [issueTypes, dispatch] = useAtom(issueTypesAtom)
+  const { lang } = useAtomValue(Environment.atom)
+  const [issueTypes, dispatch] = useAtom(IssueTypes.atom)
   return {
     values,
-    lang: formInfo.lang,
+    lang,
     issueTypes,
     onChangeName: (value) => {
       setValues((c) => {
@@ -136,7 +130,7 @@ export const useIssueTypeCreateModel = (): IssueTypeCreateModel => {
       })
     },
     onSubmit: async () => {
-      await dispatch(IssueTypesAction.Create(values.name, values.color))
+      await dispatch(IssueTypes.Action.Create(values.name, values.color))
       setValues((c) => {
         c.creating = false
       })

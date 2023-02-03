@@ -3,7 +3,8 @@ import { WritableDraft } from "immer/dist/types/types-external"
 import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 import { IssueCreateInput, IssueData } from "../../../backlog/Issue"
-import { backlogApiAtom, projectAtom } from "../../app/State"
+import { Api } from "../../app/state/Api"
+import { ProjectAtom } from "../../app/state/ProjectInfo"
 
 enum Types {
   Move = "Move",
@@ -31,15 +32,15 @@ const interfaceAtom = atomFamily((parentIssueId: number) =>
       if (stored !== null) {
         return stored
       } else {
-        const api = get(backlogApiAtom)
-        const project = get(projectAtom)
+        const api = get(Api.atom)
+        const project = get(ProjectAtom.atom)
         return await api.issue.searchChildren(project, parentIssueId)
       }
     },
     async (get, set, action: Action) => {
       if (action.type === Types.Move) {
         const { issue, destinationIssueId } = action
-        const api = get(backlogApiAtom)
+        const api = get(Api.atom)
         const updated = await api.issue.editIssue(issue.id, { parentIssueId: destinationIssueId })
         const currSrc = get(interfaceAtom(parentIssueId))
         set(

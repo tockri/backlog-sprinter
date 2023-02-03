@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import { useAtomValue } from "jotai"
 import React from "react"
 import { Status } from "../../backlog/ProjectInfo"
-import { statusesAtom } from "../app/State"
+import { Statuses } from "../app/state/ProjectInfo"
 
 type StatusViewProps = {
   status: Status
@@ -29,7 +29,7 @@ export const StatusView: React.FC<StatusViewProps> = (props) => {
 
 const StatusEditView: React.FC<StatusViewProps> = (props) => {
   const { status, onFix } = props
-  const statuses = useAtomValue(statusesAtom)
+  const statuses = useAtomValue(Statuses.atom)
   return (
     <StatusSelect
       style={{ backgroundColor: status.color }}

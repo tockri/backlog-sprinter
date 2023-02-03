@@ -3,37 +3,40 @@ import { Atom, useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { MessageBroker } from "../../../util/MessageBroker"
 import { BacklogApiContext } from "../../backlog/BacklogApiForReact"
-import { ProjectFormInfo, UserLang } from "../types"
-import { appSettingAtom, backlogApiAtom, formInfoAtom, orderCustomFieldAtom, Tabs } from "./State"
+import { ProjectEnv, UserLang } from "../types"
+import { Api } from "./state/Api"
+import { AppConfig, Tabs } from "./state/AppConfig"
+import { Environment } from "./state/Environment"
+import { OrderCustomField } from "./state/OrderCustomField"
 
 type AppModel = {
   clear: () => void
-  formInfo: ProjectFormInfo | null
+  formInfo: ProjectEnv | null
   providerInitialValues: Iterable<[Atom<unknown>, unknown]>
 }
 
-export const useAppModel = (broker: MessageBroker<ProjectFormInfo>): AppModel => {
-  const [formInfo, setFormInfo] = React.useState<ProjectFormInfo | null>(null)
+export const useAppModel = (broker: MessageBroker<ProjectEnv>): AppModel => {
+  const [env, setEnv] = React.useState<ProjectEnv | null>(null)
   const api = React.useContext(BacklogApiContext)
   React.useEffect(() => {
-    if (!formInfo) {
+    if (!env) {
       broker.subscribe("Project", (formInfo) => {
-        setFormInfo(formInfo)
+        setEnv(formInfo)
       })
     }
     return () => {
       broker.unsubscribe("Project")
     }
-  }, [formInfo, broker, setFormInfo])
+  }, [env, broker, setEnv])
   return {
     clear: () => {
-      setFormInfo(null)
+      setEnv(null)
     },
-    formInfo,
-    providerInitialValues: formInfo
+    formInfo: env,
+    providerInitialValues: env
       ? [
-          [formInfoAtom, formInfo],
-          [backlogApiAtom, api]
+          [Environment.atom, env],
+          [Api.atom, api]
         ]
       : []
   }
@@ -46,15 +49,15 @@ type InnerModel = Immutable<{
 }>
 
 export const useInnerModel = (): InnerModel => {
-  const formInfo = useAtomValue(formInfoAtom)
-  const [appSetting, setAppSetting] = useAtom(appSettingAtom)
-  const orderCustomField = useAtomValue(orderCustomFieldAtom)
-  const selectedTab = orderCustomField ? appSetting.selectedTab : Tabs.Settings
+  const env = useAtomValue(Environment.atom)
+  const [config, setConfig] = useAtom(AppConfig.atom)
+  const orderCustomField = useAtomValue(OrderCustomField.atom)
+  const selectedTab = orderCustomField ? config.selectedTab : Tabs.Settings
   return {
-    lang: formInfo.lang,
+    lang: env.lang,
     selectedTab,
     setSelectedTab: (tab) =>
-      setAppSetting((c) => {
+      setConfig((c) => {
         c.selectedTab = tab
       })
   }

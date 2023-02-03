@@ -1,6 +1,7 @@
 import { useAtom, useAtomValue } from "jotai"
 import { Version } from "../../../backlog/ProjectInfo"
-import { formInfoAtom, milestonesAtom } from "../../app/State"
+import { Environment } from "../../app/state/Environment"
+import { Milestones } from "../../app/state/ProjectInfo"
 import { UserLang } from "../../types"
 import { MilestoneForm, MilestoneFormValues } from "../state/MilestoneForm"
 
@@ -17,10 +18,10 @@ type MilestoneModel = {
 
 export const useMilestoneModel = (milestoneId?: number): MilestoneModel => {
   const [values, dispatch] = useAtom(MilestoneForm.atom(milestoneId || 0))
-  const milestones = useAtomValue(milestonesAtom)
-  const formInfo = useAtomValue(formInfoAtom)
+  const milestones = useAtomValue(Milestones.atom)
+  const { lang } = useAtomValue(Environment.atom)
   return {
-    lang: formInfo.lang,
+    lang,
     values,
     setName: (name) => {
       dispatch(MilestoneForm.Action.SetName(name))

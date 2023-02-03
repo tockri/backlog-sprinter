@@ -4,7 +4,7 @@ import { atomFamily } from "jotai/utils"
 import { DateUtil } from "../../../../util/DateUtil"
 import { ObjectUtil } from "../../../../util/ObjectUtil"
 import { ErrorData } from "../../../backlog/BacklogApiRequest"
-import { projectAtom } from "../../app/State"
+import { ProjectAtom } from "../../app/state/ProjectInfo"
 import { ProductBacklog } from "./ProductBacklog"
 
 type Values = {
@@ -98,7 +98,7 @@ const interfaceAtom = atomFamily((milestoneId: number) =>
     async (get, set, action) => {
       const curr = get(store(milestoneId))
       if (action.type === Types.Submit) {
-        const project = get(projectAtom)
+        const project = get(ProjectAtom.atom)
         const input = {
           projectId: project.id,
           name: curr.name,

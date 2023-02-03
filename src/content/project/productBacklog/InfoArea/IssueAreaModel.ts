@@ -1,7 +1,7 @@
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
-import { projectAtom } from "../../app/State"
+import { ProjectAtom } from "../../app/state/ProjectInfo"
 import { PBIListData, PBIListDataHandler } from "../PBIList/ListData"
 import { ProductBacklog, ProductBacklogAction } from "../state/ProductBacklog"
 import { SelectedItem, SelectedItemAction } from "../state/SelectedItem"
@@ -25,7 +25,7 @@ type IssueAreaModel = Immutable<{
 
 export const useIssueAreaModel = (): IssueAreaModel => {
   const item = useAtomValue(SelectedItem.atom)
-  const project = useAtomValue(projectAtom)
+  const project = useAtomValue(ProjectAtom.atom)
   const [pbiList, dispatch] = useAtom(ProductBacklog.atom)
 
   const issue = item.type === "Issue" ? findIssue(pbiList, item.issueId) : null

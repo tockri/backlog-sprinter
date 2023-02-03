@@ -4,7 +4,7 @@ import React from "react"
 import { IssueData } from "../../../backlog/Issue"
 import { HBox } from "../../../ui/Box"
 import { Draggable } from "../../../ui/DragAndDrop"
-import { formInfoAtom } from "../../app/State"
+import { Environment } from "../../app/state/Environment"
 
 import { ChildIssue, ChildIssueAction } from "../state/ChildIssue"
 import { StatusView } from "../StatusView"
@@ -17,8 +17,8 @@ type ChildIssueListViewProps = {
 export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => {
   const { parentIssueId } = props
   const [children, dispatch] = useAtom(ChildIssue.atom(parentIssueId))
-  const formInfo = useAtomValue(formInfoAtom)
-  const t = i18n(formInfo.lang)
+  const env = useAtomValue(Environment.atom)
+  const t = i18n(env.lang)
 
   return children.length === 0 ? null : (
     <div>

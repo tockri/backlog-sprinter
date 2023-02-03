@@ -2,7 +2,7 @@ import { Immutable } from "immer"
 import { useAtomValue, useSetAtom } from "jotai"
 import React from "react"
 import { Version } from "../../../backlog/ProjectInfo"
-import { formInfoAtom } from "../../app/State"
+import { Environment } from "../../app/state/Environment"
 import { UserLang } from "../../types"
 import { ProductBacklog, ProductBacklogAction } from "../state/ProductBacklog"
 import { PBIListData } from "./ListData"
@@ -26,10 +26,10 @@ type HoverState = Immutable<{
 export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
   const [hover, setHover] = React.useState<HoverState | null>(null)
   const dispatch = useSetAtom(ProductBacklog.atom)
-  const formInfo = useAtomValue(formInfoAtom)
+  const { lang } = useAtomValue(Environment.atom)
 
   return {
-    lang: formInfo.lang,
+    lang,
     setArrangeHovered: (issueId: number, hover: boolean) => {
       if (hover) {
         setHover({

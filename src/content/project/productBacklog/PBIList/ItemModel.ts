@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { NLMoveAction } from "../../../../util/NestedList"
-import { orderCustomFieldAtom } from "../../app/State"
+import { OrderCustomField } from "../../app/state/OrderCustomField"
 import { ProductBacklog } from "../state/ProductBacklog"
 
 import { SelectedItem } from "../state/SelectedItem"
@@ -14,7 +14,7 @@ type PBIItemModel = {
 export const usePBIItemModel = (): PBIItemModel => {
   const [selected, selectDispatch] = useAtom(SelectedItem.atom)
   const pbDispatch = useSetAtom(ProductBacklog.atom)
-  const orderCustomField = useAtomValue(orderCustomFieldAtom)
+  const orderCustomField = useAtomValue(OrderCustomField.atom)
   const selectedIssueId = selected?.type === "Issue" ? selected.issueId : null
   if (orderCustomField) {
     return {

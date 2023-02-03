@@ -7,12 +7,12 @@ import { TabPanel } from "../../ui/TabPanel"
 import { ProductBacklogView } from "../productBacklog/View"
 import { ProjectSettings } from "../settings/View"
 import { StatView } from "../stat/View"
-import { ProjectFormInfo } from "../types"
+import { ProjectEnv } from "../types"
 import { i18n } from "./i18n"
 import { useAppModel, useInnerModel } from "./Model"
 
 type ProjectAppProps = {
-  broker: MessageBroker<ProjectFormInfo>
+  broker: MessageBroker<ProjectEnv>
 }
 
 export const ProjectApp: React.FC<ProjectAppProps> = ({ broker }) => {

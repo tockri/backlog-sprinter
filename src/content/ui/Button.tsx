@@ -10,5 +10,8 @@ export const Button = styled.button({
   "&[disabled]": {
     backgroundColor: "#cccccc",
     color: "#999999"
+  },
+  "&:active": {
+    boxShadow: "inset 1px 1px 2px #aaaaaa"
   }
 })

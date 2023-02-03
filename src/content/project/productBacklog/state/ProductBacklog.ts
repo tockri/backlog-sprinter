@@ -8,15 +8,10 @@ import { NLLocation, NLMoveAction } from "../../../../util/NestedList"
 import { BacklogApi } from "../../../backlog/BacklogApiForReact"
 import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
 import { CustomNumberField, MilestoneInput, Version } from "../../../backlog/ProjectInfo"
-import {
-  appSettingAtom,
-  backlogApiAtom,
-  issueTypesAtom,
-  milestonesAtom,
-  orderCustomFieldAtom,
-  projectAtom,
-  statusesAtom
-} from "../../app/State"
+import { Api } from "../../app/state/Api"
+import { AppConfig } from "../../app/state/AppConfig"
+import { OrderCustomField } from "../../app/state/OrderCustomField"
+import { IssueTypes, Milestones, ProjectAtom, Statuses } from "../../app/state/ProjectInfo"
 import { PBIListData, PBIListDataHandler, PBIListMovedEvent } from "../PBIList/ListData"
 
 const pbiListDataStoreAtom = atom<PBIListData | null>(null)
@@ -64,16 +59,16 @@ type Action = NLMoveAction | AddIssueAction | AddMilestoneAction | EditIssueActi
 
 const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | void>(
   async (get) => {
-    const orderCustomField = get(orderCustomFieldAtom)
+    const orderCustomField = get(OrderCustomField.atom)
     if (orderCustomField) {
       const stored = get(pbiListDataStoreAtom)
       if (stored) {
         return stored
       } else {
-        const project = get(projectAtom)
-        const api = get(backlogApiAtom)
-        const setting = get(appSettingAtom)
-        const milestones = get(milestonesAtom)
+        const project = get(ProjectAtom.atom)
+        const api = get(Api.atom)
+        const conf = get(AppConfig.atom)
+        const milestones = get(Milestones.atom)
         const today = new Date()
         const milestoneFilter = milestones.filter(
           (ms) =>
@@ -82,7 +77,7 @@ const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | vo
             ms.releaseDueDate &&
             DateUtil.diffDays(today, new Date(ms.releaseDueDate)) > -3
         )
-        const list = await api.issue.searchInIssueTypeAndMilestones(project, setting.pbiIssueTypeId, milestoneFilter)
+        const list = await api.issue.searchInIssueTypeAndMilestones(project, conf.pbiIssueTypeId, milestoneFilter)
         return PBIListDataHandler.nestIssues(list, orderCustomField)
       }
     } else {
@@ -97,20 +92,20 @@ const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | vo
         events.push(...PBIListDataHandler.mutateByMovingAction(draft, action))
       })
       if (events.length) {
-        const api = get(backlogApiAtom)
-        const orderCustomField = get(orderCustomFieldAtom)
+        const api = get(Api.atom)
+        const orderCustomField = get(OrderCustomField.atom)
         if (orderCustomField) {
           await updateIssues(orderCustomField, events, api).then()
         }
       }
       set(pbiListDataStoreAtom, updated)
     } else if (action.type === "ProductBacklogCreate") {
-      const setting = get(appSettingAtom)
-      const issueType = get(issueTypesAtom).find((it) => it.id === setting.pbiIssueTypeId)
-      const orderCustomField = get(orderCustomFieldAtom)
+      const conf = get(AppConfig.atom)
+      const issueType = get(IssueTypes.atom).find((it) => it.id === conf.pbiIssueTypeId)
+      const orderCustomField = get(OrderCustomField.atom)
       if (issueType && orderCustomField) {
-        const project = get(projectAtom)
-        const api = get(backlogApiAtom)
+        const project = get(ProjectAtom.atom)
+        const api = get(Api.atom)
         const order = PBIListDataHandler.getNewOrder(prev, action.milestone)
         const created = await api.issue.createIssue({
           project,
@@ -128,9 +123,9 @@ const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | vo
         set(pbiListDataStoreAtom, updated)
       }
     } else if (action.type === "MilestoneCreate") {
-      const api = get(backlogApiAtom)
+      const api = get(Api.atom)
       const created = await api.projectInfo.createMilestone(action.input)
-      set(milestonesAtom, (c) => {
+      set(Milestones.atom, (c) => {
         c.push(created as WritableDraft<Version>)
       })
       const updated = produce(prev, (draft) => {
@@ -138,10 +133,10 @@ const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | vo
       })
       set(pbiListDataStoreAtom, updated)
     } else if (action.type === "EditIssue") {
-      const api = get(backlogApiAtom)
+      const api = get(Api.atom)
       const { issueId, input } = action
       await api.issue.editIssue(issueId, input)
-      const statuses = get(statusesAtom)
+      const statuses = get(Statuses.atom)
       const updated = produce(prev, (draft) => {
         PBIListDataHandler.mutateByEditingIssue(draft, statuses, issueId, input)
       })

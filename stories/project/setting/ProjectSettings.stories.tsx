@@ -3,7 +3,7 @@
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import React from "react"
 import { IssueTypeColor } from "../../../src/content/backlog/ProjectInfo"
-import { appSettingAtom } from "../../../src/content/project/app/State"
+import { AppConfig } from "../../../src/content/project/app/state/AppConfig"
 import { issueTypeCreateAtom } from "../../../src/content/project/settings/State"
 import { ProjectSettings } from "../../../src/content/project/settings/View"
 import { ProjectStoryTemplate, ProjectStoryTemplateProps } from "../ProjectStoryTemplate"
@@ -22,7 +22,7 @@ export const Default: Story = {
   args: {
     initialValues: [
       [
-        appSettingAtom,
+        AppConfig.atom,
         {
           selectedTab: 0,
           pbiIssueTypeId: 0
@@ -42,7 +42,7 @@ export const Creating: Story = {
   args: {
     initialValues: [
       [
-        appSettingAtom,
+        AppConfig.atom,
         {
           selectedTab: 0,
           pbiIssueTypeId: 0

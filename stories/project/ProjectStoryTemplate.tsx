@@ -1,9 +1,9 @@
+import styled from "@emotion/styled"
 import { Atom, Provider } from "jotai"
 import React from "react"
-
-import { appSettingAtom, backlogApiAtom, formInfoAtom } from "../../src/content/project/app/State"
-
-import styled from "@emotion/styled"
+import { Api } from "../../src/content/project/app/state/Api"
+import { AppConfig } from "../../src/content/project/app/state/AppConfig"
+import { Environment } from "../../src/content/project/app/state/Environment"
 import { Loading } from "../../src/content/ui/Loading"
 import { mockApi } from "./mockApi"
 
@@ -16,20 +16,20 @@ export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ init
     <Provider
       initialValues={[
         [
-          appSettingAtom,
+          AppConfig.atom,
           {
             selectedTab: 0,
             pbiIssueTypeId: 389286
           }
         ],
         [
-          formInfoAtom,
+          Environment.atom,
           {
             projectKey: "BT",
             lang: "ja"
           }
         ],
-        [backlogApiAtom, mockApi],
+        [Api.atom, mockApi],
         ...initialValues
       ]}
     >

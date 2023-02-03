@@ -6,7 +6,8 @@ import "react-tooltip/dist/react-tooltip.min.css"
 import { IssueData } from "../../backlog/Issue"
 import { HBox } from "../../ui/Box"
 import { cnu } from "../../ui/cnu"
-import { formInfoAtom } from "../app/State"
+import { Environment } from "../app/state/Environment"
+
 import { i18n } from "./i18n"
 
 type StoryPointViewProps = {
@@ -22,8 +23,8 @@ export const StoryPointView: React.FC<StoryPointViewProps> = (props) => {
 
 const Editor: React.FC<StoryPointViewProps> = (props) => {
   const { issue, onEstimateFix, onActualFix } = props
-  const formInfo = useAtomValue(formInfoAtom)
-  const t = i18n(formInfo.lang)
+  const env = useAtomValue(Environment.atom)
+  const t = i18n(env.lang)
   const { actualHours, estimatedHours, status } = issue
   return (
     <HBox>

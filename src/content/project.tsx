@@ -4,10 +4,10 @@ import { MessageBroker } from "../util/MessageBroker"
 import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
 import SprintIcon from "./images/sprint.svg"
 import { ProjectApp } from "./project/app/View"
-import { i18n, ProjectFormInfo, UserLang } from "./project/types"
+import { i18n, ProjectEnv, UserLang } from "./project/types"
 import { jsxToElement } from "./ui/JSXUtil"
 
-const broker = new MessageBroker<ProjectFormInfo>()
+const broker = new MessageBroker<ProjectEnv>()
 
 const getButtonPlace = () => document.querySelector(".project-header__summary")
 
