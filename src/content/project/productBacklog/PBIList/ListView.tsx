@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { usePBIListModel } from "./ListModel"
-import { MilestoneCreateForm } from "./MilestoneCreateForm"
+import { MilestoneForm } from "./MilestoneForm"
 import PlusIconSVG from "./plus-icon.svg"
 import { PBISubList } from "./SubListView"
 
@@ -10,7 +10,7 @@ export const PBIListView: React.FC = () => {
   return (
     <Root>
       {model.creating ? (
-        <MilestoneCreateForm />
+        <MilestoneForm />
       ) : (
         <AddButton type="button" onClick={model.startCreating}>
           <PlusIcon />

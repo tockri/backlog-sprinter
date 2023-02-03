@@ -2,7 +2,7 @@
 
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import React from "react"
-import { milestoneCreateFormAtom } from "../../../src/content/project/productBacklog/PBIList/State"
+import { milestoneFormAtom } from "../../../src/content/project/productBacklog/PBIList/State"
 import { selectedIssueIdAtom } from "../../../src/content/project/productBacklog/State"
 import { ProductBacklogView } from "../../../src/content/project/productBacklog/View"
 import { StoryUtil } from "../../StoryUtil"
@@ -30,7 +30,7 @@ export const SomeEmptyFields = StoryUtil.produce(Default)((args) => {
 
 export const CreatingMilestone = StoryUtil.produce(Default)((args) => {
   args.initialValues.push([
-    milestoneCreateFormAtom,
+    milestoneFormAtom,
     {
       creating: true,
       name: "",

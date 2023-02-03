@@ -1,19 +1,20 @@
 import { atom } from "jotai"
 import { atomWithImmer } from "jotai-immer"
+import { atomFamily } from "jotai/utils"
 import { DateUtil } from "../../../../util/DateUtil"
 import { ObjectUtil } from "../../../../util/ObjectUtil"
 import { ErrorData } from "../../../backlog/BacklogApiRequest"
 import { projectAtom } from "../../app/State"
 import { productBacklogAtom } from "../State"
 
-export type MilestoneCreateForm = {
+export type MilestoneFormValues = {
   creating: boolean
   name: string
   startDate: Date | null
   endDate: Date | null
   errorMessage: string | null
 }
-const emptyForm: MilestoneCreateForm = {
+const emptyForm: MilestoneFormValues = {
   creating: false,
   name: "",
   startDate: null,
@@ -78,7 +79,7 @@ const Submit: SubmitType = {
 
 type ActionType = SetNameType | SetStartDateType | SetEndDateType | StartType | CancelType | SubmitType
 
-export const MilestoneCreate = {
+export const MilestoneFormAction = {
   SetName,
   SetStartDate,
   SetEndDate,
@@ -87,58 +88,60 @@ export const MilestoneCreate = {
   Submit
 }
 
-const store = atomWithImmer<MilestoneCreateForm>(emptyForm)
+const store = atomFamily((_milestoneId: number) => atomWithImmer<MilestoneFormValues>(emptyForm))
 
-export const milestoneCreateFormAtom = atom<MilestoneCreateForm, ActionType, Promise<void>>(
-  (get) => get(store),
-  async (get, set, action) => {
-    const curr = get(store)
-    if (action.type === ActionTypes.Submit) {
-      const project = get(projectAtom)
-      const input = {
-        projectId: project.id,
-        name: curr.name,
-        startDate: curr.startDate,
-        endDate: curr.endDate,
-        description: ""
-      }
-      try {
-        await set(productBacklogAtom, {
-          type: "MilestoneCreate",
-          input
-        })
-        set(store, (c) => {
-          ObjectUtil.copyContent(emptyForm, c)
-        })
-      } catch (e) {
-        const err = e as ErrorData
-        console.warn("failed to create milestone", err)
-        set(store, (c) => {
-          c.errorMessage = err.errors[0]?.message || "unknown error"
-        })
-      }
-    } else {
-      set(store, (c) => {
-        switch (action.type) {
-          case ActionTypes.Start:
-            c.creating = true
-            break
-          case ActionTypes.Cancel:
-            ObjectUtil.copyContent(emptyForm, c)
-            break
-          case ActionTypes.SetName:
-            c.name = action.name
-            break
-          case ActionTypes.SetEndDate:
-            c.endDate = action.date
-            break
-          case ActionTypes.SetStartDate:
-            c.startDate = action.date
-            break
-          default:
-            throw new Error("unknown action type")
+export const milestoneFormAtom = atomFamily((milestoneId: number) =>
+  atom<MilestoneFormValues, ActionType, Promise<void>>(
+    (get) => get(store(milestoneId)),
+    async (get, set, action) => {
+      const curr = get(store(milestoneId))
+      if (action.type === ActionTypes.Submit) {
+        const project = get(projectAtom)
+        const input = {
+          projectId: project.id,
+          name: curr.name,
+          startDate: curr.startDate,
+          endDate: curr.endDate,
+          description: ""
         }
-      })
+        try {
+          await set(productBacklogAtom, {
+            type: "MilestoneCreate",
+            input
+          })
+          set(store(milestoneId), (c) => {
+            ObjectUtil.copyContent(emptyForm, c)
+          })
+        } catch (e) {
+          const err = e as ErrorData
+          console.warn("failed to create milestone", err)
+          set(store(milestoneId), (c) => {
+            c.errorMessage = err.errors[0]?.message || "unknown error"
+          })
+        }
+      } else {
+        set(store(milestoneId), (c) => {
+          switch (action.type) {
+            case ActionTypes.Start:
+              c.creating = true
+              break
+            case ActionTypes.Cancel:
+              ObjectUtil.copyContent(emptyForm, c)
+              break
+            case ActionTypes.SetName:
+              c.name = action.name
+              break
+            case ActionTypes.SetEndDate:
+              c.endDate = action.date
+              break
+            case ActionTypes.SetStartDate:
+              c.startDate = action.date
+              break
+            default:
+              throw new Error("unknown action type")
+          }
+        })
+      }
     }
-  }
+  )
 )

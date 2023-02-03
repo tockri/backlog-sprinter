@@ -5,10 +5,10 @@ import { HBox, VBox } from "../../../ui/Box"
 import { Button } from "../../../ui/Button"
 import { TextInput } from "../../../ui/TextInput"
 import { i18n } from "../i18n"
-import { useMilestoneCreateModel } from "./MilestoneCreateModel"
+import { useMilestoneModel } from "./MilestoneModel"
 
-export const MilestoneCreateForm: React.FC = () => {
-  const model = useMilestoneCreateModel()
+export const MilestoneForm: React.FC<{ milestoneId?: number }> = ({ milestoneId }) => {
+  const model = useMilestoneModel(milestoneId)
   const { values, lang, submittable } = model
   const t = i18n(lang)
   return (
