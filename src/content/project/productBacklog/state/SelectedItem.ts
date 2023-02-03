@@ -10,12 +10,28 @@ type MilestoneId = {
   milestoneId: number
 }
 
-const store = atom<IssueId | MilestoneId | null>(null)
-
-export const SelectedItem = {
-  atom: store
+type None = {
+  type: "None"
+}
+const None: None = {
+  type: "None"
 }
 
-export type SelectedItem_IssueId = IssueId
-export type SelectedItem_MilestoneId = MilestoneId
-export type SelectedItem = SelectedItem_IssueId | SelectedItem_MilestoneId
+type Value = IssueId | MilestoneId | None
+const store = atom<Value>(None)
+
+export const SelectedItem = {
+  atom: store,
+  Action: {
+    SelectIssue: (issueId: number): IssueId => ({
+      type: "Issue",
+      issueId
+    }),
+    SelectMilestone: (milestoneId: number): MilestoneId => ({
+      type: "Milestone",
+      milestoneId
+    }),
+    Deselect: None
+  }
+}
+export type SelectedItemAction = Value

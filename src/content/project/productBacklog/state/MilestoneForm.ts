@@ -5,16 +5,17 @@ import { DateUtil } from "../../../../util/DateUtil"
 import { ObjectUtil } from "../../../../util/ObjectUtil"
 import { ErrorData } from "../../../backlog/BacklogApiRequest"
 import { projectAtom } from "../../app/State"
-import { productBacklogAtom } from "../State"
+import { ProductBacklog } from "./ProductBacklog"
 
-export type MilestoneFormValues = {
+type Values = {
   creating: boolean
   name: string
   startDate: Date | null
   endDate: Date | null
   errorMessage: string | null
 }
-const emptyForm: MilestoneFormValues = {
+
+const emptyForm: Values = {
   creating: false,
   name: "",
   startDate: null,
@@ -22,7 +23,7 @@ const emptyForm: MilestoneFormValues = {
   errorMessage: null
 }
 
-enum ActionTypes {
+enum Types {
   Start = "Start",
   Create = "Create",
   Cancel = "Cancel",
@@ -33,70 +34,70 @@ enum ActionTypes {
 }
 
 type SetNameType = {
-  type: ActionTypes.SetName
+  type: Types.SetName
   name: string
 }
+
 const SetName = (name: string): SetNameType => ({
-  type: ActionTypes.SetName,
+  type: Types.SetName,
   name
 })
 
 type SetStartDateType = {
-  type: ActionTypes.SetStartDate
+  type: Types.SetStartDate
   date: Date | null
 }
+
 const SetStartDate = (dateString: string): SetStartDateType => ({
-  type: ActionTypes.SetStartDate,
+  type: Types.SetStartDate,
   date: DateUtil.parseDate(dateString)
 })
 
 type SetEndDateType = {
-  type: ActionTypes.SetEndDate
+  type: Types.SetEndDate
   date: Date | null
 }
+
 const SetEndDate = (dateString: string): SetEndDateType => ({
-  type: ActionTypes.SetEndDate,
+  type: Types.SetEndDate,
   date: DateUtil.parseDate(dateString)
 })
+
 type StartType = {
-  type: ActionTypes.Start
+  type: Types.Start
 }
+
 const Start: StartType = {
-  type: ActionTypes.Start
+  type: Types.Start
 }
+
 type CancelType = {
-  type: ActionTypes.Cancel
+  type: Types.Cancel
 }
+
 const Cancel: CancelType = {
-  type: ActionTypes.Cancel
+  type: Types.Cancel
 }
+
 type SubmitType = {
-  type: ActionTypes.Submit
+  type: Types.Submit
 }
+
 const Submit: SubmitType = {
-  type: ActionTypes.Submit
+  type: Types.Submit
 }
 
 type ActionType = SetNameType | SetStartDateType | SetEndDateType | StartType | CancelType | SubmitType
 
-export const MilestoneFormAction = {
-  SetName,
-  SetStartDate,
-  SetEndDate,
-  Start,
-  Cancel,
-  Submit
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const store = atomFamily((_milestoneId: number) => atomWithImmer<MilestoneFormValues>(emptyForm))
+const store = atomFamily((_milestoneId: number) => atomWithImmer<Values>(emptyForm))
 
-export const milestoneFormAtom = atomFamily((milestoneId: number) =>
-  atom<MilestoneFormValues, ActionType, Promise<void>>(
+const interfaceAtom = atomFamily((milestoneId: number) =>
+  atom<Values, ActionType, Promise<void>>(
     (get) => get(store(milestoneId)),
     async (get, set, action) => {
       const curr = get(store(milestoneId))
-      if (action.type === ActionTypes.Submit) {
+      if (action.type === Types.Submit) {
         const project = get(projectAtom)
         const input = {
           projectId: project.id,
@@ -106,7 +107,7 @@ export const milestoneFormAtom = atomFamily((milestoneId: number) =>
           description: ""
         }
         try {
-          await set(productBacklogAtom, {
+          await set(ProductBacklog.atom, {
             type: "MilestoneCreate",
             input
           })
@@ -123,19 +124,19 @@ export const milestoneFormAtom = atomFamily((milestoneId: number) =>
       } else {
         set(store(milestoneId), (c) => {
           switch (action.type) {
-            case ActionTypes.Start:
+            case Types.Start:
               c.creating = true
               break
-            case ActionTypes.Cancel:
+            case Types.Cancel:
               ObjectUtil.copyContent(emptyForm, c)
               break
-            case ActionTypes.SetName:
+            case Types.SetName:
               c.name = action.name
               break
-            case ActionTypes.SetEndDate:
+            case Types.SetEndDate:
               c.endDate = action.date
               break
-            case ActionTypes.SetStartDate:
+            case Types.SetStartDate:
               c.startDate = action.date
               break
             default:
@@ -146,3 +147,20 @@ export const milestoneFormAtom = atomFamily((milestoneId: number) =>
     }
   )
 )
+
+export type MilestoneFormValues = Values
+
+export type MilestoneFormAction = ActionType
+
+export const MilestoneForm = {
+  storeAtom_FOR_TEST: store,
+  atom: interfaceAtom,
+  Action: {
+    SetName,
+    SetStartDate,
+    SetEndDate,
+    Start,
+    Cancel,
+    Submit
+  }
+}

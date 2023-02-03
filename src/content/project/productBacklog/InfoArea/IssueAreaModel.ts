@@ -1,20 +1,19 @@
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
-import { Version } from "../../../backlog/ProjectInfo"
-import { milestonesAtom, projectAtom } from "../../app/State"
+import { projectAtom } from "../../app/State"
 import { PBIListData, PBIListDataHandler } from "../PBIList/ListData"
-import { ProductBacklogAction, productBacklogAtom } from "../State"
-import { SelectedItem } from "../state/SelectedItem"
+import { ProductBacklog, ProductBacklogAction } from "../state/ProductBacklog"
+import { SelectedItem, SelectedItemAction } from "../state/SelectedItem"
 
 type InfoAreaModel = Immutable<{
-  type?: SelectedItem["type"]
+  type: SelectedItemAction["type"]
 }>
 
 export const useInfoAreaModel = (): InfoAreaModel => {
   const item = useAtomValue(SelectedItem.atom)
   return {
-    type: item?.type
+    type: item.type
   }
 }
 
@@ -27,9 +26,9 @@ type IssueAreaModel = Immutable<{
 export const useIssueAreaModel = (): IssueAreaModel => {
   const item = useAtomValue(SelectedItem.atom)
   const project = useAtomValue(projectAtom)
-  const [pbiList, dispatch] = useAtom(productBacklogAtom)
+  const [pbiList, dispatch] = useAtom(ProductBacklog.atom)
 
-  const issue = item?.type === "Issue" ? findIssue(pbiList, item.issueId) : null
+  const issue = item.type === "Issue" ? findIssue(pbiList, item.issueId) : null
 
   return {
     issue,
@@ -51,19 +50,3 @@ const changeIssue =
     }
     await dispatch({ type: "EditIssue", issueId, input })
   }
-
-type MilestoneAreaModel = Immutable<{
-  milestone: Version | null
-}>
-
-export const useMilestoneAreaModel = (): MilestoneAreaModel => {
-  const item = useAtomValue(SelectedItem.atom)
-  const milestones = useAtomValue(milestonesAtom)
-  const milestone = item?.type === "Milestone" ? findMilestone(milestones, item.milestoneId) : null
-  return {
-    milestone
-  }
-}
-
-const findMilestone = (milestones: ReadonlyArray<Version>, milestoneId: number): Version | null =>
-  milestones.find((ms) => ms.id === milestoneId) || null

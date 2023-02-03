@@ -2,7 +2,7 @@ import { useAtom, useAtomValue } from "jotai"
 import { Version } from "../../../backlog/ProjectInfo"
 import { formInfoAtom, milestonesAtom } from "../../app/State"
 import { UserLang } from "../../types"
-import { MilestoneFormAction, milestoneFormAtom, MilestoneFormValues } from "./State"
+import { MilestoneForm, MilestoneFormValues } from "../state/MilestoneForm"
 
 type MilestoneModel = {
   setName: (value: string) => void
@@ -16,26 +16,26 @@ type MilestoneModel = {
 }
 
 export const useMilestoneModel = (milestoneId?: number): MilestoneModel => {
-  const [values, dispatch] = useAtom(milestoneFormAtom(milestoneId || 0))
+  const [values, dispatch] = useAtom(MilestoneForm.atom(milestoneId || 0))
   const milestones = useAtomValue(milestonesAtom)
   const formInfo = useAtomValue(formInfoAtom)
   return {
     lang: formInfo.lang,
     values,
     setName: (name) => {
-      dispatch(MilestoneFormAction.SetName(name))
+      dispatch(MilestoneForm.Action.SetName(name))
     },
     setStartDate: (value) => {
-      dispatch(MilestoneFormAction.SetStartDate(value))
+      dispatch(MilestoneForm.Action.SetStartDate(value))
     },
     setEndDate: (value) => {
-      dispatch(MilestoneFormAction.SetEndDate(value))
+      dispatch(MilestoneForm.Action.SetEndDate(value))
     },
     cancel: () => {
-      dispatch(MilestoneFormAction.Cancel)
+      dispatch(MilestoneForm.Action.Cancel)
     },
     submit: () => {
-      dispatch(MilestoneFormAction.Submit)
+      dispatch(MilestoneForm.Action.Submit)
     },
     submittable: isSubmittable(values, milestones)
   }

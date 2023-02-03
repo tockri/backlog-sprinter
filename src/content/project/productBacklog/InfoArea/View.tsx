@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { useInfoAreaModel } from "./IssueAreaModel"
 import { IssueAreaView } from "./IssueAreaView"
-import { useInfoAreaModel } from "./Model"
 
 export const InfoAreaView: React.FC = () => {
   const model = useInfoAreaModel()

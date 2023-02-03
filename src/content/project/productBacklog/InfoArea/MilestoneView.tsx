@@ -7,7 +7,7 @@ import { TextInput } from "../../../ui/TextInput"
 import { i18n } from "../i18n"
 import { useMilestoneModel } from "./MilestoneModel"
 
-export const MilestoneForm: React.FC<{ milestoneId?: number }> = ({ milestoneId }) => {
+export const MilestoneView: React.FC<{ milestoneId?: number }> = ({ milestoneId }) => {
   const model = useMilestoneModel(milestoneId)
   const { values, lang, submittable } = model
   const t = i18n(lang)

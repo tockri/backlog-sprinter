@@ -4,7 +4,7 @@ import { atom } from "jotai"
 
 import { ArrayUtil } from "../../../../util/ArrayUtil"
 import { DateUtil } from "../../../../util/DateUtil"
-import { NLMoveAction } from "../../../../util/NestedList"
+import { NLLocation, NLMoveAction } from "../../../../util/NestedList"
 import { BacklogApi } from "../../../backlog/BacklogApiForReact"
 import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
 import { CustomNumberField, MilestoneInput, Version } from "../../../backlog/ProjectInfo"
@@ -26,17 +26,39 @@ type AddIssueAction = {
   summary: string
   milestone: Version | null
 }
+const AddIssue = (summary: string, milestone: Version | null): AddIssueAction => ({
+  type: "ProductBacklogCreate",
+  summary,
+  milestone
+})
 
 type AddMilestoneAction = {
   type: "MilestoneCreate"
   input: MilestoneInput
 }
 
+const AddMilestone = (input: MilestoneInput): AddMilestoneAction => ({
+  type: "MilestoneCreate",
+  input
+})
+
 type EditIssueAction = {
   type: "EditIssue"
   issueId: number
   input: IssueChangeInput
 }
+
+const EditIssue = (issueId: number, input: IssueChangeInput): EditIssueAction => ({
+  type: "EditIssue",
+  issueId,
+  input
+})
+
+const ListMove = (src: NLLocation, dst: NLLocation): NLMoveAction => ({
+  type: "NLMove",
+  src,
+  dst
+})
 
 type Action = NLMoveAction | AddIssueAction | AddMilestoneAction | EditIssueAction
 
@@ -154,5 +176,11 @@ const updateIssues = async (
 export type ProductBacklogAction = Action
 
 export const ProductBacklog = {
-  atom: productBacklogAtom
+  atom: productBacklogAtom,
+  Action: {
+    AddIssue,
+    EditIssue,
+    AddMilestone,
+    ListMove
+  }
 }

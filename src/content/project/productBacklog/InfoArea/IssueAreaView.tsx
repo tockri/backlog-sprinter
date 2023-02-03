@@ -6,7 +6,7 @@ import { Loading } from "../../../ui/Loading"
 import { StatusView } from "../StatusView"
 import { StoryPointView } from "../StoryPointView"
 import { ChildIssueListView } from "./ChildIssueListView"
-import { useIssueAreaModel } from "./Model"
+import { useIssueAreaModel } from "./IssueAreaModel"
 
 export const IssueAreaView: React.FC = () => {
   const model = useIssueAreaModel()

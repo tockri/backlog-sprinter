@@ -4,7 +4,7 @@ import React from "react"
 import { Version } from "../../../backlog/ProjectInfo"
 import { formInfoAtom } from "../../app/State"
 import { UserLang } from "../../types"
-import { ProductBacklogAction, productBacklogAtom } from "../State"
+import { ProductBacklog, ProductBacklogAction } from "../state/ProductBacklog"
 import { PBIListData } from "./ListData"
 
 type PBISubListModel = Immutable<{
@@ -25,7 +25,7 @@ type HoverState = Immutable<{
 
 export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
   const [hover, setHover] = React.useState<HoverState | null>(null)
-  const dispatch = useSetAtom(productBacklogAtom)
+  const dispatch = useSetAtom(ProductBacklog.atom)
   const formInfo = useAtomValue(formInfoAtom)
 
   return {

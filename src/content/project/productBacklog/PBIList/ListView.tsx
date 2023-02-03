@@ -1,21 +1,19 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { cnu } from "../../../ui/cnu"
 import { usePBIListModel } from "./ListModel"
-import { MilestoneForm } from "./MilestoneForm"
+
 import PlusIconSVG from "./plus-icon.svg"
 import { PBISubList } from "./SubListView"
 
 export const PBIListView: React.FC = () => {
   const model = usePBIListModel()
+  const { creating } = model
   return (
     <Root>
-      {model.creating ? (
-        <MilestoneForm />
-      ) : (
-        <AddButton type="button" onClick={model.startCreating}>
-          <PlusIcon />
-        </AddButton>
-      )}
+      <AddButton type="button" onClick={model.startCreating} className={cnu({ creating })}>
+        <PlusIcon />
+      </AddButton>
 
       {model.data.subLists.map((sl) => (
         <PBISubList subList={sl} key={sl.id} />
