@@ -94,7 +94,7 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
       id: 245742,
       projectId: 78386,
       name: "01-24 ~ 01-30 sprint",
-      description: null,
+      description: "マイルストーン\n複数行\n編集できる",
       startDate: "2023-01-24T00:00:00Z",
       releaseDueDate: "2023-01-30T00:00:00Z",
       archived: false,

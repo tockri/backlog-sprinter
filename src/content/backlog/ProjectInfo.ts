@@ -196,7 +196,7 @@ const deleteCustomField = async (projectKey: string, customFieldId: number): Pro
   return await BacklogApiRequest.delete<CustomField>(`/api/v2/projects/${projectKey}/customFields/${customFieldId}`)
 }
 
-export type MilestoneInput = Immutable<{
+export type AddMilestoneInput = Immutable<{
   projectId: number
   name: string
   startDate: Date | null
@@ -204,7 +204,7 @@ export type MilestoneInput = Immutable<{
   description: string
 }>
 
-const createMilestone = async (input: MilestoneInput): Promise<Version> => {
+const addMilestone = async (input: AddMilestoneInput): Promise<Version> => {
   return await BacklogApiRequest.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
     name: input.name,
     startDate: DateUtil.dateString(input.startDate),
@@ -213,8 +213,33 @@ const createMilestone = async (input: MilestoneInput): Promise<Version> => {
   })
 }
 
-const archiveMilestone = async (projectId: number, milestone: Version) => {
-  await BacklogApiRequest.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
+export type EditMilestoneInput = Immutable<{
+  name?: string
+  startDate?: Date | null
+  releaseDueDate?: Date | null
+  description?: string
+}>
+
+const editMilestone = async (projectId: number, milestoneId: number, input: EditMilestoneInput): Promise<Version> => {
+  const { name, startDate, releaseDueDate, description } = input
+  const params: Record<string, string> = {}
+  if (name !== undefined) {
+    params["name"] = name
+  }
+  if (startDate !== undefined) {
+    params["startDate"] = DateUtil.dateString(startDate)
+  }
+  if (releaseDueDate !== undefined) {
+    params["releaseDueDate"] = DateUtil.dateString(releaseDueDate)
+  }
+  if (description !== undefined) {
+    params["description"] = description
+  }
+  return await BacklogApiRequest.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestoneId}`, params)
+}
+
+const archiveMilestone = async (projectId: number, milestone: Version): Promise<Version> => {
+  return await BacklogApiRequest.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
     name: milestone.name,
     archived: "true"
   })
@@ -238,7 +263,8 @@ const ProjectInfo = {
   getProjectInfoWithCustomFields,
   createCustomField,
   deleteCustomField,
-  createMilestone,
+  addMilestone,
+  editMilestone,
   archiveMilestone,
   createIssueType
 }

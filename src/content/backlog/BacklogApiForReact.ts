@@ -27,7 +27,8 @@ const fakeProjectInfoApi: ProjectInfoApi = {
   getProjectInfoWithCustomFields: rejectFunc,
   createCustomField: rejectFunc,
   deleteCustomField: rejectFunc,
-  createMilestone: rejectFunc,
+  addMilestone: rejectFunc,
+  editMilestone: rejectFunc,
   archiveMilestone: rejectFunc,
   createIssueType: rejectFunc
 }

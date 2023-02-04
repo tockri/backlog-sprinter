@@ -2,7 +2,7 @@ import produce from "immer"
 import { WritableDraft } from "immer/dist/types/types-external"
 import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
-import { IssueCreateInput, IssueData } from "../../../backlog/Issue"
+import { AddIssueInput, IssueData } from "../../../backlog/Issue"
 import { Api } from "../../app/state/Api"
 import { ProjectAtom } from "../../app/state/ProjectInfo"
 
@@ -13,7 +13,7 @@ enum Types {
 
 type CreateAction = {
   type: Types.Create
-  input: IssueCreateInput
+  input: AddIssueInput
 }
 type MoveAction = {
   type: Types.Move
@@ -69,7 +69,7 @@ export type ChildIssueAction = Action
 export const ChildIssue = {
   atom: interfaceAtom,
   Action: {
-    Create: (input: IssueCreateInput): CreateAction => ({
+    Create: (input: AddIssueInput): CreateAction => ({
       type: Types.Create,
       input
     }),

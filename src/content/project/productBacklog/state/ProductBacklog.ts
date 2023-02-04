@@ -6,8 +6,8 @@ import { ArrayUtil } from "../../../../util/ArrayUtil"
 import { DateUtil } from "../../../../util/DateUtil"
 import { NLLocation, NLMoveAction } from "../../../../util/NestedList"
 import { BacklogApi } from "../../../backlog/BacklogApiForReact"
-import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
-import { CustomNumberField, MilestoneInput, Version } from "../../../backlog/ProjectInfo"
+import { EditIssueInput, IssueData } from "../../../backlog/Issue"
+import { AddMilestoneInput, CustomNumberField, EditMilestoneInput, Version } from "../../../backlog/ProjectInfo"
 import { Api } from "../../app/state/Api"
 import { AppConfig } from "../../app/state/AppConfig"
 import { OrderCustomField } from "../../app/state/OrderCustomField"
@@ -24,16 +24,23 @@ type AddIssueAction = {
 
 type AddMilestoneAction = {
   type: "MilestoneCreate"
-  input: MilestoneInput
+  input: AddMilestoneInput
+}
+
+type EditMilestoneAction = {
+  type: "EditMilestone"
+  projectId: number
+  milestoneId: number
+  input: EditMilestoneInput
 }
 
 type EditIssueAction = {
   type: "EditIssue"
   issueId: number
-  input: IssueChangeInput
+  input: EditIssueInput
 }
 
-type Action = NLMoveAction | AddIssueAction | AddMilestoneAction | EditIssueAction
+type Action = NLMoveAction | AddIssueAction | AddMilestoneAction | EditIssueAction | EditMilestoneAction
 
 const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | void>(
   async (get) => {
@@ -102,7 +109,7 @@ const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | vo
       }
     } else if (action.type === "MilestoneCreate") {
       const api = get(Api.atom)
-      const created = await api.projectInfo.createMilestone(action.input)
+      const created = await api.projectInfo.addMilestone(action.input)
       set(Milestones.atom, (c) => {
         c.push(created as WritableDraft<Version>)
       })
@@ -110,6 +117,22 @@ const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | vo
         PBIListDataHandler.mutateByAddingMilestone(draft, created)
       })
       set(pbiListDataStoreAtom, updated)
+    } else if (action.type === "EditMilestone") {
+      const api = get(Api.atom)
+      const project = get(ProjectAtom.atom)
+      const updated = await api.projectInfo.editMilestone(project.id, action.milestoneId, action.input)
+      set(Milestones.atom, (c) => {
+        const idx = c.findIndex((ms) => ms.id === updated.id)
+        if (idx >= 0) {
+          c.splice(idx, 1, updated as WritableDraft<Version>)
+        }
+      })
+      set(
+        pbiListDataStoreAtom,
+        produce(prev, (draft) => {
+          PBIListDataHandler.mutateByEditingMilestone(draft, updated)
+        })
+      )
     } else if (action.type === "EditIssue") {
       const api = get(Api.atom)
       const { issueId, input } = action
@@ -156,13 +179,19 @@ export const ProductBacklog = {
       summary,
       milestone
     }),
-    EditIssue: (issueId: number, input: IssueChangeInput): EditIssueAction => ({
+    EditIssue: (issueId: number, input: EditIssueInput): EditIssueAction => ({
       type: "EditIssue",
       issueId,
       input
     }),
-    AddMilestone: (input: MilestoneInput): AddMilestoneAction => ({
+    AddMilestone: (input: AddMilestoneInput): AddMilestoneAction => ({
       type: "MilestoneCreate",
+      input
+    }),
+    EditMilestone: (projectId: number, milestoneId: number, input: EditMilestoneInput): EditMilestoneAction => ({
+      type: "EditMilestone",
+      projectId,
+      milestoneId,
       input
     }),
     ListMove: (src: NLLocation, dst: NLLocation): NLMoveAction => ({

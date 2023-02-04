@@ -2,73 +2,107 @@ import styled from "@emotion/styled"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
 import { HBox, VBox } from "../../../ui/Box"
-import { Button } from "../../../ui/Button"
-import { TextInput } from "../../../ui/TextInput"
+import { EditableField } from "../../../ui/EditableField"
 import { i18n } from "../i18n"
 import { useMilestoneModel } from "./MilestoneModel"
 
-export const MilestoneView: React.FC<{ milestoneId?: number }> = ({ milestoneId }) => {
-  const model = useMilestoneModel(milestoneId)
-  const { values, lang, submittable } = model
+export const MilestoneView: React.FC = () => {
+  const model = useMilestoneModel()
+  const { milestone, lang } = model
   const t = i18n(lang)
   return (
-    <Root>
-      <VBox style={{ flexGrow: 1 }}>
-        <label>{t.milestoneName}</label>
-        <TextInput
-          type="text"
-          value={values.name}
-          onChange={(e) => {
-            model.setName(e.target.value)
-          }}
-        />
-        {values.errorMessage && <Error>{values.errorMessage}</Error>}
-      </VBox>
-      <VBox>
-        <label>{t.milestonePeriod}</label>
-        <HBox>
-          <TextInput
-            type="date"
-            value={DateUtil.dateString(values.startDate)}
-            onChange={(e) => {
-              model.setStartDate(e.target.value)
+    milestone && (
+      <Root>
+        <Name>
+          🏁
+          <EditableField
+            defaultValue={milestone.name}
+            viewStyle={nameViewStyle}
+            editStyle={nameEditStyle}
+            blurAction="cancel"
+            onFix={(value) => {
+              model.editMilestone("name", value)
+            }}
+          />
+        </Name>
+        <Period>
+          <EditableField
+            inputType="date"
+            blurAction="none"
+            defaultValue={DateUtil.dateString(DateUtil.parseDate(milestone.startDate)) || ""}
+            onFix={(value) => {
+              const date = DateUtil.parseDate(value)
+              if (date) {
+                model.editMilestone("startDate", date)
+              }
             }}
           />
           ～
-          <TextInput
-            type="date"
-            value={DateUtil.dateString(values.endDate)}
-            onChange={(e) => {
-              model.setEndDate(e.target.value)
+          <EditableField
+            inputType="date"
+            blurAction="cancel"
+            defaultValue={DateUtil.dateString(DateUtil.parseDate(milestone.releaseDueDate)) || ""}
+            onFix={(value) => {
+              const date = DateUtil.parseDate(value)
+              if (date) {
+                model.editMilestone("releaseDueDate", date)
+              }
             }}
           />
-        </HBox>
-      </VBox>
-      <Buttons>
-        <Button onClick={() => model.cancel()}>Cancel</Button>
-        <Button onClick={() => model.submit()} disabled={!submittable}>
-          Submit
-        </Button>
-      </Buttons>
-    </Root>
+        </Period>
+
+        <EditableField
+          defaultValue={milestone.description || ""}
+          multiline={true}
+          blurAction="cancel"
+          viewStyle={descriptionViewStyle}
+          editStyle={descriptionEditStyle}
+          onFix={(value) => {
+            model.editMilestone("description", value)
+          }}
+        />
+      </Root>
+    )
   )
 }
-
-const Root = styled(HBox)({
+const Root = styled(VBox)({
+  boxSizing: "border-box",
+  padding: 8,
+  boxShadow: "-2px 0 3px #c0c0c0",
+  height: "calc(100% - 12px)",
   margin: 12,
-  gap: 4,
-  flexWrap: "wrap",
+  gap: 8
+})
+
+const Name = styled(HBox)({
+  flexGrow: 0,
+  height: 30,
   alignItems: "center"
 })
 
-const Buttons = styled(HBox)({
-  marginTop: 8,
+const Period = styled(HBox)({
+  flexGrow: 0,
   gap: 8,
-  alignItems: "center",
-  flexShrink: 1
+  height: 30,
+  alignItems: "center"
 })
 
-const Error = styled.div({
-  color: "#ff4444",
-  fontSize: "0.9em"
-})
+type Style = React.CSSProperties
+
+const nameViewStyle: Style = {
+  fontWeight: "bold",
+  flexGrow: 1
+}
+
+const nameEditStyle: Style = {
+  flexGrow: 1
+}
+
+const descriptionViewStyle: Style = {
+  flexGrow: 1,
+  backgroundColor: "#f0f0f0"
+}
+
+const descriptionEditStyle: Style = {
+  flexGrow: 1
+}

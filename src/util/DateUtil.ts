@@ -14,10 +14,10 @@ const dateString = (d: Date | null, delimiter?: string): string => {
 
 const parseDate = (str: string | null): Date | null => {
   if (str) {
-    if (str.match(/\d{4}-\d{2}-\d{2}/)) {
+    if (str.match(/^\d{4}-\d{2}-\d{2}$/)) {
       return new Date(`${str} 00:00:00`)
     } else {
-      console.warn(`not a date string: ${str}`)
+      return beginningOfDay(new Date(str))
     }
   }
   return null

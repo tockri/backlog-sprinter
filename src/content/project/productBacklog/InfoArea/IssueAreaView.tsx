@@ -77,9 +77,10 @@ export const IssueAreaView: React.FC = () => {
 }
 
 const Float = styled(VBox)({
+  boxSizing: "border-box",
   padding: 8,
   boxShadow: "-2px 0 3px #c0c0c0",
-  height: "100%",
+  height: "calc(100% - 12px)",
   margin: 12
 })
 

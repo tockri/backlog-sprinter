@@ -17,10 +17,11 @@ export type EditableFieldProps = {
   readonly onFix?: (value: string) => void
   readonly onCancel?: () => void
   readonly defaultEditing?: boolean
+  readonly inputType?: string
 }
 
 export const EditableField: React.FC<EditableFieldProps> = (props) => {
-  const { onFix, multiline, markdown, disabled, placeholder, defaultValue, defaultEditing } = props
+  const { onFix, multiline, markdown, disabled, placeholder, defaultValue, defaultEditing, inputType } = props
   const [editing, setEditing] = React.useState(defaultEditing)
   const editor = React.useRef<(HTMLInputElement & HTMLTextAreaElement) | null>(null)
   const endEdit = () => {
@@ -96,7 +97,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
           />
         ) : (
           <TextInput
-            type="text"
+            type={inputType || "text"}
             ref={editor}
             onKeyDown={onKeyDown}
             onBlur={onBlur}
@@ -140,7 +141,7 @@ const Viewer = styled.div({
   color: "#606060",
   "&.multiline": {
     whiteSpace: "pre-wrap",
-    overflow: "scroll",
+    overflow: "auto",
     height: "3em",
     flexGrow: 1
   },

@@ -1,6 +1,6 @@
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
-import { IssueChangeInput, IssueData } from "../../../backlog/Issue"
+import { EditIssueInput, IssueData } from "../../../backlog/Issue"
 import { ProjectAtom } from "../../app/state/ProjectInfo"
 import { PBIListData, PBIListDataHandler } from "../PBIList/ListData"
 import { ProductBacklog, ProductBacklogAction } from "../state/ProductBacklog"
@@ -19,7 +19,7 @@ export const useInfoAreaModel = (): InfoAreaModel => {
 
 type IssueAreaModel = Immutable<{
   issue: IssueData | null
-  changeIssue: (key: keyof IssueChangeInput, value: string | number) => void
+  changeIssue: (key: keyof EditIssueInput, value: string | number) => void
   markdown: boolean
 }>
 
@@ -44,7 +44,7 @@ const findIssue = (pbiList: PBIListData, issueId: number): IssueData | null => {
 
 const changeIssue =
   (issueId: number, dispatch: (action: ProductBacklogAction) => Promise<void> | void) =>
-  async (key: keyof IssueChangeInput, value: IssueChangeInput[typeof key]) => {
+  async (key: keyof EditIssueInput, value: EditIssueInput[typeof key]) => {
     const input = {
       [key]: value
     }

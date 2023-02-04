@@ -1,56 +1,27 @@
-import { useAtom, useAtomValue } from "jotai"
-import { Version } from "../../../backlog/ProjectInfo"
+import { useAtomValue, useSetAtom } from "jotai"
+import { EditMilestoneInput, Version } from "../../../backlog/ProjectInfo"
 import { Environment } from "../../app/state/Environment"
-import { Milestones } from "../../app/state/ProjectInfo"
 import { UserLang } from "../../types"
-import { MilestoneForm, MilestoneFormValues } from "../state/MilestoneForm"
+import { ProductBacklog } from "../state/ProductBacklog"
+import { SelectedItem } from "../state/SelectedItem"
 
 type MilestoneModel = {
-  setName: (value: string) => void
-  setStartDate: (value: string) => void
-  setEndDate: (value: string) => void
-  cancel: () => void
-  submit: () => void
-  values: MilestoneFormValues
+  milestone: Version | null
   lang: UserLang
-  submittable: boolean
+  editMilestone: (key: keyof EditMilestoneInput, value: EditMilestoneInput[typeof key]) => Promise<void>
 }
 
-export const useMilestoneModel = (milestoneId?: number): MilestoneModel => {
-  const [values, dispatch] = useAtom(MilestoneForm.atom(milestoneId || 0))
-  const milestones = useAtomValue(Milestones.atom)
+export const useMilestoneModel = (): MilestoneModel => {
+  const milestone = useAtomValue(SelectedItem.milestoneAtom)
+  const dispatch = useSetAtom(ProductBacklog.atom)
   const { lang } = useAtomValue(Environment.atom)
   return {
     lang,
-    values,
-    setName: (name) => {
-      dispatch(MilestoneForm.Action.SetName(name))
-    },
-    setStartDate: (value) => {
-      dispatch(MilestoneForm.Action.SetStartDate(value))
-    },
-    setEndDate: (value) => {
-      dispatch(MilestoneForm.Action.SetEndDate(value))
-    },
-    cancel: () => {
-      dispatch(MilestoneForm.Action.Cancel)
-    },
-    submit: () => {
-      dispatch(MilestoneForm.Action.Submit)
-    },
-    submittable: isSubmittable(values, milestones)
+    milestone,
+    editMilestone: async (key, value) => {
+      if (milestone) {
+        dispatch(ProductBacklog.Action.EditMilestone(milestone.projectId, milestone.id, { [key]: value }))
+      }
+    }
   }
-}
-
-const isSubmittable = (values: MilestoneFormValues, existing: ReadonlyArray<Version>): boolean => {
-  const { name, startDate, endDate } = values
-  if (!name || !startDate || !endDate) {
-    return false
-  } else if (existing.find((v) => v.name === name)) {
-    return false
-  } else if (startDate.getTime() >= endDate.getTime()) {
-    return false
-  }
-
-  return true
 }

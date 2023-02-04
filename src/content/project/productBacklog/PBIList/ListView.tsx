@@ -4,7 +4,7 @@ import { cnu } from "../../../ui/cnu"
 import { usePBIListModel } from "./ListModel"
 
 import PlusIconSVG from "./plus-icon.svg"
-import { PBISubList } from "./SubListView"
+import { PBISubListView } from "./SubListView"
 
 export const PBIListView: React.FC = () => {
   const model = usePBIListModel()
@@ -16,7 +16,7 @@ export const PBIListView: React.FC = () => {
       </AddButton>
 
       {model.data.subLists.map((sl) => (
-        <PBISubList subList={sl} key={sl.id} />
+        <PBISubListView subList={sl} key={sl.id} />
       ))}
     </Root>
   )

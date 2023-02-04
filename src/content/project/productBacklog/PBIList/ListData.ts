@@ -1,6 +1,6 @@
 import { WritableDraft } from "immer/dist/internal"
 import { NestedList, NestedListData, NestMethods, NLMoveAction } from "../../../../util/NestedList"
-import { IssueChangeInput, IssueData, IssueDataUtil } from "../../../backlog/Issue"
+import { EditIssueInput, IssueData, IssueDataUtil } from "../../../backlog/Issue"
 import { CustomNumberField, Status, Version } from "../../../backlog/ProjectInfo"
 
 export type IssueDataWithOrder = IssueData & { readonly order: number | null }
@@ -57,7 +57,7 @@ class EventStore {
   }
 }
 
-type PBISubList = PBIListData["subLists"][number]
+export type PBISubList = PBIListData["subLists"][number]
 
 type Work = {
   readonly issueId: number
@@ -179,6 +179,14 @@ const mutateByAddingMilestone = (data: WritableDraft<PBIListData>, created: Vers
   data.subLists.sort((sl1, sl2) => pbiNestMethods.headComparator(sl1.head, sl2.head))
 }
 
+const mutateByEditingMilestone = (data: WritableDraft<PBIListData>, updated: Version) => {
+  const sIdx = data.subLists.findIndex((sl) => sl.head?.id === updated.id)
+  if (sIdx >= 0) {
+    data.subLists[sIdx].head = updated as WritableDraft<Version>
+  }
+  data.subLists.sort((sl1, sl2) => pbiNestMethods.headComparator(sl1.head, sl2.head))
+}
+
 const getNewOrder = (data: PBIListData, milestone: Version | null): number => {
   const subList = data.subLists.find((sl) => sl.head?.id === milestone?.id)
   if (subList) {
@@ -197,7 +205,7 @@ const mutateByEditingIssue = (
   data: WritableDraft<PBIListData>,
   statuses: ReadonlyArray<Status>,
   issueId: number,
-  input: IssueChangeInput
+  input: EditIssueInput
 ) => {
   const [item] = findIssue(data, issueId)
   if (item) {
@@ -224,6 +232,7 @@ export const PBIListDataHandler = {
   mutateByMovingAction,
   mutateByAddingIssue,
   mutateByAddingMilestone,
+  mutateByEditingMilestone,
   getNewOrder,
   findIssue,
   nest,

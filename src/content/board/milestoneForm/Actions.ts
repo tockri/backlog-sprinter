@@ -1,6 +1,6 @@
 import { BacklogApi } from "../../backlog/BacklogApiForReact"
 import { IssueData } from "../../backlog/Issue"
-import { MilestoneInput, ProjectInfoWithMilestones } from "../../backlog/ProjectInfo"
+import { AddMilestoneInput, ProjectInfoWithMilestones } from "../../backlog/ProjectInfo"
 import { ViewState } from "./Reducers"
 
 type SubmitResult = {
@@ -14,7 +14,7 @@ const submitForm = async (
   projectInfo: ProjectInfoWithMilestones,
   callback?: (issue: IssueData) => void
 ): Promise<SubmitResult> => {
-  const milestoneInput: MilestoneInput = {
+  const milestoneInput: AddMilestoneInput = {
     projectId: projectInfo.project.id,
     name: state.title,
     startDate: state.startDate,
@@ -22,7 +22,7 @@ const submitForm = async (
     description: ""
   }
   try {
-    const createdMilestone = await api.projectInfo.createMilestone(milestoneInput)
+    const createdMilestone = await api.projectInfo.addMilestone(milestoneInput)
     if (state.selectedMilestone) {
       if (state.moveUnclosed) {
         const unclosed = await api.issue.searchUnclosedInMilestone(
