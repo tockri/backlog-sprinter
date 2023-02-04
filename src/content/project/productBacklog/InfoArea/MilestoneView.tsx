@@ -3,13 +3,11 @@ import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
 import { HBox, VBox } from "../../../ui/Box"
 import { EditableField } from "../../../ui/EditableField"
-import { i18n } from "../i18n"
 import { useMilestoneModel } from "./MilestoneModel"
 
 export const MilestoneView: React.FC = () => {
   const model = useMilestoneModel()
   const { milestone, lang } = model
-  const t = i18n(lang)
   return (
     milestone && (
       <Root>
@@ -23,6 +21,7 @@ export const MilestoneView: React.FC = () => {
             onFix={(value) => {
               model.editMilestone("name", value)
             }}
+            lang={lang}
           />
         </Name>
         <Period>
@@ -36,6 +35,7 @@ export const MilestoneView: React.FC = () => {
                 model.editMilestone("startDate", date)
               }
             }}
+            lang={lang}
           />
           ～
           <EditableField
@@ -48,6 +48,7 @@ export const MilestoneView: React.FC = () => {
                 model.editMilestone("releaseDueDate", date)
               }
             }}
+            lang={lang}
           />
         </Period>
 
@@ -60,6 +61,7 @@ export const MilestoneView: React.FC = () => {
           onFix={(value) => {
             model.editMilestone("description", value)
           }}
+          lang={lang}
         />
       </Root>
     )
@@ -100,7 +102,8 @@ const nameEditStyle: Style = {
 
 const descriptionViewStyle: Style = {
   flexGrow: 1,
-  backgroundColor: "#f0f0f0"
+  backgroundColor: "#f0f0f0",
+  borderRadius: 4
 }
 
 const descriptionEditStyle: Style = {

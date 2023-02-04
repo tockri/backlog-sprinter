@@ -15,14 +15,13 @@ const submitForm = async (
   callback?: (issue: IssueData) => void
 ): Promise<SubmitResult> => {
   const milestoneInput: AddMilestoneInput = {
-    projectId: projectInfo.project.id,
     name: state.title,
     startDate: state.startDate,
-    endDate: state.endDate,
+    releaseDueDate: state.endDate,
     description: ""
   }
   try {
-    const createdMilestone = await api.projectInfo.addMilestone(milestoneInput)
+    const createdMilestone = await api.projectInfo.addMilestone(projectInfo.project.id, milestoneInput)
     if (state.selectedMilestone) {
       if (state.moveUnclosed) {
         const unclosed = await api.issue.searchUnclosedInMilestone(

@@ -1,22 +1,24 @@
 import { Immutable } from "immer"
-import { useAtomValue } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 import { ProductBacklog } from "../state/ProductBacklog"
+import { SelectedItem } from "../state/SelectedItem"
 
 import { PBIListData } from "./ListData"
 
 type PBIListModel = Immutable<{
   data: PBIListData
-  creating: boolean
-  startCreating: () => void
+  isMilestoneAdding: boolean
+  startAddMilestone: () => void
 }>
 
 export const usePBIListModel = (): PBIListModel => {
   const data = useAtomValue(ProductBacklog.atom)
+  const [sel, selDispatch] = useAtom(SelectedItem.atom)
   return {
     data,
-    creating: false,
-    startCreating: () => {
-      console.error("Not implemented")
+    isMilestoneAdding: sel.type === "MilestoneAdding",
+    startAddMilestone: () => {
+      selDispatch(SelectedItem.Action.StartMilestoneAdding)
     }
   }
 }

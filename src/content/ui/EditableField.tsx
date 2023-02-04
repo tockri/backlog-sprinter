@@ -1,27 +1,30 @@
 import styled from "@emotion/styled"
+import { Immutable } from "immer"
 import React from "react"
 import ReactMarkdown from "react-markdown"
+import { Tooltip } from "react-tooltip"
 import remarkGfm from "remark-gfm"
 import { cnu } from "./cnu"
 import { TextArea, TextInput } from "./TextInput"
 
-export type EditableFieldProps = {
-  readonly placeholder?: string
-  readonly multiline?: boolean
-  readonly markdown?: boolean
-  readonly disabled?: boolean
-  readonly defaultValue?: string
-  readonly blurAction?: "none" | "submit" | "cancel"
-  readonly editStyle?: React.CSSProperties
-  readonly viewStyle?: React.CSSProperties
-  readonly onFix?: (value: string) => void
-  readonly onCancel?: () => void
-  readonly defaultEditing?: boolean
-  readonly inputType?: string
-}
+export type EditableFieldProps = Immutable<{
+  placeholder?: string
+  multiline?: boolean
+  markdown?: boolean
+  disabled?: boolean
+  defaultValue?: string
+  blurAction?: "none" | "submit" | "cancel"
+  editStyle?: React.CSSProperties
+  viewStyle?: React.CSSProperties
+  onFix?: (value: string) => void
+  onCancel?: () => void
+  defaultEditing?: boolean
+  inputType?: string
+  lang?: "ja" | "en"
+}>
 
 export const EditableField: React.FC<EditableFieldProps> = (props) => {
-  const { onFix, multiline, markdown, disabled, placeholder, defaultValue, defaultEditing, inputType } = props
+  const { onFix, multiline, markdown, disabled, placeholder, defaultValue, defaultEditing, inputType, lang } = props
   const [editing, setEditing] = React.useState(defaultEditing)
   const editor = React.useRef<(HTMLInputElement & HTMLTextAreaElement) | null>(null)
   const endEdit = () => {
@@ -82,29 +85,40 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
       }
     }
   }, [editing, defaultValue])
+  const id = React.useRef(`editable-${Math.random()}`)
 
   return (
     <>
       {editing ? (
         multiline ? (
-          <TextArea
-            ref={editor}
-            style={props.editStyle}
-            placeholder={placeholder}
-            disabled={disabled}
-            onKeyDown={onKeyDown}
-            onBlur={onBlur}
-          />
+          <>
+            <TextArea
+              ref={editor}
+              style={props.editStyle}
+              placeholder={placeholder}
+              disabled={disabled}
+              onKeyDown={onKeyDown}
+              onBlur={onBlur}
+              id={id.current}
+              data-tooltip-content={lang === "ja" ? "Ctrl+Enterで確定" : "Press 'Ctrl+Enter' to submit"}
+            />
+            <Tooltip place="bottom" anchorId={id.current} />
+          </>
         ) : (
-          <TextInput
-            type={inputType || "text"}
-            ref={editor}
-            onKeyDown={onKeyDown}
-            onBlur={onBlur}
-            style={props.editStyle}
-            placeholder={placeholder}
-            disabled={disabled}
-          />
+          <>
+            <TextInput
+              type={inputType || "text"}
+              ref={editor}
+              onKeyDown={onKeyDown}
+              onBlur={onBlur}
+              style={props.editStyle}
+              placeholder={placeholder}
+              disabled={disabled}
+              id={id.current}
+              data-tooltip-content={lang === "ja" ? "Enterで確定" : "Press 'Enter' to submit"}
+            />
+            <Tooltip place="bottom" anchorId={id.current} />
+          </>
         )
       ) : (
         <Viewer tabIndex={0} className={cnu({ disabled, multiline })} style={props.viewStyle} onFocus={onFocus}>

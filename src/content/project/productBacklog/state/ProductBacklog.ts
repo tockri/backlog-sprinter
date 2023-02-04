@@ -109,7 +109,8 @@ const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | vo
       }
     } else if (action.type === "MilestoneCreate") {
       const api = get(Api.atom)
-      const created = await api.projectInfo.addMilestone(action.input)
+      const project = get(ProjectAtom.atom)
+      const created = await api.projectInfo.addMilestone(project.id, action.input)
       set(Milestones.atom, (c) => {
         c.push(created as WritableDraft<Version>)
       })

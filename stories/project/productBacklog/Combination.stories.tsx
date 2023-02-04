@@ -31,3 +31,7 @@ export const SomeEmptyFields = StoryUtil.produce(Default)((args) => {
 export const MilestoneSelected = StoryUtil.produce(Default)((args) => {
   args.initialValues.push([SelectedItem.atom, { type: "Milestone", milestoneId: 245742 }])
 })
+
+export const MilestoneAdding = StoryUtil.produce(Default)((args) => {
+  args.initialValues.push([SelectedItem.atom, { type: "MilestoneAdding" }])
+})

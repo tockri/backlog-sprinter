@@ -104,6 +104,7 @@ export const PBISubListView: React.FC<PBISubListProps> = (props) => {
                   flexGrow: 1
                 }}
                 blurAction="cancel"
+                lang={model.lang}
               />
             </VBox>
           </DropArea>
@@ -128,7 +129,7 @@ const DropArea = styled.div({
 
 const SL = styled.div({
   marginBottom: 8,
-  paddingTop: 4
+  padding: 8
 })
 
 const SLTitle = styled.div({

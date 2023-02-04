@@ -13,14 +13,19 @@ type MilestoneId = {
   milestoneId: number
 }
 
+type MilestoneAdding = {
+  type: "MilestoneAdding"
+}
+
 type None = {
   type: "None"
 }
+
 const None: None = {
   type: "None"
 }
 
-type Value = IssueId | MilestoneId | None
+type Value = IssueId | MilestoneId | MilestoneAdding | None
 const store = atom<Value>(None)
 
 const milestoneAtom = atom((get) => {
@@ -55,6 +60,9 @@ export const SelectedItem = {
       type: "Milestone",
       milestoneId
     }),
+    StartMilestoneAdding: {
+      type: "MilestoneAdding"
+    } as MilestoneAdding,
     Deselect: None
   }
 }

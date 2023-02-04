@@ -10,7 +10,7 @@ import { useIssueAreaModel } from "./IssueAreaModel"
 
 export const IssueAreaView: React.FC = () => {
   const model = useIssueAreaModel()
-  const issue = model.issue
+  const { issue, lang } = model
   if (issue) {
     return (
       <Float>
@@ -38,6 +38,7 @@ export const IssueAreaView: React.FC = () => {
                 editStyle={{
                   flexGrow: 1
                 }}
+                lang={lang}
               />
             </Summary>
           </VBox>
@@ -60,10 +61,12 @@ export const IssueAreaView: React.FC = () => {
             }}
             viewStyle={{
               flexGrow: 1,
-              backgroundColor: "#f0f0f0"
+              backgroundColor: "#f0f0f0",
+              borderRadius: 4
             }}
             onFix={(value) => model.changeIssue("description", value)}
             blurAction="cancel"
+            lang={lang}
           />
         </Description>
         <React.Suspense fallback={<Loading />}>

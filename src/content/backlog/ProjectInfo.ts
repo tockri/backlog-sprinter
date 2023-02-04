@@ -197,18 +197,17 @@ const deleteCustomField = async (projectKey: string, customFieldId: number): Pro
 }
 
 export type AddMilestoneInput = Immutable<{
-  projectId: number
   name: string
   startDate: Date | null
-  endDate: Date | null
+  releaseDueDate: Date | null
   description: string
 }>
 
-const addMilestone = async (input: AddMilestoneInput): Promise<Version> => {
-  return await BacklogApiRequest.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
+const addMilestone = async (projectId: number, input: AddMilestoneInput): Promise<Version> => {
+  return await BacklogApiRequest.post<Version>(`/api/v2/projects/${projectId}/versions`, {
     name: input.name,
     startDate: DateUtil.dateString(input.startDate),
-    releaseDueDate: DateUtil.dateString(input.endDate),
+    releaseDueDate: DateUtil.dateString(input.releaseDueDate),
     description: input.description
   })
 }
