@@ -8,7 +8,7 @@ import { i18n } from "./i18n"
 import { useMilestoneFormModel } from "./MilestoneFormModel"
 
 export const MilestoneFormView: React.FC = () => {
-  const model = useMilestoneFormModel()
+  const model = React.useCallback(useMilestoneFormModel, [])()
   const { lang, values, submittable } = model
   const t = i18n(lang)
   return (
