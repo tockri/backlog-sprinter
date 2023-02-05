@@ -97,9 +97,8 @@ const IssueKey = styled.div({
   whiteSpace: "nowrap"
 })
 
-const Summary = styled(HBox)({
-  alignItems: "center",
-  justifyContent: "stretch",
+const Summary = styled(VBox)({
+  justifyContent: "center",
   height: 36,
   paddingRight: 4
 })

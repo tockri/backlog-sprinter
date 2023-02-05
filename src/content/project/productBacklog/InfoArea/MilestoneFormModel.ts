@@ -1,6 +1,6 @@
-import { Immutable } from "immer"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { atomWithImmer } from "jotai-immer"
+import produce, { Immutable } from "immer"
+import { useAtomValue, useSetAtom } from "jotai"
+import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
 import { AddMilestoneInput, Version } from "../../../backlog/ProjectInfo"
 import { Environment } from "../../app/state/Environment"
@@ -11,17 +11,11 @@ import { SelectedItem } from "../state/SelectedItem"
 
 type Values = Immutable<AddMilestoneInput>
 
-const valuesAtom = atomWithImmer<Values>({
-  name: "",
-  description: "",
-  startDate: null,
-  releaseDueDate: null
-})
-
 type MilestoneFormModel = {
   values: Values
   lang: UserLang
   setName: (value: string) => void
+  isNameDup: boolean
   setDescription: (value: string) => void
   setStartDate: (value: string) => void
   setReleaseDueDate: (value: string) => void
@@ -32,7 +26,12 @@ type MilestoneFormModel = {
 
 export const useMilestoneFormModel = (): MilestoneFormModel => {
   const { lang } = useAtomValue(Environment.atom)
-  const [values, setValues] = useAtom(valuesAtom)
+  const [values, setValues] = React.useState<Values>({
+    name: "",
+    description: "",
+    startDate: null,
+    releaseDueDate: null
+  })
   const milestones = useAtomValue(Milestones.atom)
   const selDispatch = useSetAtom(SelectedItem.atom)
   const pbDispatch = useSetAtom(ProductBacklog.atom)
@@ -42,29 +41,38 @@ export const useMilestoneFormModel = (): MilestoneFormModel => {
     lang,
     submittable,
     setName: (value) => {
-      setValues((d) => {
-        d.name = value
-      })
+      setValues((curr) =>
+        produce(curr, (d) => {
+          d.name = value
+        })
+      )
     },
+    isNameDup: !!values.name && !!milestones.find((ms) => ms.name === values.name),
     setDescription: (value) => {
-      setValues((d) => {
-        d.description = value
-      })
+      setValues((curr) =>
+        produce(curr, (d) => {
+          d.description = value
+        })
+      )
     },
     setStartDate: (value) => {
       const date = DateUtil.parseDate(value)
       if (date) {
-        setValues((d) => {
-          d.startDate = date
-        })
+        setValues((curr) =>
+          produce(curr, (d) => {
+            d.startDate = date
+          })
+        )
       }
     },
     setReleaseDueDate: (value) => {
       const date = DateUtil.parseDate(value)
       if (date) {
-        setValues((d) => {
-          d.releaseDueDate = date
-        })
+        setValues((curr) =>
+          produce(curr, (d) => {
+            d.releaseDueDate = date
+          })
+        )
       }
     },
     cancel: () => {
