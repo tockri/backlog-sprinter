@@ -14,11 +14,16 @@ type PBIListModel = Immutable<{
 export const usePBIListModel = (): PBIListModel => {
   const data = useAtomValue(ProductBacklog.atom)
   const [sel, selDispatch] = useAtom(SelectedItem.atom)
+  const isMilestoneAdding = sel.type === "MilestoneAdding"
   return {
     data,
-    isMilestoneAdding: sel.type === "MilestoneAdding",
+    isMilestoneAdding,
     startAddMilestone: () => {
-      selDispatch(SelectedItem.Action.StartMilestoneAdding)
+      if (isMilestoneAdding) {
+        selDispatch(SelectedItem.Action.Deselect)
+      } else {
+        selDispatch(SelectedItem.Action.StartMilestoneAdding)
+      }
     }
   }
 }

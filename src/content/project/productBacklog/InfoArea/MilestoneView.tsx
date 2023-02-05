@@ -27,7 +27,7 @@ export const MilestoneView: React.FC = () => {
         <Period>
           <EditableField
             inputType="date"
-            blurAction="none"
+            blurAction="cancel"
             defaultValue={DateUtil.dateString(DateUtil.parseDate(milestone.startDate)) || ""}
             onFix={(value) => {
               const date = DateUtil.parseDate(value)
@@ -78,14 +78,14 @@ const Root = styled(VBox)({
 
 const Name = styled(HBox)({
   flexGrow: 0,
-  height: 30,
+  height: 24,
   alignItems: "center"
 })
 
 const Period = styled(HBox)({
   flexGrow: 0,
   gap: 8,
-  height: 30,
+  height: 24,
   alignItems: "center"
 })
 

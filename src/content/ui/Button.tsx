@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 
 export const Button = styled.button({
+  boxSizing: "border-box",
   padding: "4px 12px",
   border: "1px solid #a0a0a0",
   backgroundColor: "#eeeeee",

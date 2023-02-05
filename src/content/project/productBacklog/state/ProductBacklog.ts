@@ -23,7 +23,7 @@ type AddIssueAction = {
 }
 
 type AddMilestoneAction = {
-  type: "MilestoneCreate"
+  type: "AddMilestone"
   input: AddMilestoneInput
 }
 
@@ -107,17 +107,19 @@ const productBacklogAtom = atom<Promise<PBIListData>, Action, Promise<void> | vo
         })
         set(pbiListDataStoreAtom, updated)
       }
-    } else if (action.type === "MilestoneCreate") {
+    } else if (action.type === "AddMilestone") {
       const api = get(Api.atom)
       const project = get(ProjectAtom.atom)
       const created = await api.projectInfo.addMilestone(project.id, action.input)
       set(Milestones.atom, (c) => {
         c.push(created as WritableDraft<Version>)
       })
-      const updated = produce(prev, (draft) => {
-        PBIListDataHandler.mutateByAddingMilestone(draft, created)
-      })
-      set(pbiListDataStoreAtom, updated)
+      set(
+        pbiListDataStoreAtom,
+        produce(prev, (draft) => {
+          PBIListDataHandler.mutateByAddingMilestone(draft, created)
+        })
+      )
     } else if (action.type === "EditMilestone") {
       const api = get(Api.atom)
       const project = get(ProjectAtom.atom)
@@ -186,7 +188,7 @@ export const ProductBacklog = {
       input
     }),
     AddMilestone: (input: AddMilestoneInput): AddMilestoneAction => ({
-      type: "MilestoneCreate",
+      type: "AddMilestone",
       input
     }),
     EditMilestone: (projectId: number, milestoneId: number, input: EditMilestoneInput): EditMilestoneAction => ({

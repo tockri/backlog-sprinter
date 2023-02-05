@@ -2,24 +2,20 @@ import { Immutable } from "immer"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { atomWithImmer } from "jotai-immer"
 import { DateUtil } from "../../../../util/DateUtil"
-import { AddMilestoneInput } from "../../../backlog/ProjectInfo"
+import { AddMilestoneInput, Version } from "../../../backlog/ProjectInfo"
 import { Environment } from "../../app/state/Environment"
+import { Milestones } from "../../app/state/ProjectInfo"
 import { UserLang } from "../../types"
 import { ProductBacklog } from "../state/ProductBacklog"
 import { SelectedItem } from "../state/SelectedItem"
 
-type Values = Immutable<
-  AddMilestoneInput & {
-    errorMessage: string | null
-  }
->
+type Values = Immutable<AddMilestoneInput>
 
 const valuesAtom = atomWithImmer<Values>({
   name: "",
   description: "",
   startDate: null,
-  releaseDueDate: null,
-  errorMessage: null
+  releaseDueDate: null
 })
 
 type MilestoneFormModel = {
@@ -31,16 +27,20 @@ type MilestoneFormModel = {
   setReleaseDueDate: (value: string) => void
   cancel: () => void
   submit: () => void
+  submittable: boolean
 }
 
 export const useMilestoneFormModel = (): MilestoneFormModel => {
   const { lang } = useAtomValue(Environment.atom)
   const [values, setValues] = useAtom(valuesAtom)
+  const milestones = useAtomValue(Milestones.atom)
   const selDispatch = useSetAtom(SelectedItem.atom)
   const pbDispatch = useSetAtom(ProductBacklog.atom)
+  const submittable = isSubmittable(values, milestones)
   return {
     values,
     lang,
+    submittable,
     setName: (value) => {
       setValues((d) => {
         d.name = value
@@ -75,4 +75,15 @@ export const useMilestoneFormModel = (): MilestoneFormModel => {
       selDispatch(SelectedItem.Action.Deselect)
     }
   }
+}
+
+const isSubmittable = (values: Values, milestones: ReadonlyArray<Version>): boolean => {
+  const { name, startDate, releaseDueDate } = values
+  return !!(
+    name &&
+    startDate &&
+    releaseDueDate &&
+    startDate.getTime() <= releaseDueDate.getTime() &&
+    !milestones.find((ms) => ms.name === name)
+  )
 }

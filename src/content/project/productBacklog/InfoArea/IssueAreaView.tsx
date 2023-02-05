@@ -97,14 +97,18 @@ const IssueKey = styled.div({
   whiteSpace: "nowrap"
 })
 
-const Summary = styled(VBox)({
-  padding: 4
+const Summary = styled(HBox)({
+  alignItems: "center",
+  justifyContent: "stretch",
+  height: 36,
+  paddingRight: 4
 })
 
 const HeadSide = styled(VBox)({
   flexGrow: 0,
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
+  padding: "8px 0"
 })
 
 const Description = styled(VBox)({

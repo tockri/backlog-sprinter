@@ -9,7 +9,7 @@ import { useMilestoneFormModel } from "./MilestoneFormModel"
 
 export const MilestoneFormView: React.FC = () => {
   const model = useMilestoneFormModel()
-  const { lang, values } = model
+  const { lang, values, submittable } = model
   const t = i18n(lang)
   return (
     <Root>
@@ -50,7 +50,9 @@ export const MilestoneFormView: React.FC = () => {
       />
       <Buttons>
         <Button onClick={model.cancel}>Cancel</Button>
-        <Button onClick={model.submit}>Submit</Button>
+        <Button onClick={model.submit} disabled={!submittable}>
+          Submit
+        </Button>
       </Buttons>
     </Root>
   )

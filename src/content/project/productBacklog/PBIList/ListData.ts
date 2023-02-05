@@ -189,13 +189,8 @@ const mutateByEditingMilestone = (data: WritableDraft<PBIListData>, updated: Ver
 
 const getNewOrder = (data: PBIListData, milestone: Version | null): number => {
   const subList = data.subLists.find((sl) => sl.head?.id === milestone?.id)
-  if (subList) {
-    const newValue = (subList.items[subList.items.length - 1].order || 0) + 100
-    console.log({
-      orders: subList.items.map((it) => it.order),
-      newValue
-    })
-    return newValue
+  if (subList && subList.items.length > 0) {
+    return (subList.items[subList.items.length - 1].order || 0) + 100
   } else {
     return 0
   }
