@@ -27,6 +27,7 @@ export const MilestoneView: React.FC = () => {
         <Period>
           <EditableField
             inputType="date"
+            inputMax={DateUtil.dateString(DateUtil.parseDate(milestone.releaseDueDate)) || ""}
             blurAction="cancel"
             defaultValue={DateUtil.dateString(DateUtil.parseDate(milestone.startDate)) || ""}
             onFix={(value) => {
@@ -40,6 +41,7 @@ export const MilestoneView: React.FC = () => {
           ～
           <EditableField
             inputType="date"
+            inputMin={DateUtil.dateString(DateUtil.parseDate(milestone.startDate)) || ""}
             blurAction="cancel"
             defaultValue={DateUtil.dateString(DateUtil.parseDate(milestone.releaseDueDate)) || ""}
             onFix={(value) => {

@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { Immutable } from "immer"
-import React from "react"
+import React, { HTMLInputTypeAttribute } from "react"
 import ReactMarkdown from "react-markdown"
 import { Tooltip } from "react-tooltip"
 import remarkGfm from "remark-gfm"
@@ -19,12 +19,26 @@ export type EditableFieldProps = Immutable<{
   onFix?: (value: string) => void
   onCancel?: () => void
   defaultEditing?: boolean
-  inputType?: string
   lang?: "ja" | "en"
+  inputType?: HTMLInputTypeAttribute
+  inputMin?: string
+  inputMax?: string
 }>
 
 export const EditableField: React.FC<EditableFieldProps> = (props) => {
-  const { onFix, multiline, markdown, disabled, placeholder, defaultValue, defaultEditing, inputType, lang } = props
+  const {
+    onFix,
+    multiline,
+    markdown,
+    disabled,
+    placeholder,
+    defaultValue,
+    defaultEditing,
+    inputType,
+    inputMin,
+    inputMax,
+    lang
+  } = props
   const [editing, setEditing] = React.useState(defaultEditing)
   const editor = React.useRef<(HTMLInputElement & HTMLTextAreaElement) | null>(null)
   const endEdit = () => {
@@ -108,6 +122,8 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
           <>
             <TextInput
               type={inputType || "text"}
+              min={inputMin}
+              max={inputMax}
               ref={editor}
               onKeyDown={onKeyDown}
               onBlur={onBlur}
