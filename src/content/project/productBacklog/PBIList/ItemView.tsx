@@ -1,5 +1,6 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { NLLocation } from "../../../../util/NestedList"
 import { cnu } from "../../../ui/cnu"
 import { Draggable } from "../../../ui/DragAndDrop"
 import { StatusView } from "../StatusView"
@@ -20,12 +21,12 @@ export const PBIItemView: React.FC<PBIItemViewProps> = (props) => {
   const [dragging, setDragging] = React.useState(false)
 
   return (
-    <Draggable
+    <Draggable<NLLocation>
       type="arrange"
       item={item}
       onDragEnd={(where) => {
         if (where) {
-          model.move({ type: "NLMove", src: item, dst: where })
+          model.move(item, where)
         }
         setDragging(false)
       }}

@@ -127,13 +127,16 @@ export type CustomListField = CustomFieldBase &
 
 export type CustomField = CustomTextField | CustomNumberField | CustomDateField | CustomListField
 
+// noinspection JSUnusedGlobalSymbols
 export const isTextField = (cf: CustomField): cf is CustomTextField =>
   cf.typeId in [CustomFieldTypes.Text, CustomFieldTypes.LongText]
 
 export const isNumberField = (cf: CustomField): cf is CustomNumberField => cf.typeId === CustomFieldTypes.Number
 
+// noinspection JSUnusedGlobalSymbols
 export const isDateField = (cf: CustomField): cf is CustomDateField => cf.typeId === CustomFieldTypes.Date
 
+// noinspection JSUnusedGlobalSymbols
 export const isListField = (cf: CustomField): cf is CustomListField =>
   cf.typeId in
   [CustomFieldTypes.SingleSelect, CustomFieldTypes.MultiSelect, CustomFieldTypes.Radio, CustomFieldTypes.Checkbox]

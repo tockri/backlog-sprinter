@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { NLMoveAction } from "../../../../util/NestedList"
+import { NLLocation } from "../../../../util/NestedList"
 import { OrderCustomField } from "../../app/state/OrderCustomField"
 import { ProductBacklog } from "../state/ProductBacklog"
 
@@ -8,7 +8,7 @@ import { SelectedItem } from "../state/SelectedItem"
 type PBIItemModel = {
   readonly selectItem: (issueId: number) => void
   readonly isSelected: (issueId: number) => boolean
-  readonly move: (action: NLMoveAction) => void
+  readonly move: (src: NLLocation, dst: NLLocation) => void
 }
 
 export const usePBIItemModel = (): PBIItemModel => {
@@ -26,7 +26,9 @@ export const usePBIItemModel = (): PBIItemModel => {
         }
       },
       isSelected: (issueId) => selectedIssueId === issueId,
-      move: pbDispatch
+      move: (src, dst) => {
+        pbDispatch(ProductBacklog.Action.ListMove(src, dst))
+      }
     }
   } else {
     throw new Error("orderCustomField is not set.")

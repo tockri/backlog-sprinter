@@ -19,7 +19,7 @@ export const MilestoneView: React.FC = () => {
             editStyle={nameEditStyle}
             blurAction="cancel"
             onFix={(value) => {
-              model.editMilestone("name", value)
+              model.editMilestone("name", value).then()
             }}
             lang={lang}
           />
@@ -33,7 +33,7 @@ export const MilestoneView: React.FC = () => {
             onFix={(value) => {
               const date = DateUtil.parseDate(value)
               if (date) {
-                model.editMilestone("startDate", date)
+                model.editMilestone("startDate", date).then()
               }
             }}
             lang={lang}

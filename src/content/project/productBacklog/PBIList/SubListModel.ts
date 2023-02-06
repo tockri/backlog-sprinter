@@ -2,10 +2,9 @@ import { Immutable } from "immer"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
-import { Version } from "../../../backlog/ProjectInfo"
 import { Environment } from "../../app/state/Environment"
 import { UserLang } from "../../types"
-import { ProductBacklog, ProductBacklogAction } from "../state/ProductBacklog"
+import { ProductBacklog } from "../state/ProductBacklog"
 import { SelectedItem } from "../state/SelectedItem"
 import { PBIListData } from "./ListData"
 
@@ -64,7 +63,9 @@ export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
       }
     },
     isMoveHovered: (issueId: number) => hover?.issueId === issueId && hover.type === "move",
-    createNewIssue: createNewIssue(subList.head, dispatch),
+    createNewIssue: (summary: string) => {
+      dispatch(ProductBacklog.Action.AddIssue(summary, milestone))
+    },
     selectMilestone: () => {
       if (sel.type === "Milestone" && sel.milestoneId === milestoneId) {
         select(SelectedItem.Action.Deselect)
@@ -77,12 +78,3 @@ export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
     releaseDate
   }
 }
-
-const createNewIssue =
-  (milestone: Version | null, dispatch: (action: ProductBacklogAction) => void) => (summary: string) => {
-    dispatch({
-      type: "ProductBacklogCreate",
-      milestone,
-      summary
-    })
-  }

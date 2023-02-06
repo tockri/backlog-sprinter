@@ -1,5 +1,6 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { NLLocation } from "../../../../util/NestedList"
 import { IssueData } from "../../../backlog/Issue"
 import { VBox } from "../../../ui/Box"
 import { cnu } from "../../../ui/cnu"
@@ -65,7 +66,7 @@ export const PBISubListView: React.FC<PBISubListProps> = (props) => {
               model.setMoveHovered(issue.id, h)
             }}
           >
-            <Droppable
+            <Droppable<NLLocation>
               type="arrange"
               item={{ index, subListId: subList.id }}
               canDrop={canArrange(index, subList.id)}
