@@ -1,10 +1,10 @@
 import React from "react"
 import ReactDomClient from "react-dom/client"
 import { MessageBroker } from "../util/MessageBroker"
+import { Waiter } from "../util/Waiter"
 import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
 import { BoardApp, FormInfo, Lang } from "./board/App"
 import { jsxToElement } from "./ui/JSXUtil"
-import { Waiter } from "./ui/Waiter"
 
 const broker = new MessageBroker<FormInfo>()
 

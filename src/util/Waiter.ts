@@ -21,7 +21,13 @@ const watchInfinitely = (isReady: () => boolean, callback: () => void) => {
   }, 500)
 }
 
+const sleep = (milliseconds: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, milliseconds)
+  })
+
 export const Waiter = {
   waitForReady,
-  watchInfinitely
+  watchInfinitely,
+  sleep
 }
