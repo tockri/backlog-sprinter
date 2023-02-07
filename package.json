@@ -72,6 +72,7 @@
     "@storybook/manager-webpack5": "^6.5.15",
     "@storybook/react": "^6.5.15",
     "@storybook/testing-library": "^0.0.13",
+    "@svgr/webpack": "^6.5.1",
     "@types/chrome": "^0.0.200",
     "@types/copy-webpack-plugin": "^8.0.1",
     "@types/jest": "^28.1.7",

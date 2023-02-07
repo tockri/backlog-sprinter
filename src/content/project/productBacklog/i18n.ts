@@ -1,13 +1,17 @@
 const ja = {
   estimatedHours: "予定",
   actualHours: "実績",
-  addNewItem: "新規登録"
+  addNewItem: "アイテムを追加する",
+  milestonePeriod: "期間",
+  milestoneName: "マイルストーン名"
 }
 
 const en: typeof ja = {
   estimatedHours: "Estimation",
   actualHours: "Result",
-  addNewItem: "Add a new item"
+  addNewItem: "Add a new item",
+  milestonePeriod: "Period",
+  milestoneName: "Milestone Name"
 }
 
 const resources = { ja, en }

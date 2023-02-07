@@ -1,17 +1,15 @@
 import styled from "@emotion/styled"
 import React from "react"
-import { DateUtil } from "../../../../util/DateUtil"
+import { NLLocation } from "../../../../util/NestedList"
 import { IssueData } from "../../../backlog/Issue"
 import { VBox } from "../../../ui/Box"
 import { cnu } from "../../../ui/cnu"
 import { Droppable } from "../../../ui/DragAndDrop"
 import { EditableField } from "../../../ui/EditableField"
 import { i18n } from "../i18n"
-import { PBIItemView } from "./ItemView"
-import { PBIListData } from "./ListData"
-import { usePBISubListModel } from "./SubListModel"
-
-type PBISubList = PBIListData["subLists"][number]
+import { PBISubList } from "../state/PBIList"
+import { usePBISubListModel } from "./PBISubListModel"
+import { PBItemView } from "./PBItemView"
 
 type PBISubListProps = {
   readonly subList: PBISubList
@@ -37,24 +35,25 @@ const canArrange =
 const canMove =
   (issue: IssueData) =>
   (dragging: IssueData): boolean => {
-    if (dragging.parentIssueId !== issue.id) {
-      return true
-    }
-    return false
+    return dragging.parentIssueId !== issue.id
   }
 
-export const PBISubList: React.FC<PBISubListProps> = (props) => {
+export const PBISubListView: React.FC<PBISubListProps> = (props) => {
   const { subList } = props
-  const milestone = subList.head
-  const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
   const model = React.useCallback(usePBISubListModel, [])(subList)
   const lastIdx = subList.items.length
   const t = i18n(model.lang)
   return (
     <SL>
-      <SLTitle>
-        <MilestoneName>🏁{milestone?.name || "(No milestone)"}</MilestoneName>
-        <ReleaseDate>{releaseDate}</ReleaseDate>
+      <SLTitle
+        tabIndex={0}
+        onClick={() => {
+          model.selectMilestone()
+        }}
+        className={cnu({ selected: model.isSelected })}
+      >
+        <MilestoneName>🏁{model.milestoneName}</MilestoneName>
+        <ReleaseDate>{model.releaseDate}</ReleaseDate>
       </SLTitle>
       <SLBody>
         {subList.items.map((issue, index) => (
@@ -67,7 +66,7 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
               model.setMoveHovered(issue.id, h)
             }}
           >
-            <Droppable
+            <Droppable<NLLocation>
               type="arrange"
               item={{ index, subListId: subList.id }}
               canDrop={canArrange(index, subList.id)}
@@ -81,7 +80,7 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
                   moveHover: model.isMoveHovered(issue.id)
                 })}
               >
-                <PBIItemView issue={issue} key={index} index={index} subListId={subList.id} />
+                <PBItemView issue={issue} key={index} index={index} subListId={subList.id} />
               </DropArea>
             </Droppable>
           </Droppable>
@@ -106,6 +105,7 @@ export const PBISubList: React.FC<PBISubListProps> = (props) => {
                   flexGrow: 1
                 }}
                 blurAction="cancel"
+                lang={model.lang}
               />
             </VBox>
           </DropArea>
@@ -130,11 +130,14 @@ const DropArea = styled.div({
 
 const SL = styled.div({
   marginBottom: 8,
-  paddingTop: 4
+  padding: 8
 })
 
 const SLTitle = styled.div({
-  paddingBottom: 4
+  paddingBottom: 4,
+  "&.selected": {
+    border: "2px solid #e0c0c0"
+  }
 })
 
 const MilestoneName = styled.span({

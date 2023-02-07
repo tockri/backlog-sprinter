@@ -95,7 +95,7 @@ const changeMilestoneAndCustomFieldValue = async (
   return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
 }
 
-export type IssueChangeInput = Immutable<{
+export type EditIssueInput = Immutable<{
   summary?: string
   description?: string
   estimatedHours?: number | null
@@ -104,7 +104,7 @@ export type IssueChangeInput = Immutable<{
   parentIssueId?: number | null
 }>
 
-const editIssue = async (issueId: number, input: IssueChangeInput): Promise<IssueData> => {
+const editIssue = async (issueId: number, input: EditIssueInput): Promise<IssueData> => {
   const { summary, description, estimatedHours, actualHours, statusId, parentIssueId } = input
   const params: Record<string, string> = {}
   if (summary !== undefined) {
@@ -130,7 +130,7 @@ const editIssue = async (issueId: number, input: IssueChangeInput): Promise<Issu
 
 const mutateByIssueInput = (
   issue: WritableDraft<IssueData>,
-  input: IssueChangeInput,
+  input: EditIssueInput,
   statuses: ReadonlyArray<Status>
 ) => {
   if (input.summary !== undefined) {
@@ -156,7 +156,7 @@ const mutateByIssueInput = (
   }
 }
 
-export type IssueCreateInput = Immutable<{
+export type AddIssueInput = Immutable<{
   project: Project
   issueType: IssueType
   summary: string
@@ -168,7 +168,7 @@ export type IssueCreateInput = Immutable<{
   }
 }>
 
-const createIssue = async (input: IssueCreateInput): Promise<IssueData> => {
+const addIssue = async (input: AddIssueInput): Promise<IssueData> => {
   const params: Record<string, string> = {}
   params["projectId"] = String(input.project.id)
   params["issueTypeId"] = String(input.issueType.id)
@@ -194,7 +194,7 @@ const Issue = {
   bulkChangeMilestone,
   changeMilestoneAndCustomFieldValue,
   editIssue,
-  createIssue
+  createIssue: addIssue
 }
 
 export const IssueDataUtil = {

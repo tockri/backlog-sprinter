@@ -9,11 +9,11 @@ const waitForReady = (count: number, isReady: () => boolean, callback: () => voi
       count < 10 ? 500 : 100
     )
   } else {
-    console.error("couner reached to 0, give up.")
+    console.error("counter reached to 0, give up.")
   }
 }
 
-const watchInfinitly = (isReady: () => boolean, callback: () => void) => {
+const watchInfinitely = (isReady: () => boolean, callback: () => void) => {
   setInterval(() => {
     if (isReady()) {
       callback()
@@ -21,7 +21,13 @@ const watchInfinitly = (isReady: () => boolean, callback: () => void) => {
   }, 500)
 }
 
+const sleep = (milliseconds: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, milliseconds)
+  })
+
 export const Waiter = {
   waitForReady,
-  watchInfinitly
+  watchInfinitely,
+  sleep
 }

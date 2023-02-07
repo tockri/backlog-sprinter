@@ -1,60 +1,69 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { HBox } from "../../ui/Box"
+import { Button } from "../../ui/Button"
+import { Select } from "../../ui/Select"
 import { i18n } from "./i18n"
+import { IssueTypeCreateForm } from "./IssueTypeCreateForm"
 import { useSettingModel } from "./Model"
 
 export const ProjectSettings: React.FC = () => {
-  const vm = useSettingModel()
-  const t = i18n(vm.lang)
+  const model = React.useCallback(useSettingModel, [])()
+  const t = i18n(model.lang)
   const id = (key: string) => `project.settingsForm.${key}`
   return (
     <Root>
+      <H2>{t.issueTypeLabel}</H2>
       <div className="form-element__item">
-        <label className="form-element__label" htmlFor={id("issueType")}>
-          {t.issueTypeLabel}
-        </label>
-        <select
-          id={id("issueType")}
-          onChange={(e) => {
-            const elem = e.currentTarget
-            if (elem.selectedIndex > 0) {
-              const issueType = vm.issueTypes[elem.selectedIndex - 1]
-              vm.selectIssueType(issueType.id)
-            }
-          }}
-          value={vm.pbiIssueTypeId || ""}
-        >
-          <option value=""></option>
-          {vm.issueTypes.map((it) => (
-            <option key={it.id} value={it.id}>
-              {it.name}
-            </option>
-          ))}
-        </select>
+        {model.isCreatingIssueType ? (
+          <IssueTypeCreateForm />
+        ) : (
+          <HBox style={{ gap: 4 }}>
+            <Select
+              id={id("issueType")}
+              onChange={(e) => {
+                const elem = e.currentTarget
+                if (elem.selectedIndex > 0) {
+                  const issueType = model.issueTypes[elem.selectedIndex - 1]
+                  model.selectIssueType(issueType.id)
+                } else {
+                  model.selectIssueType(0)
+                }
+              }}
+              value={model.pbiIssueTypeId || ""}
+            >
+              <option value=""></option>
+              {model.issueTypes.map((it) => (
+                <option key={it.id} value={it.id}>
+                  {it.name}
+                </option>
+              ))}
+            </Select>
+            {!model.pbiIssueTypeId && <Button onClick={() => model.startCreatingIssueType()}>{t.createLabel}</Button>}
+          </HBox>
+        )}
       </div>
+      <H2>{t.customFieldTitle}</H2>
       <div className="form-element__item">
-        <label className="form-element__label" htmlFor={id("customField")}>
-          {t.customFieldTitle}
-        </label>
-        {vm.pbiIssueTypeId ? (
-          vm.orderCustomField ? (
+        {model.pbiIssueTypeId ? (
+          model.orderCustomField ? (
             <div>
-              {t.storeOrderOn(vm.orderCustomField.name)}
-              <button
+              {t.storeOrderOn(model.orderCustomField.name)}
+              <Button
                 onClick={() => {
                   if (window.confirm(t.confirmDelete)) {
-                    vm.deleteCustomField()
+                    model.deleteCustomField()
                   }
                 }}
               >
                 {t.deleteLabel}
-              </button>
+              </Button>
             </div>
           ) : (
             <div>
               {t.customFieldNotExist}
-              <button onClick={() => vm.createCustomField()}>{t.createLabel}</button>
-              <div>{vm.errorMessageOnCustomField}</div>
+              <Button onClick={() => model.createCustomField()}>{t.createLabel}</Button>
+              <div>{model.errorMessageOnCustomField}</div>
             </div>
           )
         ) : (
@@ -67,4 +76,10 @@ export const ProjectSettings: React.FC = () => {
 
 const Root = styled.div({
   padding: 12
+})
+
+const H2 = styled.h2({
+  fontSize: 16,
+  padding: "4px 0",
+  fontWeight: "normal"
 })

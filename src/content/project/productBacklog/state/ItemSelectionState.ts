@@ -1,0 +1,69 @@
+import { atom } from "jotai"
+import { MilestonesState } from "../../app/state/ProjectInfoState"
+import { PBIListFunc } from "./PBIList"
+import { PBIListState } from "./PBIListState"
+
+type IssueId = {
+  type: "Issue"
+  issueId: number
+}
+
+type MilestoneId = {
+  type: "Milestone"
+  milestoneId: number
+}
+
+type MilestoneAdding = {
+  type: "MilestoneAdding"
+}
+
+type None = {
+  type: "None"
+}
+
+const None: None = {
+  type: "None"
+}
+
+export type ItemSelection = IssueId | MilestoneId | MilestoneAdding | None
+
+const store = atom<ItemSelection>(None)
+
+const milestoneAtom = atom((get) => {
+  const item = get(store)
+  if (item.type === "Milestone") {
+    const milestones = get(MilestonesState.atom)
+    return milestones.find((m) => m.id === item.milestoneId) || null
+  }
+  return null
+})
+
+const issueAtom = atom((get) => {
+  const item = get(store)
+  if (item.type === "Issue") {
+    const pbi = get(PBIListState.atom)
+    const [issue] = PBIListFunc.findIssue(pbi, item.issueId)
+    return issue
+  }
+  return null
+})
+
+export const ItemSelectionState = {
+  atom: store,
+  milestoneAtom,
+  issueAtom,
+  Action: {
+    SelectIssue: (issueId: number): IssueId => ({
+      type: "Issue",
+      issueId
+    }),
+    SelectMilestone: (milestoneId: number): MilestoneId => ({
+      type: "Milestone",
+      milestoneId
+    }),
+    StartMilestoneAdding: {
+      type: "MilestoneAdding"
+    } as MilestoneAdding,
+    Deselect: None
+  }
+}

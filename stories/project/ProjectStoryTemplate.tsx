@@ -1,9 +1,9 @@
+import styled from "@emotion/styled"
 import { Atom, Provider } from "jotai"
 import React from "react"
-
-import { appSettingAtom, backlogApiAtom, formInfoAtom } from "../../src/content/project/app/State"
-
-import styled from "@emotion/styled"
+import { Api } from "../../src/content/project/app/state/Api"
+import { AppConfState } from "../../src/content/project/app/state/AppConfState"
+import { EnvState } from "../../src/content/project/app/state/EnvState"
 import { Loading } from "../../src/content/ui/Loading"
 import { mockApi } from "./mockApi"
 
@@ -15,22 +15,22 @@ export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ init
   return (
     <Provider
       initialValues={[
-        ...initialValues,
         [
-          appSettingAtom,
+          AppConfState.atom,
           {
             selectedTab: 0,
             pbiIssueTypeId: 389286
           }
         ],
         [
-          formInfoAtom,
+          EnvState.atom,
           {
             projectKey: "BT",
             lang: "ja"
           }
         ],
-        [backlogApiAtom, mockApi]
+        [Api.atom, mockApi],
+        ...initialValues
       ]}
     >
       <React.Suspense fallback={<Loading />}>

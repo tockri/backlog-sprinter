@@ -2,11 +2,12 @@ import React from "react"
 import { createRoot } from "react-dom/client"
 import { MessageBroker } from "../util/MessageBroker"
 import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
+import SprintIcon from "./images/sprint.svg"
 import { ProjectApp } from "./project/app/View"
-import { i18n, ProjectFormInfo, UserLang } from "./project/types"
+import { i18n, ProjectEnv, UserLang } from "./project/types"
 import { jsxToElement } from "./ui/JSXUtil"
 
-const broker = new MessageBroker<ProjectFormInfo>()
+const broker = new MessageBroker<ProjectEnv>()
 
 const getButtonPlace = () => document.querySelector(".project-header__summary")
 
@@ -40,13 +41,12 @@ const makePortalButton = () => {
   const projectKey = getProjectKey()
   if (place && projectKey && !place.classList.contains("bsp-project-button-place")) {
     place.classList.add("bsp-project-button-place")
-    const iconUrl = chrome.runtime.getURL("images/sprint.svg")
     const lang = getUserLang()
     const t = i18n(lang)
     const buttonWrapper = jsxToElement(
       <div className="bsp-project-button-wrapper">
         <button type="button" className="icon-button icon-button--default -with-text bsp-project-button">
-          <img alt="" src={iconUrl} className="icon -large" />
+          <SprintIcon width={24} height={24} viewBox="0 0 114 128" />
           <span className="_assistive-text">{t.buttonLabel}</span>
         </button>
       </div>

@@ -4,8 +4,9 @@ import React from "react"
 import { IssueData } from "../../../backlog/Issue"
 import { HBox } from "../../../ui/Box"
 import { Draggable } from "../../../ui/DragAndDrop"
-import { formInfoAtom } from "../../app/State"
-import { ChildIssueAction, ChildIssueActionType, childIssueAtom } from "../State"
+import { EnvState } from "../../app/state/EnvState"
+
+import { ChildIssuesAction, ChildIssuesState } from "../state/ChildIssuesState"
 import { StatusView } from "../StatusView"
 import { i18n } from "./i18n"
 
@@ -15,9 +16,9 @@ type ChildIssueListViewProps = {
 
 export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => {
   const { parentIssueId } = props
-  const [children, dispatch] = useAtom(childIssueAtom(parentIssueId))
-  const formInfo = useAtomValue(formInfoAtom)
-  const t = i18n(formInfo.lang)
+  const [children, dispatch] = useAtom(ChildIssuesState.atom(parentIssueId))
+  const env = useAtomValue(EnvState.atom)
+  const t = i18n(env.lang)
 
   return children.length === 0 ? null : (
     <div>
@@ -36,7 +37,7 @@ export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => 
 
 type ChildIssueViewProps = {
   issue: IssueData
-  dispatch: (action: ChildIssueActionType) => void
+  dispatch: (action: ChildIssuesAction) => void
 }
 
 const ChildIssueView: React.FC<ChildIssueViewProps> = (props) => {
@@ -47,7 +48,7 @@ const ChildIssueView: React.FC<ChildIssueViewProps> = (props) => {
       item={issue}
       onDragEnd={(where) => {
         if (where) {
-          dispatch(ChildIssueAction.Move(issue, where.id))
+          dispatch(ChildIssuesState.Action.Move(issue, where.id))
         }
       }}
     >

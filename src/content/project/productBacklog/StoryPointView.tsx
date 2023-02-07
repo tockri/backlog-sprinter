@@ -6,7 +6,8 @@ import "react-tooltip/dist/react-tooltip.min.css"
 import { IssueData } from "../../backlog/Issue"
 import { HBox } from "../../ui/Box"
 import { cnu } from "../../ui/cnu"
-import { formInfoAtom } from "../app/State"
+import { EnvState } from "../app/state/EnvState"
+
 import { i18n } from "./i18n"
 
 type StoryPointViewProps = {
@@ -22,8 +23,8 @@ export const StoryPointView: React.FC<StoryPointViewProps> = (props) => {
 
 const Editor: React.FC<StoryPointViewProps> = (props) => {
   const { issue, onEstimateFix, onActualFix } = props
-  const formInfo = useAtomValue(formInfoAtom)
-  const t = i18n(formInfo.lang)
+  const env = useAtomValue(EnvState.atom)
+  const t = i18n(env.lang)
   const { actualHours, estimatedHours, status } = issue
   return (
     <HBox>
@@ -90,10 +91,10 @@ const Viewer: React.FC<StoryPointViewProps> = (props) => {
   const { actualHours, estimatedHours } = issue
   if (estimatedHours && actualHours) {
     return (
-      <Overwrapping>
+      <Overlapping>
         <ViewerPane className={cnu(estimatedClass(estimatedHours), "below")}>{estimatedHours}</ViewerPane>
         <ViewerPane className={cnu(estimatedClass(actualHours), "above")}>{actualHours}</ViewerPane>
-      </Overwrapping>
+      </Overlapping>
     )
   } else if (estimatedHours || actualHours) {
     const hours = estimatedHours || actualHours
@@ -149,7 +150,7 @@ const EditOption = styled.option({
   ...editCommonStyles
 })
 
-const Overwrapping = styled.div({
+const Overlapping = styled.div({
   width: 44,
   height: 30,
   position: "relative"

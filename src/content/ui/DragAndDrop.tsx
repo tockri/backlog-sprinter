@@ -9,7 +9,7 @@ type DragItem = {
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 class DragContext {
   private dragging: DragItem | null = null
-  private hoverring: DragItem | null = null
+  private hovering: DragItem | null = null
   private endFunc: (() => void) | null = null
   setDragging<T>(type: string, item: T | null) {
     this.dragging = { type, item }
@@ -17,11 +17,11 @@ class DragContext {
   getDragging<T>(type: string): T | null {
     return (this.dragging?.type === type && (this.dragging?.item as T)) || null
   }
-  setHoverring<T>(type: string, item: T | null) {
-    this.hoverring = { type, item }
+  setHovering<T>(type: string, item: T | null) {
+    this.hovering = { type, item }
   }
-  getHoverring<T>(type: string): T | null {
-    return (this.hoverring?.type == type && (this.hoverring?.item as T)) || null
+  getHovering<T>(type: string): T | null {
+    return (this.hovering?.type == type && (this.hovering?.item as T)) || null
   }
   setEndFunc(func: (() => void) | null) {
     this.endFunc = func
@@ -70,8 +70,8 @@ export const Droppable = <T,>(props: DropPointProps<T>): React.ReactElement => {
   const onEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     window.clearTimeout(timer.current)
-    if (acceptable() && context.getHoverring(type) !== item) {
-      context.setHoverring(type, item)
+    if (acceptable() && context.getHovering(type) !== item) {
+      context.setHovering(type, item)
       context.setEndFunc(onLeave)
       if (!hover.current) {
         hover.current = true
@@ -83,8 +83,8 @@ export const Droppable = <T,>(props: DropPointProps<T>): React.ReactElement => {
   const onLeave = () => {
     timer.current = window.setTimeout(() => {
       timer.current = 0
-      if (ObjectUtil.isStrictEqual(context.getHoverring(type), item)) {
-        context.setHoverring(type, null)
+      if (ObjectUtil.isStrictEqual(context.getHovering(type), item)) {
+        context.setHovering(type, null)
       }
       if (hover.current) {
         hover.current = false
@@ -119,10 +119,10 @@ export const Draggable = <T,>(props: DraggableProps<T>): React.ReactElement => {
         onDragStart && onDragStart()
       }}
       onDragEnd={() => {
-        const hp = context.getHoverring<T>(type)
+        const hp = context.getHovering<T>(type)
         if (hp) {
           context.setDragging(type, null)
-          context.setHoverring(type, null)
+          context.setHovering(type, null)
           context.executeEndFunc()
           context.setEndFunc(null)
         }

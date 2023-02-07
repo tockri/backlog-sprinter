@@ -1,11 +1,12 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { NLLocation } from "../../../../util/NestedList"
 import { cnu } from "../../../ui/cnu"
 import { Draggable } from "../../../ui/DragAndDrop"
+import { IssueDataWithOrder } from "../state/PBIList"
 import { StatusView } from "../StatusView"
 import { StoryPointView } from "../StoryPointView"
-import { usePBIItemModel } from "./ItemModel"
-import { IssueDataWithOrder } from "./ListData"
+import { usePBItemModel } from "./PBItemModel"
 
 type PBIItemViewProps = {
   subListId: string
@@ -13,19 +14,19 @@ type PBIItemViewProps = {
   issue: IssueDataWithOrder
 }
 
-export const PBIItemView: React.FC<PBIItemViewProps> = (props) => {
+export const PBItemView: React.FC<PBIItemViewProps> = (props) => {
   const { issue, subListId, index } = props
-  const model = usePBIItemModel()
+  const model = usePBItemModel()
   const item = { subListId, index }
   const [dragging, setDragging] = React.useState(false)
 
   return (
-    <Draggable
+    <Draggable<NLLocation>
       type="arrange"
       item={item}
       onDragEnd={(where) => {
         if (where) {
-          model.move({ type: "NLMove", src: item, dst: where })
+          model.move(item, where)
         }
         setDragging(false)
       }}

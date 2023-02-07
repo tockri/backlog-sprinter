@@ -48,11 +48,32 @@ const getProjectInfoWithMilestones = async (projectKey: string): Promise<Project
   }
 }
 
+// noinspection JSUnusedGlobalSymbols
+export enum IssueTypeColor {
+  pill__issue_type_1 = "#e30000",
+  pill__issue_type_2 = "#990000",
+  pill__issue_type_3 = "#934981",
+  pill__issue_type_4 = "#814fbc",
+  pill__issue_type_5 = "#2779ca",
+  pill__issue_type_6 = "#007e9a",
+  pill__issue_type_7 = "#7ea800",
+  pill__issue_type_8 = "#ff9200",
+  pill__issue_type_9 = "#ff3265",
+  pill__issue_type_10 = "#666665"
+}
+
+const classNameMap: Map<IssueTypeColor, string> = new Map()
+Object.entries(IssueTypeColor).forEach(([cls, hex]) => {
+  classNameMap.set(hex, cls.replace(/_/g, "-"))
+})
+
+export const issueTypeColorClass = (color: IssueTypeColor): string => classNameMap.get(color) || ""
+
 export type IssueType = Immutable<{
   id: number
   projectId: number
   name: string
-  color: string
+  color: IssueTypeColor
   displayOrder: number
   templateSummary: string | null
   templateDescription: string | null
@@ -106,13 +127,16 @@ export type CustomListField = CustomFieldBase &
 
 export type CustomField = CustomTextField | CustomNumberField | CustomDateField | CustomListField
 
+// noinspection JSUnusedGlobalSymbols
 export const isTextField = (cf: CustomField): cf is CustomTextField =>
   cf.typeId in [CustomFieldTypes.Text, CustomFieldTypes.LongText]
 
 export const isNumberField = (cf: CustomField): cf is CustomNumberField => cf.typeId === CustomFieldTypes.Number
 
+// noinspection JSUnusedGlobalSymbols
 export const isDateField = (cf: CustomField): cf is CustomDateField => cf.typeId === CustomFieldTypes.Date
 
+// noinspection JSUnusedGlobalSymbols
 export const isListField = (cf: CustomField): cf is CustomListField =>
   cf.typeId in
   [CustomFieldTypes.SingleSelect, CustomFieldTypes.MultiSelect, CustomFieldTypes.Radio, CustomFieldTypes.Checkbox]
@@ -175,28 +199,64 @@ const deleteCustomField = async (projectKey: string, customFieldId: number): Pro
   return await BacklogApiRequest.delete<CustomField>(`/api/v2/projects/${projectKey}/customFields/${customFieldId}`)
 }
 
-export type MilestoneInput = Immutable<{
-  projectId: number
+export type AddMilestoneInput = Immutable<{
   name: string
   startDate: Date | null
-  endDate: Date | null
+  releaseDueDate: Date | null
   description: string
 }>
 
-const createMilestone = async (input: MilestoneInput): Promise<number> => {
-  const created = await BacklogApiRequest.post<Version>(`/api/v2/projects/${input.projectId}/versions`, {
+const addMilestone = async (projectId: number, input: AddMilestoneInput): Promise<Version> => {
+  return await BacklogApiRequest.post<Version>(`/api/v2/projects/${projectId}/versions`, {
     name: input.name,
     startDate: DateUtil.dateString(input.startDate),
-    releaseDueDate: DateUtil.dateString(input.endDate),
+    releaseDueDate: DateUtil.dateString(input.releaseDueDate),
     description: input.description
   })
-  return created.id
 }
 
-const archiveMilestone = async (projectId: number, milestone: Version) => {
-  await BacklogApiRequest.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
+export type EditMilestoneInput = Immutable<{
+  name?: string
+  startDate?: Date | null
+  releaseDueDate?: Date | null
+  description?: string
+}>
+
+const editMilestone = async (projectId: number, milestoneId: number, input: EditMilestoneInput): Promise<Version> => {
+  const { name, startDate, releaseDueDate, description } = input
+  const params: Record<string, string> = {}
+  if (name !== undefined) {
+    params["name"] = name
+  }
+  if (startDate !== undefined) {
+    params["startDate"] = DateUtil.dateString(startDate)
+  }
+  if (releaseDueDate !== undefined) {
+    params["releaseDueDate"] = DateUtil.dateString(releaseDueDate)
+  }
+  if (description !== undefined) {
+    params["description"] = description
+  }
+  return await BacklogApiRequest.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestoneId}`, params)
+}
+
+const archiveMilestone = async (projectId: number, milestone: Version): Promise<Version> => {
+  return await BacklogApiRequest.patch<Version>(`/api/v2/projects/${projectId}/versions/${milestone.id}`, {
     name: milestone.name,
     archived: "true"
+  })
+}
+
+export type IssueTypeInput = Immutable<{
+  projectId: number
+  name: string
+  color: IssueTypeColor
+}>
+
+const createIssueType = async (input: IssueTypeInput): Promise<IssueType> => {
+  return await BacklogApiRequest.post<IssueType>(`/api/v2/projects/${input.projectId}/issueTypes`, {
+    name: input.name,
+    color: input.color
   })
 }
 
@@ -205,8 +265,10 @@ const ProjectInfo = {
   getProjectInfoWithCustomFields,
   createCustomField,
   deleteCustomField,
-  createMilestone,
-  archiveMilestone
+  addMilestone,
+  editMilestone,
+  archiveMilestone,
+  createIssueType
 }
 
 export type ProjectInfoApi = typeof ProjectInfo

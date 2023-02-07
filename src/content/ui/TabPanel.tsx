@@ -41,7 +41,10 @@ export const TabPanel: React.FC<TabPanelProps> = (props) => {
 const Panel = styled.div({
   display: "flex",
   width: "100%",
-  height: "100%"
+  height: "100%",
+  " *": {
+    boxSizing: "border-box"
+  }
 })
 
 const TabBar = styled.nav({
@@ -54,6 +57,7 @@ const TabBar = styled.nav({
 })
 
 const Tab = styled.button({
+  boxSizing: "border-box",
   padding: "1em 2em",
   whiteSpace: "pre",
   marginBottom: 1,
@@ -65,6 +69,7 @@ const Tab = styled.button({
 })
 
 const Body = styled.div({
+  boxSizing: "border-box",
   flexGrow: 1,
   position: "relative"
 })

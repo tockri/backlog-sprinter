@@ -32,6 +32,11 @@ module.exports = {
             options: { url: false }
           }
         ]
+      },
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        use: ["@svgr/webpack"]
       }
     ]
   },

@@ -2,14 +2,14 @@ import { Immutable } from "immer"
 import { useAtomValue } from "jotai"
 import { DateUtil } from "../../../util/DateUtil"
 import { Version } from "../../backlog/ProjectInfo"
-import { milestonesAtom } from "../app/State"
+import { MilestonesState } from "../app/state/ProjectInfoState"
 
 type StatModel = Immutable<{
   statMilestones: Version[]
 }>
 
 export const useModel = (): StatModel => {
-  const milestones = useAtomValue(milestonesAtom)
+  const milestones = useAtomValue(MilestonesState.atom)
   return {
     statMilestones: filterMilestones(milestones)
   }

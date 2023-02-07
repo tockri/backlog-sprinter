@@ -1,25 +1,44 @@
 import styled from "@emotion/styled"
-import React from "react"
+import { Immutable } from "immer"
+import React, { HTMLInputTypeAttribute } from "react"
 import ReactMarkdown from "react-markdown"
+import { Tooltip } from "react-tooltip"
 import remarkGfm from "remark-gfm"
 import { cnu } from "./cnu"
+import { TextArea, TextInput } from "./TextInput"
 
-export type EditableFieldProps = {
-  readonly placeholder?: string
-  readonly multiline?: boolean
-  readonly markdown?: boolean
-  readonly disabled?: boolean
-  readonly defaultValue?: string
-  readonly blurAction?: "none" | "submit" | "cancel"
-  readonly editStyle?: React.CSSProperties
-  readonly viewStyle?: React.CSSProperties
-  readonly onFix?: (value: string) => void
-  readonly onCancel?: () => void
-  readonly defaultEditing?: boolean
-}
+export type EditableFieldProps = Immutable<{
+  placeholder?: string
+  multiline?: boolean
+  markdown?: boolean
+  disabled?: boolean
+  defaultValue?: string
+  blurAction?: "none" | "submit" | "cancel"
+  editStyle?: React.CSSProperties
+  viewStyle?: React.CSSProperties
+  onFix?: (value: string) => void
+  onCancel?: () => void
+  defaultEditing?: boolean
+  lang?: "ja" | "en"
+  inputType?: HTMLInputTypeAttribute
+  inputMin?: string
+  inputMax?: string
+}>
 
 export const EditableField: React.FC<EditableFieldProps> = (props) => {
-  const { onFix, multiline, markdown, disabled, placeholder, defaultValue, defaultEditing } = props
+  const {
+    onFix,
+    multiline,
+    markdown,
+    disabled,
+    placeholder,
+    defaultValue,
+    defaultEditing,
+    inputType,
+    inputMin,
+    inputMax,
+    lang
+  } = props
   const [editing, setEditing] = React.useState(defaultEditing)
   const editor = React.useRef<(HTMLInputElement & HTMLTextAreaElement) | null>(null)
   const endEdit = () => {
@@ -80,29 +99,42 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
       }
     }
   }, [editing, defaultValue])
+  const id = React.useRef(`editable-${Math.random()}`)
 
   return (
     <>
       {editing ? (
         multiline ? (
-          <TextAreaBase
-            ref={editor}
-            style={props.editStyle}
-            placeholder={placeholder}
-            disabled={disabled}
-            onKeyDown={onKeyDown}
-            onBlur={onBlur}
-          />
+          <>
+            <TextArea
+              ref={editor}
+              style={props.editStyle}
+              placeholder={placeholder}
+              disabled={disabled}
+              onKeyDown={onKeyDown}
+              onBlur={onBlur}
+              id={id.current}
+              data-tooltip-content={lang === "ja" ? "Ctrl+Enterで確定" : "Press 'Ctrl+Enter' to submit"}
+            />
+            <Tooltip place="bottom" anchorId={id.current} />
+          </>
         ) : (
-          <TextInput
-            type="text"
-            ref={editor}
-            onKeyDown={onKeyDown}
-            onBlur={onBlur}
-            style={props.editStyle}
-            placeholder={placeholder}
-            disabled={disabled}
-          />
+          <>
+            <TextInput
+              type={inputType || "text"}
+              min={inputMin}
+              max={inputMax}
+              ref={editor}
+              onKeyDown={onKeyDown}
+              onBlur={onBlur}
+              style={props.editStyle}
+              placeholder={placeholder}
+              disabled={disabled}
+              id={id.current}
+              data-tooltip-content={lang === "ja" ? "Enterで確定" : "Press 'Enter' to submit"}
+            />
+            <Tooltip place="bottom" anchorId={id.current} />
+          </>
         )
       ) : (
         <Viewer tabIndex={0} className={cnu({ disabled, multiline })} style={props.viewStyle} onFocus={onFocus}>
@@ -126,23 +158,9 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
 // 2023-01-25 "keyCode" is deprecated
 // but since "isComposing" is not exist on Mac chrome,
 // (keyCode === 229) is the only way to know composing status.
+// noinspection JSDeprecatedSymbols
 const isComposing = (e: React.KeyboardEvent): boolean =>
   (e as React.KeyboardEvent & { isComposing: boolean }).isComposing || e.keyCode === 229 || false
-
-const inputStyle: React.CSSProperties = {
-  padding: 6,
-  borderRadius: 3,
-  border: "1px solid #d0d0d0"
-}
-
-const TextInput = styled.input({
-  ...inputStyle
-})
-
-const TextAreaBase = styled.textarea({
-  ...inputStyle,
-  minHeight: "3em"
-})
 
 const Placeholder = styled.div({
   color: "#c0c0c0"
@@ -152,10 +170,12 @@ const Viewer = styled.div({
   cursor: "pointer",
   color: "#606060",
   "&.multiline": {
-    whiteSpace: "pre-wrap",
-    overflow: "scroll",
+    overflow: "auto",
     height: "3em",
     flexGrow: 1
+  },
+  " p": {
+    whiteSpace: "pre-wrap"
   },
 
   "&.disabled": {

@@ -31,6 +31,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
 }
 
 const Wrapper = styled.div({
+  boxSizing: "border-box",
   width: "100vw",
   height: "100vh",
   position: "fixed",
@@ -43,6 +44,7 @@ const Wrapper = styled.div({
 })
 
 const Content = styled.div({
+  boxSizing: "border-box",
   height: "calc(100% - 36px)",
   overflow: "hidden"
 })
