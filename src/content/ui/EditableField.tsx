@@ -170,10 +170,12 @@ const Viewer = styled.div({
   cursor: "pointer",
   color: "#606060",
   "&.multiline": {
-    whiteSpace: "pre-wrap",
     overflow: "auto",
     height: "3em",
     flexGrow: 1
+  },
+  " p": {
+    whiteSpace: "pre-wrap"
   },
 
   "&.disabled": {
