@@ -101,6 +101,7 @@ const stAdd: Write<AddAction> = async (get, set, action) => {
   const api = get(Api.atom)
   const added = await api.addSomething({name, address})
   const prev = get(stAtom)
+  
   // 更新後の値を保存用Atomに保存
   set(stStoreAtom,
     // Immerを使う更新コード。短い！
@@ -134,7 +135,7 @@ const stAtom = atom(
 })
 ```
 
-実例の[PBIListState.ts](../../src/content/project/productBacklog/state/PBIListState.ts)では、ここまでの構成を少し便利にするため、に[JotaiUtil.asyncAtomWithAction](../../src/content/util/JotaiUtil.ts)を利用している。
+実例の[PBIListState.ts](../../src/content/project/productBacklog/state/PBIListState.ts)では、ここまでの構成を少し便利にするため、[JotaiUtil.asyncAtomWithAction](../../src/content/util/JotaiUtil.ts)を利用している。
 
 本質的ではない`stStoreAtom`が関数中に隠蔽されている。
 

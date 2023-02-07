@@ -59,9 +59,9 @@ export const MilestoneFormView: React.FC = () => {
         placeholder={t.milestoneDescription}
       />
       <Buttons>
-        <Button onClick={model.cancel}>Cancel</Button>
+        <Button onClick={model.cancel}>{t.cancel}</Button>
         <Button onClick={model.submit} disabled={!submittable}>
-          Submit
+          {t.submitForm}
         </Button>
       </Buttons>
     </Root>
