@@ -10,18 +10,18 @@ export enum Tabs {
   Settings = 2
 }
 
-export type AppConfigValue = Immutable<{
+export type AppConf = Immutable<{
   selectedTab: Tabs
   pbiIssueTypeId: number
 }>
 
-const InitialAppSetting: AppConfigValue = {
+const InitialAppConf: AppConf = {
   selectedTab: Tabs.Backlog,
   pbiIssueTypeId: 0
 }
 
-const appSettingAtom = withImmer(atomWithStorage<AppConfigValue>("bsp.project.app.setting", InitialAppSetting))
+const store = withImmer(atomWithStorage<AppConf>("bsp.project.app.setting", InitialAppConf))
 
-export const AppConfig = {
-  atom: appSettingAtom
+export const AppConfState = {
+  atom: store
 }

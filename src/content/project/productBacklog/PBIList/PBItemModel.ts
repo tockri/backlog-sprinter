@@ -1,33 +1,34 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { NLLocation } from "../../../../util/NestedList"
-import { OrderCustomField } from "../../app/state/OrderCustomField"
-import { ProductBacklog } from "../state/ProductBacklog"
+import { OrderCustomFieldState } from "../../app/state/OrderCustomFieldState"
+import { PBIListState } from "../state/PBIListState"
 
-import { SelectedItem } from "../state/SelectedItem"
+import { ItemSelectionState } from "../state/ItemSelectionState"
 
-type PBIItemModel = {
+type PBItemModel = {
   readonly selectItem: (issueId: number) => void
   readonly isSelected: (issueId: number) => boolean
   readonly move: (src: NLLocation, dst: NLLocation) => void
 }
 
-export const usePBIItemModel = (): PBIItemModel => {
-  const [selected, selectDispatch] = useAtom(SelectedItem.atom)
-  const pbDispatch = useSetAtom(ProductBacklog.atom)
-  const orderCustomField = useAtomValue(OrderCustomField.atom)
+export const usePBItemModel = (): PBItemModel => {
+  const [selected, selectDispatch] = useAtom(ItemSelectionState.atom)
+  const pbDispatch = useSetAtom(PBIListState.atom)
+  const orderCustomField = useAtomValue(OrderCustomFieldState.atom)
   const selectedIssueId = selected?.type === "Issue" ? selected.issueId : null
   if (orderCustomField) {
     return {
       selectItem: (issueId) => {
         if (issueId === selectedIssueId) {
-          selectDispatch(SelectedItem.Action.Deselect)
+          selectDispatch(ItemSelectionState.Action.Deselect)
         } else {
-          selectDispatch(SelectedItem.Action.SelectIssue(issueId))
+          selectDispatch(ItemSelectionState.Action.SelectIssue(issueId))
         }
       },
       isSelected: (issueId) => selectedIssueId === issueId,
       move: (src, dst) => {
-        pbDispatch(ProductBacklog.Action.ListMove(src, dst))
+        console.log("here")
+        pbDispatch(PBIListState.Action.ListMove(src, dst))
       }
     }
   } else {

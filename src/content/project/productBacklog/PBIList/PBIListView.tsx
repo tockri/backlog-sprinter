@@ -1,10 +1,10 @@
 import styled from "@emotion/styled"
 import React from "react"
 import { cnu } from "../../../ui/cnu"
-import { usePBIListModel } from "./ListModel"
+import { usePBIListModel } from "./PBIListModel"
 
+import { PBISubListView } from "./PBISubListView"
 import PlusIconSVG from "./plus-icon.svg"
-import { PBISubListView } from "./SubListView"
 
 export const PBIListView: React.FC = () => {
   const model = usePBIListModel()

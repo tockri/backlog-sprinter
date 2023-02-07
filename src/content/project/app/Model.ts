@@ -5,9 +5,9 @@ import { MessageBroker } from "../../../util/MessageBroker"
 import { BacklogApiContext } from "../../backlog/BacklogApiForReact"
 import { ProjectEnv, UserLang } from "../types"
 import { Api } from "./state/Api"
-import { AppConfig, Tabs } from "./state/AppConfig"
-import { Environment } from "./state/Environment"
-import { OrderCustomField } from "./state/OrderCustomField"
+import { AppConfState, Tabs } from "./state/AppConfState"
+import { EnvState } from "./state/EnvState"
+import { OrderCustomFieldState } from "./state/OrderCustomFieldState"
 
 type AppModel = {
   clear: () => void
@@ -35,7 +35,7 @@ export const useAppModel = (broker: MessageBroker<ProjectEnv>): AppModel => {
     formInfo: env,
     providerInitialValues: env
       ? [
-          [Environment.atom, env],
+          [EnvState.atom, env],
           [Api.atom, api]
         ]
       : []
@@ -49,9 +49,9 @@ type InnerModel = Immutable<{
 }>
 
 export const useInnerModel = (): InnerModel => {
-  const env = useAtomValue(Environment.atom)
-  const [config, setConfig] = useAtom(AppConfig.atom)
-  const orderCustomField = useAtomValue(OrderCustomField.atom)
+  const env = useAtomValue(EnvState.atom)
+  const [config, setConfig] = useAtom(AppConfState.atom)
+  const orderCustomField = useAtomValue(OrderCustomFieldState.atom)
   const selectedTab = orderCustomField ? config.selectedTab : Tabs.Settings
   return {
     lang: env.lang,

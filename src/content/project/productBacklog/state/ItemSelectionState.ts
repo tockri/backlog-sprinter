@@ -1,7 +1,7 @@
 import { atom } from "jotai"
-import { Milestones } from "../../app/state/ProjectInfo"
-import { PBIListDataHandler } from "../PBIList/ListData"
-import { ProductBacklog } from "./ProductBacklog"
+import { MilestonesState } from "../../app/state/ProjectInfoState"
+import { PBIListFunc } from "./PBIList"
+import { PBIListState } from "./PBIListState"
 
 type IssueId = {
   type: "Issue"
@@ -25,13 +25,14 @@ const None: None = {
   type: "None"
 }
 
-type Value = IssueId | MilestoneId | MilestoneAdding | None
-const store = atom<Value>(None)
+export type ItemSelection = IssueId | MilestoneId | MilestoneAdding | None
+
+const store = atom<ItemSelection>(None)
 
 const milestoneAtom = atom((get) => {
   const item = get(store)
   if (item.type === "Milestone") {
-    const milestones = get(Milestones.atom)
+    const milestones = get(MilestonesState.atom)
     return milestones.find((m) => m.id === item.milestoneId) || null
   }
   return null
@@ -40,14 +41,14 @@ const milestoneAtom = atom((get) => {
 const issueAtom = atom((get) => {
   const item = get(store)
   if (item.type === "Issue") {
-    const pbi = get(ProductBacklog.atom)
-    const [issue] = PBIListDataHandler.findIssue(pbi, item.issueId)
+    const pbi = get(PBIListState.atom)
+    const [issue] = PBIListFunc.findIssue(pbi, item.issueId)
     return issue
   }
   return null
 })
 
-export const SelectedItem = {
+export const ItemSelectionState = {
   atom: store,
   milestoneAtom,
   issueAtom,
@@ -66,4 +67,3 @@ export const SelectedItem = {
     Deselect: None
   }
 }
-export type SelectedItemAction = Value

@@ -3,11 +3,11 @@ import { useAtomValue, useSetAtom } from "jotai"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
 import { AddMilestoneInput, Version } from "../../../backlog/ProjectInfo"
-import { Environment } from "../../app/state/Environment"
-import { Milestones } from "../../app/state/ProjectInfo"
+import { EnvState } from "../../app/state/EnvState"
+import { MilestonesState } from "../../app/state/ProjectInfoState"
 import { UserLang } from "../../types"
-import { ProductBacklog } from "../state/ProductBacklog"
-import { SelectedItem } from "../state/SelectedItem"
+import { ItemSelectionState } from "../state/ItemSelectionState"
+import { PBIListState } from "../state/PBIListState"
 
 type Values = Immutable<AddMilestoneInput>
 
@@ -25,16 +25,16 @@ type MilestoneFormModel = {
 }
 
 export const useMilestoneFormModel = (): MilestoneFormModel => {
-  const { lang } = useAtomValue(Environment.atom)
+  const { lang } = useAtomValue(EnvState.atom)
   const [values, setValues] = React.useState<Values>({
     name: "",
     description: "",
     startDate: null,
     releaseDueDate: null
   })
-  const milestones = useAtomValue(Milestones.atom)
-  const selDispatch = useSetAtom(SelectedItem.atom)
-  const pbDispatch = useSetAtom(ProductBacklog.atom)
+  const milestones = useAtomValue(MilestonesState.atom)
+  const selDispatch = useSetAtom(ItemSelectionState.atom)
+  const pbDispatch = useSetAtom(PBIListState.atom)
   const submittable = isSubmittable(values, milestones)
   return {
     values,
@@ -76,11 +76,11 @@ export const useMilestoneFormModel = (): MilestoneFormModel => {
       }
     },
     cancel: () => {
-      selDispatch(SelectedItem.Action.Deselect)
+      selDispatch(ItemSelectionState.Action.Deselect)
     },
     submit: async () => {
-      await pbDispatch(ProductBacklog.Action.AddMilestone(values))
-      selDispatch(SelectedItem.Action.Deselect)
+      await pbDispatch(PBIListState.Action.AddMilestone(values))
+      selDispatch(ItemSelectionState.Action.Deselect)
     }
   }
 }

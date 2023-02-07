@@ -2,11 +2,11 @@ import { Immutable } from "immer"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
-import { Environment } from "../../app/state/Environment"
+import { EnvState } from "../../app/state/EnvState"
 import { UserLang } from "../../types"
-import { ProductBacklog } from "../state/ProductBacklog"
-import { SelectedItem } from "../state/SelectedItem"
-import { PBIListData } from "./ListData"
+import { ItemSelectionState } from "../state/ItemSelectionState"
+import { PBIList } from "../state/PBIList"
+import { PBIListState } from "../state/PBIListState"
 
 type PBISubListModel = Immutable<{
   lang: UserLang
@@ -21,7 +21,7 @@ type PBISubListModel = Immutable<{
   releaseDate: string
 }>
 
-type PBISubList = PBIListData["subLists"][number]
+type PBISubList = PBIList["subLists"][number]
 
 type HoverState = Immutable<{
   issueId: number
@@ -30,9 +30,9 @@ type HoverState = Immutable<{
 
 export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
   const [hover, setHover] = React.useState<HoverState | null>(null)
-  const dispatch = useSetAtom(ProductBacklog.atom)
-  const { lang } = useAtomValue(Environment.atom)
-  const [sel, select] = useAtom(SelectedItem.atom)
+  const dispatch = useSetAtom(PBIListState.atom)
+  const { lang } = useAtomValue(EnvState.atom)
+  const [sel, select] = useAtom(ItemSelectionState.atom)
   const milestone = subList.head
   const milestoneId = milestone?.id || 0
   const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
@@ -64,13 +64,13 @@ export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
     },
     isMoveHovered: (issueId: number) => hover?.issueId === issueId && hover.type === "move",
     createNewIssue: (summary: string) => {
-      dispatch(ProductBacklog.Action.AddIssue(summary, milestone))
+      dispatch(PBIListState.Action.AddIssue(summary, milestone))
     },
     selectMilestone: () => {
       if (sel.type === "Milestone" && sel.milestoneId === milestoneId) {
-        select(SelectedItem.Action.Deselect)
+        select(ItemSelectionState.Action.Deselect)
       } else {
-        select(SelectedItem.Action.SelectMilestone(milestoneId))
+        select(ItemSelectionState.Action.SelectMilestone(milestoneId))
       }
     },
     milestoneName,

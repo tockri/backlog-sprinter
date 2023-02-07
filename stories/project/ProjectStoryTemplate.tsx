@@ -2,8 +2,8 @@ import styled from "@emotion/styled"
 import { Atom, Provider } from "jotai"
 import React from "react"
 import { Api } from "../../src/content/project/app/state/Api"
-import { AppConfig } from "../../src/content/project/app/state/AppConfig"
-import { Environment } from "../../src/content/project/app/state/Environment"
+import { AppConfState } from "../../src/content/project/app/state/AppConfState"
+import { EnvState } from "../../src/content/project/app/state/EnvState"
 import { Loading } from "../../src/content/ui/Loading"
 import { mockApi } from "./mockApi"
 
@@ -16,14 +16,14 @@ export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ init
     <Provider
       initialValues={[
         [
-          AppConfig.atom,
+          AppConfState.atom,
           {
             selectedTab: 0,
             pbiIssueTypeId: 389286
           }
         ],
         [
-          Environment.atom,
+          EnvState.atom,
           {
             projectKey: "BT",
             lang: "ja"

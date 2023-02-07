@@ -4,23 +4,18 @@ import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 import { AddIssueInput, IssueData } from "../../../backlog/Issue"
 import { Api } from "../../app/state/Api"
-import { ProjectAtom } from "../../app/state/ProjectInfo"
-
-enum Types {
-  Move = "Move",
-  Create = "Create"
-}
+import { ProjectState } from "../../app/state/ProjectInfoState"
 
 type CreateAction = {
-  type: Types.Create
+  type: "Create"
   input: AddIssueInput
 }
 type MoveAction = {
-  type: Types.Move
+  type: "Move"
   issue: IssueData
   destinationIssueId: number
 }
-type Action = CreateAction | MoveAction
+export type ChildIssuesAction = CreateAction | MoveAction
 
 /* eslint @typescript-eslint/no-unused-vars: 0 */
 const storeAtom = atomFamily((_parentIssueId: number) => atom<ReadonlyArray<IssueData> | null>(null))
@@ -33,12 +28,12 @@ const interfaceAtom = atomFamily((parentIssueId: number) =>
         return stored
       } else {
         const api = get(Api.atom)
-        const project = get(ProjectAtom.atom)
+        const project = get(ProjectState.atom)
         return await api.issue.searchChildren(project, parentIssueId)
       }
     },
-    async (get, set, action: Action) => {
-      if (action.type === Types.Move) {
+    async (get, set, action: ChildIssuesAction) => {
+      if (action.type === "Move") {
         const { issue, destinationIssueId } = action
         const api = get(Api.atom)
         const updated = await api.issue.editIssue(issue.id, { parentIssueId: destinationIssueId })
@@ -64,17 +59,15 @@ const interfaceAtom = atomFamily((parentIssueId: number) =>
   )
 )
 
-export type ChildIssueAction = Action
-
-export const ChildIssue = {
+export const ChildIssuesState = {
   atom: interfaceAtom,
   Action: {
     Create: (input: AddIssueInput): CreateAction => ({
-      type: Types.Create,
+      type: "Create",
       input
     }),
     Move: (issue: IssueData, destinationIssueId: number): MoveAction => ({
-      type: Types.Move,
+      type: "Move",
       issue,
       destinationIssueId
     })

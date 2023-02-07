@@ -2,7 +2,7 @@ import produce from "immer"
 import { ArrayUtil } from "../../../../util/ArrayUtil"
 import { NestedList, NLLocation, NLMoveAction } from "../../../../util/NestedList"
 import { Version } from "../../../backlog/ProjectInfo"
-import { IssueDataWithOrder, PBIListData, PBIListDataHandler, PBIListMovedEvent } from "./ListData"
+import { IssueDataWithOrder, PBIList, PBIListFunc, PBIListMovedEvent } from "./PBIList"
 
 // -------------------- preparation --------------------------
 
@@ -57,7 +57,7 @@ const issues = makeFakeBacklog(
   [12, 0, null],
   [14, 0, 52]
 )
-const nested = PBIListDataHandler.nest(Object.values(issues))
+const nested = PBIListFunc.nest(Object.values(issues))
 const toLoc = (subListId: string, index: number): NLLocation => ({ subListId, index })
 const toAction = (src: [subListId: string, index: number], dst: [subListId: string, index: number]): NLMoveAction => ({
   type: "NLMove",
@@ -67,7 +67,7 @@ const toAction = (src: [subListId: string, index: number], dst: [subListId: stri
 
 // ------------------- /preparation --------------------------
 test("preparations are correct", () => {
-  expect(nested).toStrictEqual<PBIListData>({
+  expect(nested).toStrictEqual<PBIList>({
     subLists: [
       {
         id: "1",
@@ -93,7 +93,7 @@ test("preparations are correct", () => {
   })
 
   const updated = NestedList.move(nested, toAction(["1", 2], ["2", 0]))
-  expect(updated).toStrictEqual<PBIListData>({
+  expect(updated).toStrictEqual<PBIList>({
     subLists: [
       {
         id: "1",
@@ -123,7 +123,7 @@ test("Move to the top of another subList", () => {
   const action = toAction(["1", 2], ["2", 0])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
-    events = PBIListDataHandler.mutateByMovingAction(draft, action)
+    events = PBIListFunc.mutateByMovingAction(draft, action)
   })
   expect(events).toStrictEqual<PBIListMovedEvent[]>([
     {
@@ -138,7 +138,7 @@ test("Move to the inside of another subList", () => {
   const action = toAction(["1", 2], ["2", 1])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
-    events = PBIListDataHandler.mutateByMovingAction(draft, action)
+    events = PBIListFunc.mutateByMovingAction(draft, action)
   })
 
   expect(events).toStrictEqual<PBIListMovedEvent[]>([
@@ -154,7 +154,7 @@ test("Move within a subList", () => {
   const action = toAction(["1", 2], ["1", 0])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
-    events = PBIListDataHandler.mutateByMovingAction(draft, action)
+    events = PBIListFunc.mutateByMovingAction(draft, action)
   })
   expect(events).toStrictEqual<PBIListMovedEvent[]>([
     {
@@ -168,7 +168,7 @@ test("Move to the last", () => {
   const action = toAction(["1", 2], ["1", 4])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
-    events = PBIListDataHandler.mutateByMovingAction(draft, action)
+    events = PBIListFunc.mutateByMovingAction(draft, action)
   })
   expect(events).toStrictEqual<PBIListMovedEvent[]>([
     {
@@ -182,7 +182,7 @@ test("Move and cause infection", () => {
   const action = toAction(["1", 2], ["3", 1])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
-    events = PBIListDataHandler.mutateByMovingAction(draft, action)
+    events = PBIListFunc.mutateByMovingAction(draft, action)
   })
   expect(Array.from(events).sort((e1, e2) => e1.issueId - e2.issueId)).toStrictEqual<PBIListMovedEvent[]>([
     {
@@ -213,7 +213,7 @@ test("Move and make order between null and some", () => {
   const action = toAction(["1", 2], ["--", 1])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
-    events = PBIListDataHandler.mutateByMovingAction(draft, action)
+    events = PBIListFunc.mutateByMovingAction(draft, action)
   })
   expect(Array.from(events).sort((e1, e2) => e1.issueId - e2.issueId)).toStrictEqual<PBIListMovedEvent[]>([
     {
@@ -236,7 +236,7 @@ test("Move and cause infection on existing issues", () => {
   const action = toAction(["1", 2], ["--", 2])
   let events: PBIListMovedEvent[] = []
   produce(nested, (draft) => {
-    events = PBIListDataHandler.mutateByMovingAction(draft, action)
+    events = PBIListFunc.mutateByMovingAction(draft, action)
   })
   expect(events.sort((e1, e2) => e1.issueId - e2.issueId)).toStrictEqual<PBIListMovedEvent[]>([
     {

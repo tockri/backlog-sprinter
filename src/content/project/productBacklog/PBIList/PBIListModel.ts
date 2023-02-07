@@ -1,28 +1,28 @@
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
-import { ProductBacklog } from "../state/ProductBacklog"
-import { SelectedItem } from "../state/SelectedItem"
+import { ItemSelectionState } from "../state/ItemSelectionState"
+import { PBIListState } from "../state/PBIListState"
 
-import { PBIListData } from "./ListData"
+import { PBIList } from "../state/PBIList"
 
 type PBIListModel = Immutable<{
-  data: PBIListData
+  data: PBIList
   isMilestoneAdding: boolean
   startAddMilestone: () => void
 }>
 
 export const usePBIListModel = (): PBIListModel => {
-  const data = useAtomValue(ProductBacklog.atom)
-  const [sel, selDispatch] = useAtom(SelectedItem.atom)
+  const data = useAtomValue(PBIListState.atom)
+  const [sel, selDispatch] = useAtom(ItemSelectionState.atom)
   const isMilestoneAdding = sel.type === "MilestoneAdding"
   return {
     data,
     isMilestoneAdding,
     startAddMilestone: () => {
       if (isMilestoneAdding) {
-        selDispatch(SelectedItem.Action.Deselect)
+        selDispatch(ItemSelectionState.Action.Deselect)
       } else {
-        selDispatch(SelectedItem.Action.StartMilestoneAdding)
+        selDispatch(ItemSelectionState.Action.StartMilestoneAdding)
       }
     }
   }

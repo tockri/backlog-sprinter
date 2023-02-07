@@ -6,11 +6,11 @@ import { withImmer } from "jotai-immer"
 import { IssueType, IssueTypeColor } from "../../../backlog/ProjectInfo"
 import { JotaiUtil } from "../../../util/JotaiUtil"
 import { Api } from "./Api"
-import { AppConfig } from "./AppConfig"
-import { Environment } from "./Environment"
+import { AppConfState } from "./AppConfState"
+import { EnvState } from "./EnvState"
 
 const projectInfoAtom = atom(async (get) => {
-  const env = get(Environment.atom)
+  const env = get(EnvState.atom)
   const api = get(Api.atom)
   return await api.projectInfo.getProjectInfoWithCustomFields(env.projectKey)
 })
@@ -40,7 +40,7 @@ const issueTypesAtom = atom(
         name: action.name,
         color: action.color
       })
-      set(AppConfig.atom, (c) => {
+      set(AppConfState.atom, (c) => {
         c.pbiIssueTypeId = created.id
       })
       set(issueTypesStoreAtom, (draft) => {
@@ -50,23 +50,23 @@ const issueTypesAtom = atom(
   }
 )
 
-export const ProjectAtom = {
+export const ProjectState = {
   atom: projectAtom
 }
 
-export const Statuses = {
+export const StatusesState = {
   atom: statusesAtom
 }
 
-export const Milestones = {
+export const MilestonesState = {
   atom: milestonesAtom
 }
 
-export const CustomFields = {
+export const CustomFieldsState = {
   atom: customFieldsAtom
 }
 
-export const IssueTypes = {
+export const IssueTypesState = {
   atom: issueTypesAtom,
   Action: {
     Create: (name: string, color: IssueTypeColor): IssueTypeCreate => ({

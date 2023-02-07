@@ -7,9 +7,9 @@ import { cnu } from "../../../ui/cnu"
 import { Droppable } from "../../../ui/DragAndDrop"
 import { EditableField } from "../../../ui/EditableField"
 import { i18n } from "../i18n"
-import { PBIItemView } from "./ItemView"
-import { PBISubList } from "./ListData"
-import { usePBISubListModel } from "./SubListModel"
+import { PBISubList } from "../state/PBIList"
+import { usePBISubListModel } from "./PBISubListModel"
+import { PBItemView } from "./PBItemView"
 
 type PBISubListProps = {
   readonly subList: PBISubList
@@ -80,7 +80,7 @@ export const PBISubListView: React.FC<PBISubListProps> = (props) => {
                   moveHover: model.isMoveHovered(issue.id)
                 })}
               >
-                <PBIItemView issue={issue} key={index} index={index} subListId={subList.id} />
+                <PBItemView issue={issue} key={index} index={index} subListId={subList.id} />
               </DropArea>
             </Droppable>
           </Droppable>

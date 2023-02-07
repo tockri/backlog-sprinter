@@ -2,8 +2,8 @@
 
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import React from "react"
-import { PBIListView } from "../../../src/content/project/productBacklog/PBIList/ListView"
-import { SelectedItem } from "../../../src/content/project/productBacklog/state/SelectedItem"
+import { PBIListView } from "../../../src/content/project/productBacklog/PBIList/PBIListView"
+import { ItemSelectionState } from "../../../src/content/project/productBacklog/state/ItemSelectionState"
 import { StoryUtil } from "../../StoryUtil"
 import { ProjectStoryTemplate, ProjectStoryTemplateProps } from "../ProjectStoryTemplate"
 
@@ -24,5 +24,5 @@ export const Default: Story = {
 }
 
 export const Selected = StoryUtil.produce(Default)((args) => {
-  args.initialValues = [[SelectedItem.atom, { type: "Issue", issueId: 7177962 }]]
+  args.initialValues = [[ItemSelectionState.atom, { type: "Issue", issueId: 7177962 }]]
 })

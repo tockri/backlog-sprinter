@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import React from "react"
 import { DragAndDropProvider } from "../../ui/DragAndDrop"
 import { InfoAreaView } from "./InfoArea/View"
-import { PBIListView } from "./PBIList/ListView"
+import { PBIListView } from "./PBIList/PBIListView"
 
 export const ProductBacklogView: React.FC = () => {
   return (

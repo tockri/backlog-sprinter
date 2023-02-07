@@ -1,19 +1,19 @@
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import { EditIssueInput, IssueData } from "../../../backlog/Issue"
-import { Environment } from "../../app/state/Environment"
-import { ProjectAtom } from "../../app/state/ProjectInfo"
+import { EnvState } from "../../app/state/EnvState"
+import { ProjectState } from "../../app/state/ProjectInfoState"
 import { UserLang } from "../../types"
-import { PBIListData, PBIListDataHandler } from "../PBIList/ListData"
-import { ProductBacklog, ProductBacklogAction } from "../state/ProductBacklog"
-import { SelectedItem, SelectedItemAction } from "../state/SelectedItem"
+import { ItemSelection, ItemSelectionState } from "../state/ItemSelectionState"
+import { PBIList, PBIListFunc } from "../state/PBIList"
+import { PBIListAction, PBIListState } from "../state/PBIListState"
 
 type InfoAreaModel = Immutable<{
-  type: SelectedItemAction["type"]
+  type: ItemSelection["type"]
 }>
 
 export const useInfoAreaModel = (): InfoAreaModel => {
-  const item = useAtomValue(SelectedItem.atom)
+  const item = useAtomValue(ItemSelectionState.atom)
   return {
     type: item.type
   }
@@ -27,10 +27,10 @@ type IssueAreaModel = Immutable<{
 }>
 
 export const useIssueAreaModel = (): IssueAreaModel => {
-  const item = useAtomValue(SelectedItem.atom)
-  const project = useAtomValue(ProjectAtom.atom)
-  const [pbiList, dispatch] = useAtom(ProductBacklog.atom)
-  const { lang } = useAtomValue(Environment.atom)
+  const item = useAtomValue(ItemSelectionState.atom)
+  const project = useAtomValue(ProjectState.atom)
+  const [pbiList, dispatch] = useAtom(PBIListState.atom)
+  const { lang } = useAtomValue(EnvState.atom)
 
   const issue = item.type === "Issue" ? findIssue(pbiList, item.issueId) : null
 
@@ -42,13 +42,13 @@ export const useIssueAreaModel = (): IssueAreaModel => {
   }
 }
 
-const findIssue = (pbiList: PBIListData, issueId: number): IssueData | null => {
-  const [issue] = PBIListDataHandler.findIssue(pbiList, issueId)
+const findIssue = (pbiList: PBIList, issueId: number): IssueData | null => {
+  const [issue] = PBIListFunc.findIssue(pbiList, issueId)
   return issue
 }
 
 const changeIssue =
-  (issueId: number, dispatch: (action: ProductBacklogAction) => Promise<void> | void) =>
+  (issueId: number, dispatch: (action: PBIListAction) => Promise<void> | void) =>
   async (key: keyof EditIssueInput, value: EditIssueInput[typeof key]) => {
     const input = {
       [key]: value

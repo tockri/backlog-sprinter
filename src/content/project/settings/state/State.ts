@@ -1,6 +1,6 @@
 import { Immutable } from "immer"
 import { atomWithImmer } from "jotai-immer"
-import { IssueTypeColor } from "../../backlog/ProjectInfo"
+import { IssueTypeColor } from "../../../backlog/ProjectInfo"
 
 export type IssueTypeCreateForm = Immutable<{
   creating: boolean

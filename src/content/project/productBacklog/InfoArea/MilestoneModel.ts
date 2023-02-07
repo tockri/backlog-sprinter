@@ -1,9 +1,9 @@
 import { useAtomValue, useSetAtom } from "jotai"
 import { EditMilestoneInput, Version } from "../../../backlog/ProjectInfo"
-import { Environment } from "../../app/state/Environment"
+import { EnvState } from "../../app/state/EnvState"
 import { UserLang } from "../../types"
-import { ProductBacklog } from "../state/ProductBacklog"
-import { SelectedItem } from "../state/SelectedItem"
+import { ItemSelectionState } from "../state/ItemSelectionState"
+import { PBIListState } from "../state/PBIListState"
 
 type MilestoneModel = {
   milestone: Version | null
@@ -12,15 +12,15 @@ type MilestoneModel = {
 }
 
 export const useMilestoneModel = (): MilestoneModel => {
-  const milestone = useAtomValue(SelectedItem.milestoneAtom)
-  const dispatch = useSetAtom(ProductBacklog.atom)
-  const { lang } = useAtomValue(Environment.atom)
+  const milestone = useAtomValue(ItemSelectionState.milestoneAtom)
+  const dispatch = useSetAtom(PBIListState.atom)
+  const { lang } = useAtomValue(EnvState.atom)
   return {
     lang,
     milestone,
     editMilestone: async (key, value) => {
       if (milestone) {
-        dispatch(ProductBacklog.Action.EditMilestone(milestone.projectId, milestone.id, { [key]: value }))
+        dispatch(PBIListState.Action.EditMilestone(milestone.projectId, milestone.id, { [key]: value }))
       }
     }
   }
