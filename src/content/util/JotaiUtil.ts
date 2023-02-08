@@ -1,89 +1,42 @@
 // noinspection JSUnusedGlobalSymbols
 
-import { WritableDraft } from "immer/dist/internal"
-
-import { atom, Atom, Getter, Setter } from "jotai"
-
-// Copied from jotai/core/atom.d.ts
-export type WriteGetter = Getter & {
-  <Value>(
-    atom: Atom<Value | Promise<Value>>,
-    options: {
-      unstable_promise: true
-    }
-  ): Promise<Value> | Value
-  <Value>(
-    atom: Atom<Promise<Value>>,
-    options: {
-      unstable_promise: true
-    }
-  ): Promise<Value> | Value
-  <Value>(
-    atom: Atom<Value>,
-    options: {
-      unstable_promise: true
-    }
-  ): Promise<Awaited<Value>> | Awaited<Value>
-}
+import { atom, Atom, Getter, Setter, WritableAtom } from "jotai"
 
 // Copied from jotai/core/atom.d.ts
 export type Read<Value> = (get: Getter) => Value
 
 // Copied from jotai/core/atom.d.ts
-export type Write<Update, Result extends void | Promise<void> = Promise<void>> = (
-  get: WriteGetter,
-  set: Setter,
-  update: Update
-) => Result
-
-export type ImmerAtomSetter<T> = (draft: (update: WritableDraft<T>) => void) => void
+export type Write<Args extends unknown[], Result> = (get: Getter, set: Setter, ...args: Args) => Result
 
 export type ValueOrUpdater<U> = U | ((prev: U) => U | Promise<U>)
 
 const isValue = <U>(update: ValueOrUpdater<U>): update is U => typeof update !== "function"
 
-const atomFromParent = <T, U>(parentAtom: Atom<Promise<T>>, relation: (t: T) => U) => {
+const asyncAtomFromParent = <T, U>(
+  parentAtom: Atom<Promise<T>>,
+  relation: (t: T) => U
+): WritableAtom<Promise<U>, [ValueOrUpdater<U>], Promise<void>> => {
   const store = atom<U | null>(null)
-  const main = atom<Promise<U>, [U], void>(
-    async (get: Getter) => get(store) || relation(await get(parentAtom)),
-    async (get: WriteGetter, set: Setter, update: ValueOrUpdater<U>) => {
-      const prev = await get(main)
-      const newValue = isValue(update) ? update : await update(prev)
-      set(store, newValue)
+  const main = atom<Promise<U>, [ValueOrUpdater<U>], Promise<void>>(
+    async (get) => get(store) || relation(await get(parentAtom)),
+    async (get, set, update) => {
+      set(store, isValue(update) ? update : await update(await get(main)))
     }
   )
   return main
 }
 
 export type AsyncRead<Value> = (get: Getter) => Promise<Value>
-export type Handler<Value, Action> = (
-  curr: Value,
-  get: WriteGetter,
-  set: Setter,
-  action: Action
-) => Value | Promise<Value>
+export type Handler<Value, Action> = (curr: Value, get: Getter, set: Setter, action: Action) => Value | Promise<Value>
+
+const awaited = async <T>(p: Promise<T> | T): Promise<T> => (p instanceof Promise ? await p : p)
 
 const asyncAtomWithAction = <Value, Action>(read: AsyncRead<Value>, handler: Handler<Value, Action>) => {
   const store = atom<Value | null>(null)
-  const main = atom<Promise<Value>, [Action], void | Promise<void>>(
-    async (get) => {
-      const stored = get(store)
-      if (stored !== null) {
-        return stored
-      } else {
-        return await read(get)
-      }
-    },
-    async (get: WriteGetter, set: Setter, action: Action) => {
-      const curr = await get(main)
-      if (curr !== null) {
-        const updated = handler(curr, get, set, action)
-        if (updated instanceof Promise) {
-          return updated.then((up) => set(store, up))
-        } else {
-          return set(store, updated)
-        }
-      }
+  const main = atom<Promise<Value>, [Action], Promise<void>>(
+    async (get) => get(store) || (await read(get)),
+    async (get, set, action: Action) => {
+      set(store, await awaited(handler(await get(main), get, set, action)))
     }
   )
   return main
@@ -91,6 +44,6 @@ const asyncAtomWithAction = <Value, Action>(read: AsyncRead<Value>, handler: Han
 
 export const JotaiUtil = {
   isValue,
-  atomFromParent,
+  atomFromParent: asyncAtomFromParent,
   asyncAtomWithAction
 }

@@ -149,9 +149,8 @@ const pbEditMilestone: Handler<PBIList, EditMilestoneAction> = async (prev, get,
   const api = get(Api.atom)
   const project = await get(ProjectState.atom)
   const updated = await api.projectInfo.editMilestone(project.id, action.milestoneId, action.input)
-  const milestones = await get(MilestonesState.atom)
-  set(
-    MilestonesState.atom,
+
+  await set(MilestonesState.atom, (milestones) =>
     produce(milestones, (c) => {
       const idx = c.findIndex((ms) => ms.id === updated.id)
       if (idx >= 0) {

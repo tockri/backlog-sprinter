@@ -3,8 +3,7 @@ import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
 import { CustomNumberField, IssueType, IssueTypeColor } from "../../backlog/ProjectInfo"
-import { ImmerAtomSetter } from "../../util/JotaiUtil"
-import { AppConf, AppConfState } from "../app/state/AppConfState"
+import { AppConfState } from "../app/state/AppConfState"
 import { EnvState } from "../app/state/EnvState"
 import { OrderCustomFieldAction, OrderCustomFieldState } from "../app/state/OrderCustomFieldState"
 import { IssueTypesState } from "../app/state/ProjectInfoState"
@@ -54,12 +53,6 @@ export const useSettingModel = (): SettingModel => {
       }),
     isCreatingIssueType: form.creating
   }
-}
-
-const selectIssueType = (set: ImmerAtomSetter<AppConf>) => (issueTypeId: number) => {
-  set((c) => {
-    c.pbiIssueTypeId = issueTypeId
-  })
 }
 
 const createCustomField =

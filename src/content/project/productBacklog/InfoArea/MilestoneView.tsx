@@ -47,7 +47,7 @@ export const MilestoneView: React.FC = () => {
             onFix={(value) => {
               const date = DateUtil.parseDate(value)
               if (date) {
-                model.editMilestone("releaseDueDate", date)
+                model.editMilestone("releaseDueDate", date).then()
               }
             }}
             lang={lang}
@@ -61,7 +61,7 @@ export const MilestoneView: React.FC = () => {
           viewStyle={descriptionViewStyle}
           editStyle={descriptionEditStyle}
           onFix={(value) => {
-            model.editMilestone("description", value)
+            model.editMilestone("description", value).then()
           }}
           lang={lang}
         />

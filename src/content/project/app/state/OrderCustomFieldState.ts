@@ -49,9 +49,7 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
           description: "",
           required: false
         })
-        const customFields = await get(CustomFieldsState.atom)
-        set(
-          CustomFieldsState.atom,
+        set(CustomFieldsState.atom, (customFields) =>
           produce(customFields, (draft) => {
             draft.push(created as WritableDraft<CustomField>)
           })
@@ -61,9 +59,7 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
       const curr = await get(mainAtom)
       if (curr) {
         const deleted = await api.projectInfo.deleteCustomField(env.projectKey, curr.id)
-        const customFields = await get(CustomFieldsState.atom)
-        set(
-          CustomFieldsState.atom,
+        set(CustomFieldsState.atom, (customFields) =>
           produce(customFields, (draft) => {
             const idx = draft.findIndex((cf) => cf.id === deleted.id)
             if (idx >= 0) {

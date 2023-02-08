@@ -39,15 +39,13 @@ const issueTypesAtom = atom(
         name: action.name,
         color: action.color
       })
-      set(
-        AppConfState.atom,
-        produce(get(AppConfState.atom), (c) => {
+      set(AppConfState.atom, (conf) =>
+        produce(conf, (c) => {
           c.pbiIssueTypeId = created.id
         })
       )
-      await set(
-        issueTypesStoreAtom,
-        produce(await get(issueTypesStoreAtom), (draft) => {
+      await set(issueTypesStoreAtom, (curr) =>
+        produce(curr, (draft) => {
           draft.splice(0, 0, created as WritableDraft<IssueType>)
         })
       )

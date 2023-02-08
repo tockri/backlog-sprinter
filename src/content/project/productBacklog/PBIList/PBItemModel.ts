@@ -27,7 +27,7 @@ export const usePBItemModel = (): PBItemModel => {
       },
       isSelected: (issueId) => selectedIssueId === issueId,
       move: (src, dst) => {
-        pbDispatch(PBIListState.Action.ListMove(src, dst))
+        pbDispatch(PBIListState.Action.ListMove(src, dst)).then()
       }
     }
   } else {

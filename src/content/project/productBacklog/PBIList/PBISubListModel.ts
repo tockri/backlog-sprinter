@@ -64,7 +64,7 @@ export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
     },
     isMoveHovered: (issueId: number) => hover?.issueId === issueId && hover.type === "move",
     createNewIssue: (summary: string) => {
-      dispatch(PBIListState.Action.AddIssue(summary, milestone))
+      dispatch(PBIListState.Action.AddIssue(summary, milestone)).then()
     },
     selectMilestone: () => {
       if (sel.type === "Milestone" && sel.milestoneId === milestoneId) {

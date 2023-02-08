@@ -105,12 +105,16 @@ async (get: WriteGetter, set: Setter, action: IssueTypesAction) => {
     })
     
     // 複数のAtomの値を更新する
-    set(AppConfState.atom, (c) => {
-      c.pbiIssueTypeId = created.id
-    })
-    set(issueTypesStoreAtom, (draft) => {
-      draft.splice(0, 0, created as WritableDraft<IssueType>)
-    })
+    set(AppConfState.atom, (curr) => 
+      produce(curr, (c) => {
+        c.pbiIssueTypeId = created.id
+      })
+    )
+    set(issueTypesStoreAtom, (curr) => 
+      produce(curr, (draft) => {
+        draft.splice(0, 0, created as WritableDraft<IssueType>)
+      })
+    )
   }
 }
 ```
