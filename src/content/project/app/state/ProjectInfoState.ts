@@ -1,7 +1,6 @@
-import { Immutable } from "immer"
+import { Immutable, produce } from "immer"
 import { WritableDraft } from "immer/dist/types/types-external"
 import { atom } from "jotai"
-import { withImmer } from "jotai-immer"
 
 import { IssueType, IssueTypeColor } from "../../../backlog/ProjectInfo"
 import { JotaiUtil } from "../../../util/JotaiUtil"
@@ -16,8 +15,8 @@ const projectInfoAtom = atom(async (get) => {
 })
 const projectAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.project)
 const statusesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.statuses)
-const milestonesAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.milestones))
-const customFieldsAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.customFields))
+const milestonesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.milestones)
+const customFieldsAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.customFields)
 
 type IssueTypeCreate = Immutable<{
   type: "Create"
@@ -27,25 +26,31 @@ type IssueTypeCreate = Immutable<{
 
 export type IssueTypesAction = IssueTypeCreate
 
-const issueTypesStoreAtom = withImmer(JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes))
+const issueTypesStoreAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes)
 
 const issueTypesAtom = atom(
   (get) => get(issueTypesStoreAtom),
   async (get, set, action: IssueTypesAction) => {
     if (action.type === "Create") {
       const api = get(Api.atom)
-      const project = get(projectAtom)
+      const project = await get(projectAtom)
       const created = await api.projectInfo.createIssueType({
         projectId: project.id,
         name: action.name,
         color: action.color
       })
-      set(AppConfState.atom, (c) => {
-        c.pbiIssueTypeId = created.id
-      })
-      set(issueTypesStoreAtom, (draft) => {
-        draft.splice(0, 0, created as WritableDraft<IssueType>)
-      })
+      set(
+        AppConfState.atom,
+        produce(get(AppConfState.atom), (c) => {
+          c.pbiIssueTypeId = created.id
+        })
+      )
+      await set(
+        issueTypesStoreAtom,
+        produce(await get(issueTypesStoreAtom), (draft) => {
+          draft.splice(0, 0, created as WritableDraft<IssueType>)
+        })
+      )
     }
   }
 )

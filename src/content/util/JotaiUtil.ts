@@ -44,13 +44,15 @@ const isValue = <U>(update: ValueOrUpdater<U>): update is U => typeof update !==
 
 const atomFromParent = <T, U>(parentAtom: Atom<Promise<T>>, relation: (t: T) => U) => {
   const store = atom<U | null>(null)
-  return atom<U, ValueOrUpdater<U>>(
-    (get: Getter) => get(store) || relation(get(parentAtom)),
+  const main = atom<Promise<U>, [U], void>(
+    async (get: Getter) => get(store) || relation(await get(parentAtom)),
     async (get: WriteGetter, set: Setter, update: ValueOrUpdater<U>) => {
-      const newValue = isValue(update) ? update : await update(get(store) || relation(get(parentAtom)))
+      const prev = await get(main)
+      const newValue = isValue(update) ? update : await update(prev)
       set(store, newValue)
     }
   )
+  return main
 }
 
 export type AsyncRead<Value> = (get: Getter) => Promise<Value>
@@ -63,7 +65,7 @@ export type Handler<Value, Action> = (
 
 const asyncAtomWithAction = <Value, Action>(read: AsyncRead<Value>, handler: Handler<Value, Action>) => {
   const store = atom<Value | null>(null)
-  const main = atom<Promise<Value>, Action, void | Promise<void>>(
+  const main = atom<Promise<Value>, [Action], void | Promise<void>>(
     async (get) => {
       const stored = get(store)
       if (stored !== null) {
@@ -72,8 +74,8 @@ const asyncAtomWithAction = <Value, Action>(read: AsyncRead<Value>, handler: Han
         return await read(get)
       }
     },
-    (get: WriteGetter, set: Setter, action: Action) => {
-      const curr = get(main)
+    async (get: WriteGetter, set: Setter, action: Action) => {
+      const curr = await get(main)
       if (curr !== null) {
         const updated = handler(curr, get, set, action)
         if (updated instanceof Promise) {

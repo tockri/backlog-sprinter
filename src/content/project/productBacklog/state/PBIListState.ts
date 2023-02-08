@@ -42,12 +42,12 @@ type EditIssueAction = {
 export type PBIListAction = NLMoveAction | AddIssueAction | AddMilestoneAction | EditIssueAction | EditMilestoneAction
 
 const pbRead: AsyncRead<PBIList> = async (get) => {
-  const orderCustomField = get(OrderCustomFieldState.atom)
+  const orderCustomField = await get(OrderCustomFieldState.atom)
   if (orderCustomField) {
-    const project = get(ProjectState.atom)
+    const project = await get(ProjectState.atom)
     const api = get(Api.atom)
     const conf = get(AppConfState.atom)
-    const milestones = get(MilestonesState.atom)
+    const milestones = await get(MilestonesState.atom)
     const today = new Date()
     const milestoneFilter = milestones.filter(
       (ms) =>
@@ -67,7 +67,7 @@ const pbMove: Handler<PBIList, NLMoveAction> = async (prev, get, set, action) =>
   })
   if (events.length) {
     const api = get(Api.atom)
-    const orderCustomField = get(OrderCustomFieldState.atom)
+    const orderCustomField = await get(OrderCustomFieldState.atom)
     if (orderCustomField) {
       await updateIssues(orderCustomField, events, api).then()
     }
@@ -105,10 +105,10 @@ const updateIssues = async (
 
 const pbAddIssue: Handler<PBIList, AddIssueAction> = async (prev, get, set, action) => {
   const conf = get(AppConfState.atom)
-  const issueType = get(IssueTypesState.atom).find((it) => it.id === conf.pbiIssueTypeId)
-  const orderCustomField = get(OrderCustomFieldState.atom)
+  const issueType = (await get(IssueTypesState.atom)).find((it) => it.id === conf.pbiIssueTypeId)
+  const orderCustomField = await get(OrderCustomFieldState.atom)
   if (issueType && orderCustomField) {
-    const project = get(ProjectState.atom)
+    const project = await get(ProjectState.atom)
     const api = get(Api.atom)
     const order = PBIListFunc.getNewOrder(prev, action.milestone)
     const created = await api.issue.createIssue({
@@ -131,11 +131,15 @@ const pbAddIssue: Handler<PBIList, AddIssueAction> = async (prev, get, set, acti
 
 const pbAddMilestone: Handler<PBIList, AddMilestoneAction> = async (prev, get, set, action) => {
   const api = get(Api.atom)
-  const project = get(ProjectState.atom)
+  const project = await get(ProjectState.atom)
   const created = await api.projectInfo.addMilestone(project.id, action.input)
-  set(MilestonesState.atom, (c) => {
-    c.push(created as WritableDraft<Version>)
-  })
+  const milestones = await get(MilestonesState.atom)
+  await set(
+    MilestonesState.atom,
+    produce(milestones, (c) => {
+      c.push(created as WritableDraft<Version>)
+    })
+  )
   return produce(prev, (draft) => {
     PBIListFunc.mutateByAddingMilestone(draft, created)
   })
@@ -143,14 +147,18 @@ const pbAddMilestone: Handler<PBIList, AddMilestoneAction> = async (prev, get, s
 
 const pbEditMilestone: Handler<PBIList, EditMilestoneAction> = async (prev, get, set, action) => {
   const api = get(Api.atom)
-  const project = get(ProjectState.atom)
+  const project = await get(ProjectState.atom)
   const updated = await api.projectInfo.editMilestone(project.id, action.milestoneId, action.input)
-  set(MilestonesState.atom, (c) => {
-    const idx = c.findIndex((ms) => ms.id === updated.id)
-    if (idx >= 0) {
-      c.splice(idx, 1, updated as WritableDraft<Version>)
-    }
-  })
+  const milestones = await get(MilestonesState.atom)
+  set(
+    MilestonesState.atom,
+    produce(milestones, (c) => {
+      const idx = c.findIndex((ms) => ms.id === updated.id)
+      if (idx >= 0) {
+        c.splice(idx, 1, updated as WritableDraft<Version>)
+      }
+    })
+  )
   return produce(prev, (draft) => {
     PBIListFunc.mutateByEditingMilestone(draft, updated)
   })
@@ -160,7 +168,7 @@ const pbEditIssue: Handler<PBIList, EditIssueAction> = async (prev, get, set, ac
   const api = get(Api.atom)
   const { issueId, input } = action
   await api.issue.editIssue(issueId, input)
-  const statuses = get(StatusesState.atom)
+  const statuses = await get(StatusesState.atom)
   return produce(prev, (draft) => {
     PBIListFunc.mutateByEditingIssue(draft, statuses, issueId, input)
   })

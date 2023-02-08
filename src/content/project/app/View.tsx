@@ -17,12 +17,12 @@ type ProjectAppProps = {
 
 export const ProjectApp: React.FC<ProjectAppProps> = ({ broker }) => {
   const model = useAppModel(broker)
-  const formInfo = model.formInfo
-  if (formInfo) {
-    const t = i18n(formInfo.lang)
+  const env = model.env
+  if (env) {
+    const t = i18n(env.lang)
     return (
       <Modal onClose={model.clear} size="large" title={t.formTitle} height="calc(100vh - 200px)">
-        <Provider initialValues={model.providerInitialValues}>
+        <Provider store={model.jotaiStore}>
           <React.Suspense fallback={<Loading />}>
             <Inner />
           </React.Suspense>

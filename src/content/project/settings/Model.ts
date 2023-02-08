@@ -1,4 +1,4 @@
-import { Immutable } from "immer"
+import { Immutable, produce } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
@@ -37,7 +37,13 @@ export const useSettingModel = (): SettingModel => {
     lang,
     pbiIssueTypeId: conf.pbiIssueTypeId,
     issueTypes,
-    selectIssueType: selectIssueType(setConf),
+    selectIssueType: (issueTypeId: number) => {
+      setConf(
+        produce(conf, (c) => {
+          c.pbiIssueTypeId = issueTypeId
+        })
+      )
+    },
     orderCustomField,
     createCustomField: createCustomField(lang, orderCustomFieldsDispatch, setErrorMessage),
     deleteCustomField: deleteCustomField(lang, orderCustomFieldsDispatch, setErrorMessage),

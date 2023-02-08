@@ -29,19 +29,19 @@ export type ItemSelection = IssueId | MilestoneId | MilestoneAdding | None
 
 const store = atom<ItemSelection>(None)
 
-const milestoneAtom = atom((get) => {
+const milestoneAtom = atom(async (get) => {
   const item = get(store)
   if (item.type === "Milestone") {
-    const milestones = get(MilestonesState.atom)
+    const milestones = await get(MilestonesState.atom)
     return milestones.find((m) => m.id === item.milestoneId) || null
   }
   return null
 })
 
-const issueAtom = atom((get) => {
+const issueAtom = atom(async (get) => {
   const item = get(store)
   if (item.type === "Issue") {
-    const pbi = get(PBIListState.atom)
+    const pbi = await get(PBIListState.atom)
     const [issue] = PBIListFunc.findIssue(pbi, item.issueId)
     return issue
   }
