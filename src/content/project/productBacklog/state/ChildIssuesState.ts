@@ -28,7 +28,7 @@ const interfaceAtom = atomFamily((parentIssueId: number) =>
         return stored
       } else {
         const api = get(Api.atom)
-        const project = get(ProjectState.atom)
+        const project = await get(ProjectState.atom)
         return await api.issue.searchChildren(project, parentIssueId)
       }
     },
@@ -37,7 +37,7 @@ const interfaceAtom = atomFamily((parentIssueId: number) =>
         const { issue, destinationIssueId } = action
         const api = get(Api.atom)
         const updated = await api.issue.editIssue(issue.id, { parentIssueId: destinationIssueId })
-        const currSrc = get(interfaceAtom(parentIssueId))
+        const currSrc = await get(interfaceAtom(parentIssueId))
         set(
           storeAtom(parentIssueId),
           produce(currSrc, (draft) => {
@@ -47,7 +47,7 @@ const interfaceAtom = atomFamily((parentIssueId: number) =>
             }
           })
         )
-        const currDst = get(interfaceAtom(destinationIssueId))
+        const currDst = await get(interfaceAtom(destinationIssueId))
         set(
           storeAtom(destinationIssueId),
           produce(currDst, (draft) => {

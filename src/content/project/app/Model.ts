@@ -1,5 +1,5 @@
-import { Immutable } from "immer"
-import { Atom, useAtom, useAtomValue } from "jotai"
+import { Immutable, produce } from "immer"
+import { createStore, useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { MessageBroker } from "../../../util/MessageBroker"
 import { BacklogApiContext } from "../../backlog/BacklogApiForReact"
@@ -11,17 +11,22 @@ import { OrderCustomFieldState } from "./state/OrderCustomFieldState"
 
 type AppModel = {
   clear: () => void
-  formInfo: ProjectEnv | null
-  providerInitialValues: Iterable<[Atom<unknown>, unknown]>
+  env: ProjectEnv | null
+  jotaiStore: ReturnType<typeof createStore>
 }
+
+const jotaiStore = createStore()
 
 export const useAppModel = (broker: MessageBroker<ProjectEnv>): AppModel => {
   const [env, setEnv] = React.useState<ProjectEnv | null>(null)
   const api = React.useContext(BacklogApiContext)
+  jotaiStore.set(Api.atom, api)
+
   React.useEffect(() => {
     if (!env) {
-      broker.subscribe("Project", (formInfo) => {
-        setEnv(formInfo)
+      broker.subscribe("Project", (env) => {
+        setEnv(env)
+        jotaiStore.set(EnvState.atom, env)
       })
     }
     return () => {
@@ -32,13 +37,8 @@ export const useAppModel = (broker: MessageBroker<ProjectEnv>): AppModel => {
     clear: () => {
       setEnv(null)
     },
-    formInfo: env,
-    providerInitialValues: env
-      ? [
-          [EnvState.atom, env],
-          [Api.atom, api]
-        ]
-      : []
+    env: env,
+    jotaiStore
   }
 }
 
@@ -57,8 +57,10 @@ export const useInnerModel = (): InnerModel => {
     lang: env.lang,
     selectedTab,
     setSelectedTab: (tab) =>
-      setConfig((c) => {
-        c.selectedTab = tab
-      })
+      setConfig(
+        produce(config, (c) => {
+          c.selectedTab = tab
+        })
+      )
   }
 }

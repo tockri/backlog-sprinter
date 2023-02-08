@@ -1,6 +1,7 @@
 import { WritableDraft } from "immer/dist/types/types-external"
 import { atom } from "jotai"
 
+import { produce } from "immer"
 import { CustomField, CustomFieldTypes, CustomNumberField, isNumberField } from "../../../backlog/ProjectInfo"
 import { Api } from "./Api"
 import { AppConfState } from "./AppConfState"
@@ -16,11 +17,11 @@ type Delete = {
 
 export type OrderCustomFieldAction = Create | Delete
 
-const store = atom<CustomNumberField | null, OrderCustomFieldAction, Promise<void>>(
-  (get) => {
-    const customFields = get(CustomFieldsState.atom)
+const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction], Promise<void>>(
+  async (get) => {
+    const customFields = await get(CustomFieldsState.atom)
     const setting = get(AppConfState.atom)
-    const issueTypes = get(IssueTypesState.atom)
+    const issueTypes = await get(IssueTypesState.atom)
     const issueType = issueTypes.find((it) => it.id === setting.pbiIssueTypeId)
     if (issueType) {
       return (
@@ -48,27 +49,35 @@ const store = atom<CustomNumberField | null, OrderCustomFieldAction, Promise<voi
           description: "",
           required: false
         })
-        set(CustomFieldsState.atom, (draft) => {
-          draft.push(created as WritableDraft<CustomField>)
-        })
+        const customFields = await get(CustomFieldsState.atom)
+        set(
+          CustomFieldsState.atom,
+          produce(customFields, (draft) => {
+            draft.push(created as WritableDraft<CustomField>)
+          })
+        )
       }
     } else if (action.type === "OCDelete") {
-      const curr = get(store)
+      const curr = await get(mainAtom)
       if (curr) {
         const deleted = await api.projectInfo.deleteCustomField(env.projectKey, curr.id)
-        set(CustomFieldsState.atom, (draft) => {
-          const idx = draft.findIndex((cf) => cf.id === deleted.id)
-          if (idx >= 0) {
-            draft.splice(idx, 1)
-          }
-        })
+        const customFields = await get(CustomFieldsState.atom)
+        set(
+          CustomFieldsState.atom,
+          produce(customFields, (draft) => {
+            const idx = draft.findIndex((cf) => cf.id === deleted.id)
+            if (idx >= 0) {
+              draft.splice(idx, 1)
+            }
+          })
+        )
       }
     }
   }
 )
 
 export const OrderCustomFieldState = {
-  atom: store,
+  atom: mainAtom,
   Action: {
     Create: (): Create => ({
       type: "OCCreate"
