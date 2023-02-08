@@ -34,13 +34,13 @@ src/(path)/(to)/(domain)/
         MyAppModel.ts ... `MyAppView`のJSX以外のロジック。"Model"サフィックス
 ```
 
-## Atomのファイル内構造 （架空の例：`SomethingsState.ts`）
+## Stateファイル内構造 （架空の例：`SomethingsState.ts`）
 
 型`Something`の配列を扱うAtomの例を記載する。名前はSomethingの複数形でSomethingsとしたが、SomethingListなども考えられる。
 
 実例は[PBIListState.ts](../../src/content/project/productBacklog/state/PBIListState.ts)にある。
 
-### 型宣言
+### Stateファイル内構造 1. 型宣言
 ```typescript
 // 関心事の中心データ型。ImmerのImmutable型を利用している。
 // ここで宣言するのではなくAPIを扱うモジュールからimportするる場合もある。
@@ -69,7 +69,7 @@ export type SometingAction = AddAction | DeleteAction
 ```
 `export`しているtypeはすべて「Something」プレフィックス。
 
-### 初期値の取得
+### Stateファイル内構造 2. Atom初期値の取得
 ```typescript
 import {Read} from "../../src/content/util/JotaiUtil"
 
@@ -91,7 +91,7 @@ const stRead:Read<Promise<ReadonlyArray<Something>>> = async (get) => {
 型`Read`はjotaiでexportされていないため[JotaiUtil](../../src/content/util/JotaiUtil.ts)にコピーして置いたのでそれを使う。
 
 
-### 更新
+### Stateファイル内構造 3. Atom更新
 ```typescript
 import {Write} from "../../src/content/util/JotaiUtil"
 
@@ -113,7 +113,7 @@ const stAdd: Write<AddAction> = async (get, set, action) => {
 ```
 型`Write`はjotaiでexportされていないため[JotaiUtil](../../src/content/util/JotaiUtil.ts)にコピーして置いたのでそれを使う。
 
-### Atomの構成
+### Stateファイル内構造 4. Atomの宣言
 ```typescript
 // 値を保存する用
 const stStoreAtom = atom<ReadonlyArray<Something> | null>(null)
@@ -139,7 +139,7 @@ const stAtom = atom(
 
 本質的ではない`stStoreAtom`が関数中に隠蔽されている。
 
-### export
+### Stateファイル内構造 5. export
 ```typescript
 // 名前空間をコンパクトに保つため、一つの関心事につき一つのオブジェクトだけexportする。サフィックス「State」
 export const SomethingsState = {
@@ -161,30 +161,30 @@ export const SomethingsState = {
 }
 ```
 
-## Modelのコード例（架空の例：`SomethingModel.ts`）
+## Modelのコード例（架空の例：`MyAppModel.ts`）
 
 ```typescript
 // カスタムフックとしてStateとActionに関わる処理を実装
-export const useSomethingModel = () => {
+export const useMyAppModel = () => {
   // UIで使いたい情報とActionを渡す関数
-  const [something, dispatch] = useAtom(SomethingsAtom.atom)
+  const [something, dispatch] = useAtom(SomethingsState.atom)
   return {
     add: (name: string, address: string) => {
-      dispatch(SomethingsAtom.Action.Add(name, address))
+      dispatch(SomethingsState.Action.Add(name, address))
     },
     delete: (id: number) => {
-      dispatch(SomethingsAtom.Action.Delete(id))
+      dispatch(SomethingsState.Action.Delete(id))
     }
   }
 }
 ```
 
-## Viewのコード例（架空の例：`SomethingView.tsx`）
+## Viewのコード例（架空の例：`MyAppView.tsx`）
 
 ```typescript jsx
-export const SomethingView: React.FC = () => {
+export const MyAppView: React.FC = () => {
   // Stateに関する処理をmodelに移したので、JSXの構築だけ行う
-  const model = useSomethingModel()
+  const model = useMyAppModel()
   return (<div>
     ....
     <button onClick={() => model.add(name, address)}>追加する</button>
