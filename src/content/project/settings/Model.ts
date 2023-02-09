@@ -2,14 +2,14 @@ import { Immutable, produce } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
-import { CustomNumberField, IssueType, IssueTypeColor } from "../../backlog/ProjectInfo"
+import { CustomNumberField, IssueType } from "../../backlog/ProjectInfo"
 import { AppConfState } from "../app/state/AppConfState"
 import { EnvState } from "../app/state/EnvState"
 import { OrderCustomFieldAction, OrderCustomFieldState } from "../app/state/OrderCustomFieldState"
 import { IssueTypesState } from "../app/state/ProjectInfoState"
 import { UserLang } from "../types"
 import { i18n } from "./i18n"
-import { issueTypeCreateAtom, IssueTypeCreateForm } from "./state/State"
+import { AddIssueTypeFormState } from "./state/State"
 
 type SettingModel = Immutable<{
   lang: UserLang
@@ -30,15 +30,15 @@ export const useSettingModel = (): SettingModel => {
   const issueTypes = useAtomValue(IssueTypesState.atom)
   const [orderCustomField, orderCustomFieldsDispatch] = useAtom(OrderCustomFieldState.atom)
   const [errorMessage, setErrorMessage] = React.useState("")
-  const [form, setForm] = useAtom(issueTypeCreateAtom)
+  const [form, setForm] = useAtom(AddIssueTypeFormState.atom)
 
   return {
     lang,
     pbiIssueTypeId: conf.pbiIssueTypeId,
     issueTypes,
     selectIssueType: (issueTypeId: number) => {
-      setConf(
-        produce(conf, (c) => {
+      setConf((curr) =>
+        produce(curr, (c) => {
           c.pbiIssueTypeId = issueTypeId
         })
       )
@@ -99,45 +99,3 @@ const deleteCustomField =
       }
     }
   }
-
-type IssueTypeCreateModel = Immutable<{
-  values: IssueTypeCreateForm
-  lang: UserLang
-  issueTypes: IssueType[]
-  onChangeName: (value: string) => void
-  onChangeColor: (value: string) => void
-  onSubmit: () => Promise<void>
-  cancel: () => void
-}>
-
-export const useIssueTypeCreateModel = (): IssueTypeCreateModel => {
-  const [values, setValues] = useAtom(issueTypeCreateAtom)
-  const { lang } = useAtomValue(EnvState.atom)
-  const [issueTypes, dispatch] = useAtom(IssueTypesState.atom)
-  return {
-    values,
-    lang,
-    issueTypes,
-    onChangeName: (value) => {
-      setValues((c) => {
-        c.name = value
-      })
-    },
-    onChangeColor: (value) => {
-      setValues((c) => {
-        c.color = value as IssueTypeColor
-      })
-    },
-    onSubmit: async () => {
-      await dispatch(IssueTypesState.Action.Create(values.name, values.color))
-      setValues((c) => {
-        c.creating = false
-      })
-    },
-    cancel: () => {
-      setValues((c) => {
-        c.creating = false
-      })
-    }
-  }
-}

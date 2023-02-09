@@ -3,8 +3,8 @@ import React from "react"
 import { HBox } from "../../ui/Box"
 import { Button } from "../../ui/Button"
 import { Select } from "../../ui/Select"
+import { AddIssueTypeView } from "./AddIssueTypeView"
 import { i18n } from "./i18n"
-import { IssueTypeCreateForm } from "./IssueTypeCreateForm"
 import { useSettingModel } from "./Model"
 
 export const ProjectSettings: React.FC = () => {
@@ -16,7 +16,7 @@ export const ProjectSettings: React.FC = () => {
       <H2>{t.issueTypeLabel}</H2>
       <div className="form-element__item">
         {model.isCreatingIssueType ? (
-          <IssueTypeCreateForm />
+          <AddIssueTypeView />
         ) : (
           <HBox style={{ gap: 4 }}>
             <Select

@@ -1,9 +1,9 @@
 // noinspection JSUnusedGlobalSymbols
 
+import { ItemSelectionState } from "@/content/project/productBacklog/state/ItemSelectionState"
+import { ProductBacklogView } from "@/content/project/productBacklog/View"
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import React from "react"
-import { ItemSelectionState } from "../../../src/content/project/productBacklog/state/ItemSelectionState"
-import { ProductBacklogView } from "../../../src/content/project/productBacklog/View"
 
 import { StoryUtil } from "../../StoryUtil"
 import { ProjectStoryTemplate, ProjectStoryTemplateProps } from "../ProjectStoryTemplate"

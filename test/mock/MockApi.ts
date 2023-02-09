@@ -1,9 +1,9 @@
+import { BacklogApi, FakeBacklogApi } from "@/content/backlog/BacklogApiForReact"
+import { EditIssueInput, IssueData, IssueDataUtil } from "@/content/backlog/Issue"
 import produce from "immer"
-import { BacklogApi, FakeBacklogApi } from "../../src/content/backlog/BacklogApiForReact"
-import { EditIssueInput, IssueData, IssueDataUtil } from "../../src/content/backlog/Issue"
-import { childIssuesBT, productBacklogBT, projectInfoBT } from "./mockApiData"
+import { childIssuesBT, productBacklogBT, projectInfoBT } from "./MockApi-data"
 
-export const mockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
+export const MockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
   draft.projectInfo.getProjectInfoWithCustomFields = () => Promise.resolve(projectInfoBT)
   draft.issue.searchInIssueTypeAndMilestones = () => Promise.resolve(productBacklogBT)
   draft.issue.changeMilestoneAndCustomFieldValue = async (
