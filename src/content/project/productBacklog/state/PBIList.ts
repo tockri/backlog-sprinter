@@ -130,7 +130,7 @@ const indexAfterMove = (action: NLMoveAction): number => {
   }
 }
 
-const mutateByMovingAction = (data: WritableDraft<PBIList>, action: NLMoveAction): PBIListMovedEvent[] => {
+const mutateByMove = (data: WritableDraft<PBIList>, action: NLMoveAction): PBIListMovedEvent[] => {
   NestedList.mutateMove(data, action)
   const eventStore = new EventStore()
   const subList = data.subLists.find((sl) => sl.id === action.dst.subListId)
@@ -159,14 +159,14 @@ const mutateByMovingAction = (data: WritableDraft<PBIList>, action: NLMoveAction
   return eventStore.values()
 }
 
-const mutateByAddingIssue = (data: WritableDraft<PBIList>, created: IssueData, orderCustomField: CustomNumberField) => {
+const mutateByAddIssue = (data: WritableDraft<PBIList>, created: IssueData, orderCustomField: CustomNumberField) => {
   const subList = data.subLists.find((sl) => sl.head?.id === created.milestone[0]?.id)
   if (subList) {
     subList.items.push(withOrder(orderCustomField)(created) as WritableDraft<IssueDataWithOrder>)
   }
 }
 
-const mutateByAddingMilestone = (data: WritableDraft<PBIList>, created: Version) => {
+const mutateByAddMilestone = (data: WritableDraft<PBIList>, created: Version) => {
   data.subLists.push({
     head: created as WritableDraft<Version>,
     items: [],
@@ -175,7 +175,7 @@ const mutateByAddingMilestone = (data: WritableDraft<PBIList>, created: Version)
   data.subLists.sort((sl1, sl2) => pbiNestMethods.headComparator(sl1.head, sl2.head))
 }
 
-const mutateByEditingMilestone = (data: WritableDraft<PBIList>, updated: Version) => {
+const mutateByEditMilestone = (data: WritableDraft<PBIList>, updated: Version) => {
   const sIdx = data.subLists.findIndex((sl) => sl.head?.id === updated.id)
   if (sIdx >= 0) {
     data.subLists[sIdx].head = updated as WritableDraft<Version>
@@ -192,13 +192,13 @@ const getNewOrder = (data: PBIList, milestone: Version | null): number => {
   }
 }
 
-const mutateByEditingIssue = (
+const mutateByEditIssue = (
   data: WritableDraft<PBIList>,
   statuses: ReadonlyArray<Status>,
   issueId: number,
   input: EditIssueInput
 ) => {
-  const [item] = findIssue(data, issueId)
+  const item = findIssue(data, issueId)
   if (item) {
     IssueDataUtil.mutateByIssueInput(item, input, statuses)
   }
@@ -207,23 +207,23 @@ const mutateByEditingIssue = (
 const findIssue = <T extends PBIList | WritableDraft<PBIList>>(
   data: T,
   issueId: number
-): [T["subLists"][number]["items"][number], T["subLists"][number]["head"]] | [null, null] => {
+): T["subLists"][number]["items"][number] | null => {
   for (const subList of data.subLists) {
     for (const item of subList.items) {
       if (item.id === issueId) {
-        return [item, subList.head]
+        return item
       }
     }
   }
-  return [null, null]
+  return null
 }
 
 export const PBIListFunc = {
-  mutateByEditingIssue,
-  mutateByMovingAction,
-  mutateByAddingIssue,
-  mutateByAddingMilestone,
-  mutateByEditingMilestone,
+  mutateByEditingIssue: mutateByEditIssue,
+  mutateByMovingAction: mutateByMove,
+  mutateByAddingIssue: mutateByAddIssue,
+  mutateByAddingMilestone: mutateByAddMilestone,
+  mutateByEditingMilestone: mutateByEditMilestone,
   getNewOrder,
   findIssue,
   nest,
