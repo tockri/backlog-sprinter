@@ -3,7 +3,7 @@
 import { IssueData } from "@/content/backlog/Issue"
 import { CustomField, IssueTypeColor, Project, ProjectInfoWithCustomFields } from "@/content/backlog/ProjectInfo"
 
-export const projectInfoBT: ProjectInfoWithCustomFields = {
+const projectInfoBT: ProjectInfoWithCustomFields = {
   project: {
     id: 78386,
     projectKey: "BT",
@@ -148,7 +148,7 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
   ]
 }
 
-export const productBacklogBT = [
+const productBacklogBT = [
   {
     id: 20641035,
     projectId: 78386,
@@ -888,7 +888,7 @@ export const productBacklogBT = [
   }
 ] as IssueData[]
 
-export const childIssuesBT = [
+const childIssuesBT = [
   {
     id: 20641035,
     projectId: 78386,
@@ -1108,3 +1108,9 @@ export const childIssuesBT = [
     stars: []
   } as IssueData
 ] as IssueData[]
+
+export const MockData = {
+  projectInfoBT,
+  productBacklogBT,
+  childIssuesBT
+}
