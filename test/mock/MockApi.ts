@@ -5,6 +5,12 @@ import { MockData } from "./MockApi-data"
 
 export const MockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
   draft.projectInfo.getProjectInfoWithCustomFields = () => Promise.resolve(MockData.projectInfoBT)
+  draft.projectInfo.createIssueType = (input) =>
+    Promise.resolve({
+      ...MockData.projectInfoBT.issueTypes[0],
+      id: 100000,
+      ...input
+    })
   draft.issue.searchInIssueTypeAndMilestones = () => Promise.resolve(MockData.productBacklogBT)
   draft.issue.changeMilestoneAndCustomFieldValue = async (
     issueId: number,

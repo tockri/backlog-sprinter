@@ -19,6 +19,7 @@ type PBISubListModel = Immutable<{
   milestoneName: string
   isSelected: boolean
   releaseDate: string
+  dataForTest: PBISubList
 }>
 
 type PBISubList = PBIList["subLists"][number]
@@ -41,6 +42,7 @@ export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
 
   return {
     lang,
+    dataForTest: subList,
     setArrangeHovered: (issueId: number, hover: boolean) => {
       if (hover) {
         setHover({
