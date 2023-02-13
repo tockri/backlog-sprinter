@@ -37,7 +37,7 @@ describe("PBISubListModel", () => {
       },
       () => <TestView tester={tester} />
     )
-    await tester.wait()
+    // await tester.wait()
     return tester
   }
 

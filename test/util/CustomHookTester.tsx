@@ -26,14 +26,62 @@ type RenderResult = ReturnType<typeof render>
 type ActResult = ReturnType<typeof act>
 
 export interface Tester<Model, Args extends unknown[]> {
+  /**
+   * React component to wait being rendered
+   */
   probeElement(): React.ReactElement
+
+  /**
+   * execute the useXXXXX hook function passed by constructor
+   * @param args argument for useXXXXX
+   */
   useTarget(...args: Args): Model
+
+  /**
+   * render component tree using custom component
+   * @param initialize callback to set initial values to atoms
+   * @param component custom component
+   */
   renderComponent(initialize: (set: Store["set"]) => void, component: () => React.ReactElement): Promise<void>
+
+  /**
+   * render default component tree using the useXXXXX hook function passed by constructor
+   * @param initialize
+   * @param args
+   */
   renderFixture(initialize: (set: Store["set"]) => void, ...args: Args): Promise<void>
+
+  /**
+   * return value of `render()` of @testing-library/react
+   */
   getDom(): RenderResult
+
+  /**
+   * return value of the useXXXXX hook function passed by constructor
+   */
   getTarget(): Model
+
+  /**
+   * wait for re-rendering.
+   * if you get a error like "Warning: A suspended resource finished loading inside a test, but the event was not wrapped in act(...)."
+   * please add
+   * ```typescript
+   * await tester.wait()
+   * ```
+   * @param count
+   */
   wait(count?: number): Promise<void>
+
+  /**
+   * write test code using objects from `getTarget()` and `getDom()`
+   * @param content
+   */
   test<Result extends void | Promise<void>>(content: (target: Model, dom: RenderResult) => Result): Result
+
+  /**
+   * write mutation code using object from `getTarget()`
+   * @param action
+   */
   act(action: (target: Model) => void | Promise<void>): ActResult
 }
 
