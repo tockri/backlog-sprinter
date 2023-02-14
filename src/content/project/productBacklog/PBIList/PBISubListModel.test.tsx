@@ -11,7 +11,7 @@ import { AddIssueTypeFormState } from "@/content/project/settings/state/State"
 import { MockApi } from "@test/mock/MockApi"
 import { MockConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
-import { CustomHookTester, Tester } from "@test/util/CustomHookTester"
+import { CustomHookTester } from "@test/util/CustomHookTester"
 import { produce } from "immer"
 import { useAtomValue } from "jotai"
 import React from "react"
@@ -20,7 +20,7 @@ describe("PBISubListModel", () => {
   type Model = ReturnType<typeof usePBISubListModel>
   type Args = Parameters<typeof usePBISubListModel>
 
-  const TestView: React.FC<{ tester: Tester<Model, Args> }> = ({ tester }) => {
+  const TestView: React.FC<{ tester: CustomHookTester<Model, Args> }> = ({ tester }) => {
     const data = useAtomValue(PBIListState.atom)
     const subList = data.subLists[0]
     tester.useTarget(subList)

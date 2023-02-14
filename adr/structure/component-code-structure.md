@@ -18,7 +18,32 @@
 
 # Decision
 
-以下のような命名規則、ディレクトリ構造にする。
+## コードの責務
+
+次のように整理する。
+
+### State
+
+- jotai Atomとそれに付随するAction生成関数のセットとして作る
+- Web API、localStorage、他のAtomからデータを収集する
+- Viewで扱いやすいデータ型を構築する
+- データに対するActionを受け取る
+- Actionに従ってWeb APIを呼ぶ
+- ActionやWeb APIの結果に従って自分自身や他のAtomを更新する
+
+### View
+
+- `React.FC`のコンポーネントとして作る
+- Stateから受け取ったデータを使ってJSXを構築する
+- UIイベントから作ったActionをStateに渡す
+
+### Model
+
+- Viewの一部。短くて済む場合はなくても良い
+- "useXXX"という名前の関数でカスタムフックとして作る
+- `useAtom`を実行する
+- AtomのSetterを実行する
+- Viewで使いやすいインターフェイスとAtomの橋渡し
 
 ## ディレクトリ、ファイル名規則
 
@@ -71,7 +96,7 @@ export type SometingAction = AddAction | DeleteAction
 
 ### Stateファイル内構造 2. Atom初期値の取得
 ```typescript
-import {Read} from "../../src/content/util/JotaiUtil"
+import {Read} from "@/content/util/JotaiUtil"
 
 // イニシャライザ
 // プライベートメンバーにプレフィックスをつけるかは自由。ここでは「st」をつけた。
@@ -93,7 +118,7 @@ const stRead:Read<Promise<ReadonlyArray<Something>>> = async (get) => {
 
 ### Stateファイル内構造 3. Atom更新
 ```typescript
-import {Write} from "../../src/content/util/JotaiUtil"
+import {Write} from "@/content/util/JotaiUtil"
 
 // 追加アクションによる処理。
 const stAdd: Write<AddAction> = async (get, set, action) => {

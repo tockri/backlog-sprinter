@@ -13,10 +13,10 @@ const projectInfoAtom = atom(async (get) => {
   const api = get(Api.atom)
   return await api.projectInfo.getProjectInfoWithCustomFields(env.projectKey)
 })
-const projectAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.project)
-const statusesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.statuses)
-const milestonesAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.milestones)
-const customFieldsAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.customFields)
+const projectAtom = JotaiUtil.asyncAtomFromParent(projectInfoAtom, (pi) => pi.project)
+const statusesAtom = JotaiUtil.asyncAtomFromParent(projectInfoAtom, (pi) => pi.statuses)
+const milestonesAtom = JotaiUtil.asyncAtomFromParent(projectInfoAtom, (pi) => pi.milestones)
+const customFieldsAtom = JotaiUtil.asyncAtomFromParent(projectInfoAtom, (pi) => pi.customFields)
 
 type IssueTypeCreate = Immutable<{
   type: "Create"
@@ -26,7 +26,7 @@ type IssueTypeCreate = Immutable<{
 
 export type IssueTypesAction = IssueTypeCreate
 
-const issueTypesStoreAtom = JotaiUtil.atomFromParent(projectInfoAtom, (pi) => pi.issueTypes)
+const issueTypesStoreAtom = JotaiUtil.asyncAtomFromParent(projectInfoAtom, (pi) => pi.issueTypes)
 
 const issueTypesAtom = atom(
   (get) => get(issueTypesStoreAtom),

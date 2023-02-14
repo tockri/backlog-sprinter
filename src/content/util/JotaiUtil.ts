@@ -27,11 +27,16 @@ const asyncAtomFromParent = <T, U>(
 }
 
 export type AsyncRead<Value> = (get: Getter) => Promise<Value>
-export type Handler<Value, Action> = (curr: Value, get: Getter, set: Setter, action: Action) => Value | Promise<Value>
+export type AsyncHandler<Value, Action> = (
+  curr: Value,
+  get: Getter,
+  set: Setter,
+  action: Action
+) => Value | Promise<Value>
 
 const awaited = async <T>(p: Promise<T> | T): Promise<T> => (p instanceof Promise ? await p : p)
 
-const asyncAtomWithAction = <Value, Action>(read: AsyncRead<Value>, handler: Handler<Value, Action>) => {
+const asyncAtomWithAction = <Value, Action>(read: AsyncRead<Value>, handler: AsyncHandler<Value, Action>) => {
   const store = atom<Value | null>(null)
   const main = atom<Promise<Value>, [Action], Promise<void>>(
     async (get) => get(store) || (await read(get)),
@@ -44,6 +49,6 @@ const asyncAtomWithAction = <Value, Action>(read: AsyncRead<Value>, handler: Han
 
 export const JotaiUtil = {
   isValue,
-  atomFromParent: asyncAtomFromParent,
+  asyncAtomFromParent,
   asyncAtomWithAction
 }
