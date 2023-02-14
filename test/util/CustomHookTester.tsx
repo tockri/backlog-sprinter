@@ -157,6 +157,7 @@ class TesterImpl<Model, Args extends unknown[]> implements Tester<Model, Args> {
     return content(this.getTarget(), this.getDom())
   }
 
+  act<T>(action: (target: Model) => T | Promise<T>): ReturnType<typeof act>
   act(action: (target: Model) => void | Promise<void>): ReturnType<typeof act> {
     return act(() => action(this.getTarget()))
   }

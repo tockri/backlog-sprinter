@@ -1,5 +1,5 @@
 import { BacklogApi, FakeBacklogApi } from "@/content/backlog/BacklogApiForReact"
-import { EditIssueInput, IssueData, IssueDataUtil } from "@/content/backlog/Issue"
+import { AddIssueInput, EditIssueInput, IssueData, IssueDataUtil } from "@/content/backlog/Issue"
 import produce from "immer"
 import { MockData } from "./MockApi-data"
 
@@ -27,6 +27,25 @@ export const MockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
       }
     })
   }
+  draft.issue.addIssue = (input: AddIssueInput) =>
+    Promise.resolve(
+      produce(MockData.productBacklogBT[0], (d) => {
+        d.id = 200000
+        d.summary = input.summary
+
+        if (input.milestoneId) {
+          d.milestone[0].id = input.milestoneId
+        }
+        const inCf = input.customField
+        if (inCf) {
+          const cf = d.customFields.find((cf) => cf.id === inCf.id)
+          if (cf) {
+            cf.id = inCf.id
+            cf.value = inCf.value
+          }
+        }
+      })
+    )
   draft.issue.editIssue = async (issueId: number, input: EditIssueInput) => {
     const issue = MockData.productBacklogBT.find((i) => i.id === issueId) as IssueData
     const statuses = MockData.projectInfoBT.statuses

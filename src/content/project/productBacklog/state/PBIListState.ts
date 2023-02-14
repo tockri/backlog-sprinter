@@ -1,11 +1,11 @@
 import produce from "immer"
 import { WritableDraft } from "immer/dist/types/types-external"
 
-import { ArrayUtil } from "../../../../util/ArrayUtil"
-import { DateUtil } from "../../../../util/DateUtil"
-import { NLLocation, NLMoveAction } from "../../../../util/NestedList"
-import { Waiter } from "../../../../util/Waiter"
-import { BacklogApi } from "../../../backlog/BacklogApiForReact"
+import { BacklogApi } from "@/content/backlog/BacklogApiForReact"
+import { ArrayUtil } from "@/util/ArrayUtil"
+import { DateUtil } from "@/util/DateUtil"
+import { NLLocation, NLMoveAction } from "@/util/NestedList"
+import { Waiter } from "@/util/Waiter"
 import { EditIssueInput, IssueData } from "../../../backlog/Issue"
 import { AddMilestoneInput, CustomNumberField, EditMilestoneInput, Version } from "../../../backlog/ProjectInfo"
 import { AsyncRead, Handler, JotaiUtil } from "../../../util/JotaiUtil"
@@ -111,9 +111,9 @@ const pbAddIssue: Handler<PBIList, AddIssueAction> = async (prev, get, set, acti
     const project = await get(ProjectState.atom)
     const api = get(Api.atom)
     const order = PBIListFunc.getNewOrder(prev, action.milestone)
-    const created = await api.issue.createIssue({
-      project,
-      issueType,
+    const created = await api.issue.addIssue({
+      projectId: project.id,
+      issueTypeId: issueType.id,
       summary: action.summary,
       milestoneId: action.milestone?.id,
       customField: {

@@ -1,7 +1,7 @@
+import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import React from "react"
-import { DateUtil } from "../../../../util/DateUtil"
 import { EnvState } from "../../app/state/EnvState"
 import { UserLang } from "../../types"
 import { ItemSelectionState } from "../state/ItemSelectionState"
@@ -14,7 +14,7 @@ type PBISubListModel = Immutable<{
   isArrangeHovered: (index: number) => boolean
   setMoveHovered: (issueId: number, hover: boolean) => void
   isMoveHovered: (issueId: number) => boolean
-  createNewIssue: (summary: string) => void
+  addNewIssue: (summary: string) => void
   selectMilestone: () => void
   milestoneName: string
   isSelected: boolean
@@ -65,7 +65,7 @@ export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
       }
     },
     isMoveHovered: (issueId: number) => hover?.issueId === issueId && hover.type === "move",
-    createNewIssue: (summary: string) => {
+    addNewIssue: (summary: string) => {
       dispatch(PBIListState.Action.AddIssue(summary, milestone)).then()
     },
     selectMilestone: () => {

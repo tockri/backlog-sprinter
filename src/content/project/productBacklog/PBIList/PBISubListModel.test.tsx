@@ -12,6 +12,7 @@ import { MockApi } from "@test/mock/MockApi"
 import { MockConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
 import { CustomHookTester, Tester } from "@test/util/CustomHookTester"
+import { produce } from "immer"
 import { useAtomValue } from "jotai"
 import React from "react"
 
@@ -23,8 +24,10 @@ describe("PBISubListModel", () => {
     const data = useAtomValue(PBIListState.atom)
     const subList = data.subLists[0]
     tester.useTarget(subList)
-    return <>{tester.probeElement()}</>
+    return tester.probeElement()
   }
+
+  const fakeCreateIssue = jest.fn(MockApi.issue.addIssue)
 
   const makeTester = async () => {
     const tester = CustomHookTester.create(usePBISubListModel)
@@ -32,12 +35,17 @@ describe("PBISubListModel", () => {
       (set) => {
         set(AppConfState.atom, MockConf)
         set(EnvState.atom, MockEnv)
-        set(Api.atom, MockApi)
+        set(
+          Api.atom,
+          produce(MockApi, (c) => {
+            c.issue.addIssue = fakeCreateIssue
+          })
+        )
         set(AddIssueTypeFormState.atom, (curr) => ({ ...curr, creating: true }))
       },
       () => <TestView tester={tester} />
     )
-    // await tester.wait()
+    await tester.wait()
     return tester
   }
 
@@ -69,6 +77,35 @@ describe("PBISubListModel", () => {
     tester.test((model) => {
       expect(model.isMoveHovered(model.dataForTest.items[1].id)).toBe(true)
       expect(model.isMoveHovered(model.dataForTest.items[0].id)).toBe(false)
+    })
+  })
+
+  test("add issue", async () => {
+    const tester = await makeTester()
+    const data = tester.getTarget().dataForTest
+    const projectId = data.head?.projectId
+    const milestoneId = data.head?.id
+    await tester.act(async (model) => {
+      await model.addNewIssue("issue adding test")
+    })
+    expect(fakeCreateIssue).toBeCalledWith({
+      projectId: projectId,
+      milestoneId: milestoneId,
+      issueTypeId: 389286,
+      summary: "issue adding test",
+      customField: {
+        id: 71491,
+        value: -665
+      }
+    })
+    tester.test((model) => {
+      expect(model.dataForTest.items.find((issue) => issue.summary === "issue adding test")).toMatchObject({
+        id: 200000,
+        projectId: 78386,
+        summary: "issue adding test",
+        milestone: [{ id: 244967 }],
+        issueType: { id: 389286 }
+      })
     })
   })
 })
