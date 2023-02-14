@@ -1,7 +1,7 @@
 import { Immutable } from "immer"
 import { WritableDraft } from "immer/dist/internal"
 import { BacklogApiRequest } from "./BacklogApiRequest"
-import { CustomNumberField, IssueType, Project, Status, Version } from "./ProjectInfo"
+import { CustomNumberField, Project, Status, Version } from "./ProjectInfo"
 
 export type CustomFieldData = Immutable<{
   id: number
@@ -157,8 +157,8 @@ const mutateByIssueInput = (
 }
 
 export type AddIssueInput = Immutable<{
-  project: Project
-  issueType: IssueType
+  projectId: number
+  issueTypeId: number
   summary: string
   parentIssueId?: number
   milestoneId?: number | null
@@ -170,8 +170,8 @@ export type AddIssueInput = Immutable<{
 
 const addIssue = async (input: AddIssueInput): Promise<IssueData> => {
   const params: Record<string, string> = {}
-  params["projectId"] = String(input.project.id)
-  params["issueTypeId"] = String(input.issueType.id)
+  params["projectId"] = String(input.projectId)
+  params["issueTypeId"] = String(input.issueTypeId)
   params["priorityId"] = "3"
   params["summary"] = input.summary
   const { parentIssueId, milestoneId, customField } = input
@@ -194,7 +194,7 @@ const Issue = {
   bulkChangeMilestone,
   changeMilestoneAndCustomFieldValue,
   editIssue,
-  createIssue: addIssue
+  addIssue
 }
 
 export const IssueDataUtil = {

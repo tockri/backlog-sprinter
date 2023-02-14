@@ -19,7 +19,7 @@ const fakeIssueApi: IssueApi = {
   bulkChangeMilestone: rejectFunc,
   changeMilestoneAndCustomFieldValue: rejectFunc,
   editIssue: rejectFunc,
-  createIssue: rejectFunc
+  addIssue: rejectFunc
 }
 
 const fakeProjectInfoApi: ProjectInfoApi = {

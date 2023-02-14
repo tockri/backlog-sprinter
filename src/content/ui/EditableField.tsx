@@ -16,6 +16,7 @@ export type EditableFieldProps = Immutable<{
   blurAction?: "none" | "submit" | "cancel"
   editStyle?: React.CSSProperties
   viewStyle?: React.CSSProperties
+  errorMessage?: (value: string) => string | null
   onFix?: (value: string) => void
   onCancel?: () => void
   defaultEditing?: boolean
@@ -37,9 +38,11 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
     inputType,
     inputMin,
     inputMax,
-    lang
+    lang,
+    errorMessage
   } = props
   const [editing, setEditing] = React.useState(defaultEditing)
+  const [error, setError] = React.useState<string | null>(null)
   const editor = React.useRef<(HTMLInputElement & HTMLTextAreaElement) | null>(null)
   const endEdit = () => {
     editor.current = null
@@ -47,7 +50,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
   }
 
   const submit = () => {
-    if (editing) {
+    if (editing && !error) {
       onFix && onFix(editor.current?.value || "")
       endEdit()
     }
@@ -100,6 +103,11 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
     }
   }, [editing, defaultValue])
   const id = React.useRef(`editable-${Math.random()}`)
+  const onChange = errorMessage
+    ? (e: { target: { value: string } }) => {
+        setError(errorMessage(e.target.value))
+      }
+    : undefined
 
   return (
     <>
@@ -113,8 +121,10 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
               disabled={disabled}
               onKeyDown={onKeyDown}
               onBlur={onBlur}
+              onChange={onChange}
               id={id.current}
-              data-tooltip-content={lang === "ja" ? "Ctrl+Enterで確定" : "Press 'Ctrl+Enter' to submit"}
+              data-tooltip-content={error ? error : lang === "ja" ? "Ctrl+Enterで確定" : "Press 'Ctrl+Enter' to submit"}
+              className={cnu({ error: !!error })}
             />
             <Tooltip place="bottom" anchorId={id.current} />
           </>
@@ -131,7 +141,9 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
               placeholder={placeholder}
               disabled={disabled}
               id={id.current}
-              data-tooltip-content={lang === "ja" ? "Enterで確定" : "Press 'Enter' to submit"}
+              onChange={onChange}
+              data-tooltip-content={error ? error : lang === "ja" ? "Enterで確定" : "Press 'Enter' to submit"}
+              className={cnu({ error: !!error })}
             />
             <Tooltip place="bottom" anchorId={id.current} />
           </>

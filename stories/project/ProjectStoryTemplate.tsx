@@ -1,31 +1,29 @@
+import { Api } from "@/content/project/app/state/Api"
+import { AppConfState } from "@/content/project/app/state/AppConfState"
+import { EnvState } from "@/content/project/app/state/EnvState"
+import { Loading } from "@/content/ui/Loading"
 import styled from "@emotion/styled"
+import { MockApi } from "@test/mock/MockApi"
+import { MockConf } from "@test/mock/MockConf"
+import { MockEnv } from "@test/mock/MockEnv"
+import { Immutable } from "immer"
 import { createStore, PrimitiveAtom, Provider, WritableAtom } from "jotai"
 import React from "react"
-import { Api } from "../../src/content/project/app/state/Api"
-import { AppConfState } from "../../src/content/project/app/state/AppConfState"
-import { EnvState } from "../../src/content/project/app/state/EnvState"
-import { Loading } from "../../src/content/ui/Loading"
-import { mockApi } from "./mockApi"
 
-type Pair<T = any> = [WritableAtom<T, [T], void> | PrimitiveAtom<T>, T]
+type Pair<T = any> = Immutable<[WritableAtom<T, [T], void> | PrimitiveAtom<T>, T]>
 
-export type ProjectStoryTemplateProps = {
+export type ProjectStoryTemplateProps = Immutable<{
   initialValues: Array<Pair>
   children: React.ReactNode
-}
+}>
+
 export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ initialValues, children }) => {
   const store = createStore()
-  store.set(AppConfState.atom, {
-    selectedTab: 0,
-    pbiIssueTypeId: 389286
-  })
-  store.set(EnvState.atom, {
-    projectKey: "BT",
-    lang: "ja"
-  })
-  store.set(Api.atom, mockApi)
-  initialValues.forEach(([atomConf, value]) => {
-    store.set(atomConf, value)
+  store.set(AppConfState.atom, MockConf)
+  store.set(EnvState.atom, MockEnv)
+  store.set(Api.atom, MockApi)
+  initialValues.forEach(([atm, value]) => {
+    store.set(atm, value)
   })
   return (
     <Provider store={store}>

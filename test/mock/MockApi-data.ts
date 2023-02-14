@@ -1,14 +1,9 @@
 // noinspection SpellCheckingInspection,DuplicatedCode
 
-import { IssueData } from "../../src/content/backlog/Issue"
-import {
-  CustomField,
-  IssueTypeColor,
-  Project,
-  ProjectInfoWithCustomFields
-} from "../../src/content/backlog/ProjectInfo"
+import { IssueData } from "@/content/backlog/Issue"
+import { CustomField, IssueTypeColor, Project, ProjectInfoWithCustomFields } from "@/content/backlog/ProjectInfo"
 
-export const projectInfoBT: ProjectInfoWithCustomFields = {
+const projectInfoBT: ProjectInfoWithCustomFields = {
   project: {
     id: 78386,
     projectKey: "BT",
@@ -153,7 +148,7 @@ export const projectInfoBT: ProjectInfoWithCustomFields = {
   ]
 }
 
-export const productBacklogBT = [
+const productBacklogBT = [
   {
     id: 20641035,
     projectId: 78386,
@@ -238,14 +233,14 @@ export const productBacklogBT = [
     versions: [],
     milestone: [
       {
-        id: 245742,
+        id: 244967,
         projectId: 78386,
-        name: "01-24 ~ 01-30 sprint",
+        name: "01-18 ~ 01-24 sprint",
         description: null,
-        startDate: "2023-01-24T00:00:00Z",
-        releaseDueDate: "2023-01-30T00:00:00Z",
+        startDate: "2023-01-18T00:00:00Z",
+        releaseDueDate: "2023-01-24T00:00:00Z",
         archived: false,
-        displayOrder: 0
+        displayOrder: 1
       }
     ],
     startDate: null,
@@ -320,14 +315,14 @@ export const productBacklogBT = [
     versions: [],
     milestone: [
       {
-        id: 245742,
+        id: 244967,
         projectId: 78386,
-        name: "01-24 ~ 01-30 sprint",
+        name: "01-18 ~ 01-24 sprint",
         description: null,
-        startDate: "2023-01-24T00:00:00Z",
-        releaseDueDate: "2023-01-30T00:00:00Z",
+        startDate: "2023-01-18T00:00:00Z",
+        releaseDueDate: "2023-01-24T00:00:00Z",
         archived: false,
-        displayOrder: 0
+        displayOrder: 1
       }
     ],
     startDate: null,
@@ -389,14 +384,14 @@ export const productBacklogBT = [
     versions: [],
     milestone: [
       {
-        id: 245742,
+        id: 244967,
         projectId: 78386,
-        name: "01-24 ~ 01-30 sprint",
+        name: "01-18 ~ 01-24 sprint",
         description: null,
-        startDate: "2023-01-24T00:00:00Z",
-        releaseDueDate: "2023-01-30T00:00:00Z",
+        startDate: "2023-01-18T00:00:00Z",
+        releaseDueDate: "2023-01-24T00:00:00Z",
         archived: false,
-        displayOrder: 0
+        displayOrder: 1
       }
     ],
     startDate: null,
@@ -457,14 +452,14 @@ export const productBacklogBT = [
     versions: [],
     milestone: [
       {
-        id: 245742,
+        id: 244967,
         projectId: 78386,
-        name: "01-24 ~ 01-30 sprint",
+        name: "01-18 ~ 01-24 sprint",
         description: null,
-        startDate: "2023-01-24T00:00:00Z",
-        releaseDueDate: "2023-01-30T00:00:00Z",
+        startDate: "2023-01-18T00:00:00Z",
+        releaseDueDate: "2023-01-24T00:00:00Z",
         archived: false,
-        displayOrder: 0
+        displayOrder: 1
       }
     ],
     startDate: null,
@@ -893,7 +888,7 @@ export const productBacklogBT = [
   }
 ] as IssueData[]
 
-export const childIssuesBT = [
+const childIssuesBT = [
   {
     id: 20641035,
     projectId: 78386,
@@ -1113,3 +1108,9 @@ export const childIssuesBT = [
     stars: []
   } as IssueData
 ] as IssueData[]
+
+export const MockData = {
+  projectInfoBT,
+  productBacklogBT,
+  childIssuesBT
+}

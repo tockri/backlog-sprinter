@@ -1,14 +1,14 @@
 import produce from "immer"
 import { WritableDraft } from "immer/dist/types/types-external"
 
-import { ArrayUtil } from "../../../../util/ArrayUtil"
-import { DateUtil } from "../../../../util/DateUtil"
-import { NLLocation, NLMoveAction } from "../../../../util/NestedList"
-import { Waiter } from "../../../../util/Waiter"
-import { BacklogApi } from "../../../backlog/BacklogApiForReact"
+import { BacklogApi } from "@/content/backlog/BacklogApiForReact"
+import { ArrayUtil } from "@/util/ArrayUtil"
+import { DateUtil } from "@/util/DateUtil"
+import { NLLocation, NLMoveAction } from "@/util/NestedList"
+import { Waiter } from "@/util/Waiter"
 import { EditIssueInput, IssueData } from "../../../backlog/Issue"
 import { AddMilestoneInput, CustomNumberField, EditMilestoneInput, Version } from "../../../backlog/ProjectInfo"
-import { AsyncRead, Handler, JotaiUtil } from "../../../util/JotaiUtil"
+import { AsyncHandler, AsyncRead, JotaiUtil } from "../../../util/JotaiUtil"
 import { Api } from "../../app/state/Api"
 import { AppConfState } from "../../app/state/AppConfState"
 import { OrderCustomFieldState } from "../../app/state/OrderCustomFieldState"
@@ -60,7 +60,7 @@ const pbRead: AsyncRead<PBIList> = async (get) => {
   }
 }
 
-const pbMove: Handler<PBIList, NLMoveAction> = async (prev, get, set, action) => {
+const pbMove: AsyncHandler<PBIList, NLMoveAction> = async (prev, get, set, action) => {
   const events: PBIListMovedEvent[] = []
   const updated = produce(prev, (draft) => {
     events.push(...PBIListFunc.mutateByMovingAction(draft, action))
@@ -103,7 +103,7 @@ const updateIssues = async (
   return updated
 }
 
-const pbAddIssue: Handler<PBIList, AddIssueAction> = async (prev, get, set, action) => {
+const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set, action) => {
   const conf = get(AppConfState.atom)
   const issueType = (await get(IssueTypesState.atom)).find((it) => it.id === conf.pbiIssueTypeId)
   const orderCustomField = await get(OrderCustomFieldState.atom)
@@ -111,9 +111,9 @@ const pbAddIssue: Handler<PBIList, AddIssueAction> = async (prev, get, set, acti
     const project = await get(ProjectState.atom)
     const api = get(Api.atom)
     const order = PBIListFunc.getNewOrder(prev, action.milestone)
-    const created = await api.issue.createIssue({
-      project,
-      issueType,
+    const created = await api.issue.addIssue({
+      projectId: project.id,
+      issueTypeId: issueType.id,
       summary: action.summary,
       milestoneId: action.milestone?.id,
       customField: {
@@ -129,7 +129,7 @@ const pbAddIssue: Handler<PBIList, AddIssueAction> = async (prev, get, set, acti
   }
 }
 
-const pbAddMilestone: Handler<PBIList, AddMilestoneAction> = async (prev, get, set, action) => {
+const pbAddMilestone: AsyncHandler<PBIList, AddMilestoneAction> = async (prev, get, set, action) => {
   const api = get(Api.atom)
   const project = await get(ProjectState.atom)
   const created = await api.projectInfo.addMilestone(project.id, action.input)
@@ -145,7 +145,7 @@ const pbAddMilestone: Handler<PBIList, AddMilestoneAction> = async (prev, get, s
   })
 }
 
-const pbEditMilestone: Handler<PBIList, EditMilestoneAction> = async (prev, get, set, action) => {
+const pbEditMilestone: AsyncHandler<PBIList, EditMilestoneAction> = async (prev, get, set, action) => {
   const api = get(Api.atom)
   const project = await get(ProjectState.atom)
   const updated = await api.projectInfo.editMilestone(project.id, action.milestoneId, action.input)
@@ -163,7 +163,7 @@ const pbEditMilestone: Handler<PBIList, EditMilestoneAction> = async (prev, get,
   })
 }
 
-const pbEditIssue: Handler<PBIList, EditIssueAction> = async (prev, get, set, action) => {
+const pbEditIssue: AsyncHandler<PBIList, EditIssueAction> = async (prev, get, set, action) => {
   const api = get(Api.atom)
   const { issueId, input } = action
   await api.issue.editIssue(issueId, input)

@@ -20,10 +20,10 @@ const jotaiStore = createStore()
 export const useAppModel = (broker: MessageBroker<ProjectEnv>): AppModel => {
   const [env, setEnv] = React.useState<ProjectEnv | null>(null)
   const api = React.useContext(BacklogApiContext)
-  jotaiStore.set(Api.atom, api)
 
   React.useEffect(() => {
     if (!env) {
+      jotaiStore.set(Api.atom, api)
       broker.subscribe("Project", (env) => {
         setEnv(env)
         jotaiStore.set(EnvState.atom, env)
@@ -32,7 +32,7 @@ export const useAppModel = (broker: MessageBroker<ProjectEnv>): AppModel => {
     return () => {
       broker.unsubscribe("Project")
     }
-  }, [env, broker, setEnv])
+  }, [env, broker, setEnv, api])
   return {
     clear: () => {
       setEnv(null)

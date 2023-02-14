@@ -5,11 +5,11 @@ import { HBox, VBox } from "../../ui/Box"
 import { Button } from "../../ui/Button"
 import { cnu } from "../../ui/cnu"
 import { TextInput } from "../../ui/TextInput"
+import { useAddIssueTypeModel } from "./AddIssueTypeModel"
 import { i18n } from "./i18n"
-import { useIssueTypeCreateModel } from "./Model"
 
-export const IssueTypeCreateForm: React.FC = () => {
-  const model = React.useCallback(useIssueTypeCreateModel, [])()
+export const AddIssueTypeView: React.FC = () => {
+  const model = React.useCallback(useAddIssueTypeModel, [])()
   const { lang, issueTypes, values } = model
   const t = i18n(lang)
 

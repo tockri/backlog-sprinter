@@ -1,11 +1,11 @@
 // noinspection JSUnusedGlobalSymbols
 
+import { IssueTypeColor } from "@/content/backlog/ProjectInfo"
+import { AppConfState } from "@/content/project/app/state/AppConfState"
+import { AddIssueTypeFormState } from "@/content/project/settings/state/State"
+import { ProjectSettings } from "@/content/project/settings/View"
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import React from "react"
-import { IssueTypeColor } from "../../../src/content/backlog/ProjectInfo"
-import { AppConfState } from "../../../src/content/project/app/state/AppConfState"
-import { issueTypeCreateAtom } from "../../../src/content/project/settings/state/State"
-import { ProjectSettings } from "../../../src/content/project/settings/View"
 import { ProjectStoryTemplate, ProjectStoryTemplateProps } from "../ProjectStoryTemplate"
 
 const Template: React.FC<ProjectStoryTemplateProps> = (props) => (
@@ -48,7 +48,7 @@ export const Creating: Story = {
           pbiIssueTypeId: 0
         }
       ],
-      [issueTypeCreateAtom, { creating: true, name: "PBI", color: IssueTypeColor.pill__issue_type_1 }]
+      [AddIssueTypeFormState.atom, { creating: true, name: "PBI", color: IssueTypeColor.pill__issue_type_1 }]
     ]
   }
 }

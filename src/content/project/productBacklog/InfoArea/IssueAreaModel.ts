@@ -43,8 +43,7 @@ export const useIssueAreaModel = (): IssueAreaModel => {
 }
 
 const findIssue = (pbiList: PBIList, issueId: number): IssueData | null => {
-  const [issue] = PBIListFunc.findIssue(pbiList, issueId)
-  return issue
+  return PBIListFunc.findIssue(pbiList, issueId)
 }
 
 const changeIssue =

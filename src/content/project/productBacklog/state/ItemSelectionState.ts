@@ -42,8 +42,7 @@ const issueAtom = atom(async (get) => {
   const item = get(store)
   if (item.type === "Issue") {
     const pbi = await get(PBIListState.atom)
-    const [issue] = PBIListFunc.findIssue(pbi, item.issueId)
-    return issue
+    return PBIListFunc.findIssue(pbi, item.issueId)
   }
   return null
 })

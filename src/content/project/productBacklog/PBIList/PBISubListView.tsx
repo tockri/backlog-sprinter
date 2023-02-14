@@ -1,11 +1,11 @@
+import { IssueData } from "@/content/backlog/Issue"
+import { VBox } from "@/content/ui/Box"
+import { cnu } from "@/content/ui/cnu"
+import { Droppable } from "@/content/ui/DragAndDrop"
+import { EditableField } from "@/content/ui/EditableField"
+import { NLLocation } from "@/util/NestedList"
 import styled from "@emotion/styled"
 import React from "react"
-import { NLLocation } from "../../../../util/NestedList"
-import { IssueData } from "../../../backlog/Issue"
-import { VBox } from "../../../ui/Box"
-import { cnu } from "../../../ui/cnu"
-import { Droppable } from "../../../ui/DragAndDrop"
-import { EditableField } from "../../../ui/EditableField"
 import { i18n } from "../i18n"
 import { PBISubList } from "../state/PBIList"
 import { usePBISubListModel } from "./PBISubListModel"
@@ -96,7 +96,7 @@ export const PBISubListView: React.FC<PBISubListProps> = (props) => {
               <EditableField
                 placeholder={t.addNewItem}
                 onFix={(summary) => {
-                  model.createNewIssue(summary)
+                  model.addNewIssue(summary)
                 }}
                 viewStyle={{
                   padding: 4

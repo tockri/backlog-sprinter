@@ -3,11 +3,13 @@ import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
 import { HBox, VBox } from "../../../ui/Box"
 import { EditableField } from "../../../ui/EditableField"
+import { i18n } from "./i18n"
 import { useMilestoneModel } from "./MilestoneModel"
 
 export const MilestoneView: React.FC = () => {
   const model = useMilestoneModel()
   const { milestone, lang } = model
+  const t = i18n(lang)
   return (
     milestone && (
       <Root>
@@ -21,6 +23,7 @@ export const MilestoneView: React.FC = () => {
             onFix={(value) => {
               model.editMilestone("name", value).then()
             }}
+            errorMessage={(value) => (model.isNameDup(value) ? t.isNameDup : null)}
             lang={lang}
           />
         </Name>
