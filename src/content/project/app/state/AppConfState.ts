@@ -12,11 +12,13 @@ export enum Tabs {
 export type AppConf = Immutable<{
   selectedTab: Tabs
   pbiIssueTypeId: number
+  velocityWikiId: number
 }>
 
 const InitialAppConf: AppConf = {
   selectedTab: Tabs.Backlog,
-  pbiIssueTypeId: 0
+  pbiIssueTypeId: 0,
+  velocityWikiId: 0
 }
 
 const store = atomWithStorage<AppConf>("bsp.project.app.setting", InitialAppConf)
