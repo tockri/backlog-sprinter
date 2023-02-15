@@ -14,7 +14,7 @@ export const ProjectSettings: React.FC = () => {
   return (
     <Root>
       <H2>{t.issueTypeLabel}</H2>
-      <div className="form-element__item">
+      <div>
         {model.isCreatingIssueType ? (
           <AddIssueTypeView />
         ) : (
@@ -44,7 +44,7 @@ export const ProjectSettings: React.FC = () => {
         )}
       </div>
       <H2>{t.customFieldTitle}</H2>
-      <div className="form-element__item">
+      <div>
         {model.pbiIssueTypeId ? (
           model.orderCustomField ? (
             <div>
@@ -70,6 +70,15 @@ export const ProjectSettings: React.FC = () => {
           <div>{t.setIssueType}</div>
         )}
       </div>
+      <H2>{t.velocityTitle}</H2>
+      {model.velocityWikiId ? (
+        <strong>not impl</strong>
+      ) : (
+        <div>
+          {t.wikiNotSelected}
+          <Button>{t.selectLabel}</Button>
+        </div>
+      )}
     </Root>
   )
 }

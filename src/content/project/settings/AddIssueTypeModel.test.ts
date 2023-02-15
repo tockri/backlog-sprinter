@@ -7,26 +7,18 @@ import { AppConfState } from "@/content/project/app/state/AppConfState"
 import { EnvState } from "@/content/project/app/state/EnvState"
 import { useAddIssueTypeModel } from "@/content/project/settings/AddIssueTypeModel"
 import { AddIssueTypeFormState, AddIssueTypeFormValue } from "@/content/project/settings/state/State"
-import { MockApi } from "@test/mock/MockApi"
 import { MockConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
+import { TestMockApi } from "@test/mock/TestMockApi"
 import { CustomHookTester } from "@test/util/CustomHookTester"
 import "@testing-library/jest-dom"
-import produce from "immer"
 describe("AddIssueTypeModel", () => {
-  const fakeCreateIssueType = jest.fn(MockApi.projectInfo.createIssueType)
-
   const makeTester = async () => {
     const tester = CustomHookTester.create(useAddIssueTypeModel)
     await tester.renderFixture((set) => {
       set(AppConfState.atom, MockConf)
       set(EnvState.atom, MockEnv)
-      set(
-        Api.atom,
-        produce(MockApi, (api) => {
-          api.projectInfo.createIssueType = fakeCreateIssueType
-        })
-      )
+      set(Api.atom, TestMockApi)
       set(AddIssueTypeFormState.atom, (curr) => ({ ...curr, creating: true }))
     })
     return tester
@@ -60,9 +52,9 @@ describe("AddIssueTypeModel", () => {
   test("onChangeColor and onSubmit", async () => {
     const tester = await makeTester()
     await tester.act((model) => model.onChangeColor(IssueTypeColor.pill__issue_type_3))
-    expect(fakeCreateIssueType).not.toBeCalled()
+    expect(TestMockApi.projectInfo.createIssueType).not.toBeCalled()
     await tester.act((model) => model.onSubmit())
-    expect(fakeCreateIssueType).toBeCalledWith({
+    expect(TestMockApi.projectInfo.createIssueType).toBeCalledWith({
       projectId: 78386,
       name: "PBI",
       color: IssueTypeColor.pill__issue_type_3

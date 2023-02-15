@@ -14,6 +14,7 @@ import { AddIssueTypeFormState } from "./state/State"
 type SettingModel = Immutable<{
   lang: UserLang
   pbiIssueTypeId: number
+  velocityWikiId: number
   issueTypes: IssueType[]
   selectIssueType: (issueTypeId: number) => void
   orderCustomField: CustomNumberField | null
@@ -35,6 +36,7 @@ export const useSettingModel = (): SettingModel => {
   return {
     lang,
     pbiIssueTypeId: conf.pbiIssueTypeId,
+    velocityWikiId: conf.velocityWikiId,
     issueTypes,
     selectIssueType: (issueTypeId: number) => {
       setConf((curr) =>

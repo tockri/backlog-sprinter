@@ -8,11 +8,10 @@ import { EnvState } from "@/content/project/app/state/EnvState"
 import { usePBISubListModel } from "@/content/project/productBacklog/PBIList/PBISubListModel"
 import { PBIListState } from "@/content/project/productBacklog/state/PBIListState"
 import { AddIssueTypeFormState } from "@/content/project/settings/state/State"
-import { MockApi } from "@test/mock/MockApi"
 import { MockConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
+import { TestMockApi } from "@test/mock/TestMockApi"
 import { CustomHookTester } from "@test/util/CustomHookTester"
-import { produce } from "immer"
 import { useAtomValue } from "jotai"
 import React from "react"
 
@@ -27,20 +26,13 @@ describe("PBISubListModel", () => {
     return tester.probeElement()
   }
 
-  const fakeCreateIssue = jest.fn(MockApi.issue.addIssue)
-
   const makeTester = async () => {
     const tester = CustomHookTester.create(usePBISubListModel)
     await tester.renderComponent(
       (set) => {
         set(AppConfState.atom, MockConf)
         set(EnvState.atom, MockEnv)
-        set(
-          Api.atom,
-          produce(MockApi, (c) => {
-            c.issue.addIssue = fakeCreateIssue
-          })
-        )
+        set(Api.atom, TestMockApi)
         set(AddIssueTypeFormState.atom, (curr) => ({ ...curr, creating: true }))
       },
       () => <TestView tester={tester} />
@@ -88,7 +80,7 @@ describe("PBISubListModel", () => {
     await tester.act(async (model) => {
       await model.addNewIssue("issue adding test")
     })
-    expect(fakeCreateIssue).toBeCalledWith({
+    expect(TestMockApi.issue.addIssue).toBeCalledWith({
       projectId: projectId,
       milestoneId: milestoneId,
       issueTypeId: 389286,
