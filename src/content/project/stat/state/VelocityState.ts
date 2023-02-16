@@ -12,7 +12,7 @@ const collectIssues = async (api: BacklogApi, project: Project, pbiIssueTypeId: 
   return { pbis, others }
 }
 
-const calcurateVelocity = (issues: ReadonlyArray<Issue>): number =>
+const calcVelocity = (issues: ReadonlyArray<Issue>): number =>
   issues.reduce((acc, issue) => acc + (issue.actualHours || issue.estimatedHours || 1), 0)
 
 const loadData = async (api: BacklogApi, project: Project, wikiId: number) => {}
