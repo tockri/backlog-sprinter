@@ -1,55 +1,27 @@
+import { Conf, ConfState } from "@/content/board/state/ConfState"
+import { EnvState } from "@/content/board/state/EnvState"
+import { FormState, FormValues } from "@/content/board/state/FormState"
+import { TextInput } from "@/content/ui/TextInput"
 import styled from "@emotion/styled"
-import React, { useEffect } from "react"
-import { DateUtil } from "../../../util/DateUtil"
-import { BacklogApiContext } from "../../backlog/BacklogApiForReact"
-import { ProjectInfoWithMilestones } from "../../backlog/ProjectInfoApi"
-import { i18n } from "../i18n"
-import { BoardEnv } from "../types"
-import { Actions } from "./Actions"
-import { ReducerFunc, Reducers, ViewState } from "./Reducers"
-import { StorageSystem } from "./Storage"
+import { useAtom, useAtomValue } from "jotai"
+import React from "react"
+import { DateUtil } from "../../util/DateUtil"
+import { i18n } from "./i18n"
 
-type MilestoneFormProps = {
-  formInfo: BoardEnv
-  projectInfo: ProjectInfoWithMilestones
+type FormViewProps = {
   onSuccess: (newMilestoneId: number) => void
 }
 
 const dateOrNull = (e: { target: { value: string } }) => DateUtil.parseDate(e.target.value)
 
-const id = (suffix: keyof ViewState) => `bsp-milestone-${suffix}`
+const id = (suffix: keyof (FormValues & Conf)) => `bsp-milestone-${suffix}`
 
-export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
-  const { formInfo, projectInfo, onSuccess } = props
-  const [state, dispatch] = React.useReducer<ReducerFunc, void>(Reducers.reduceState(projectInfo), void 0, () => {
-    const loaded = StorageSystem.load()
-    return Reducers.makeInitialState(formInfo.selectedMilestoneId, projectInfo, loaded)
-  })
-
-  const t = i18n(formInfo.lang)
-  const api = React.useContext(BacklogApiContext)
-
-  const toSave = StorageSystem.extract(state)
-  useEffect(() => {
-    StorageSystem.save(toSave)
-  }, [toSave])
-
-  const onSubmit = async () => {
-    if (state.submittable) {
-      const submitting = (submitting: boolean, submitErrorMessage: string | null, submittingMessage: string | null) => {
-        dispatch({ src: "submit", submitting, submitErrorMessage, submittingMessage })
-      }
-      submitting(true, null, null)
-      const result = await Actions.submitForm(api, state, projectInfo, (issue) => {
-        submitting(true, null, `${t.updating}${issue.issueKey} ${issue.summary}`)
-      })
-      if (result.errorMessage) {
-        submitting(false, result.errorMessage, null)
-      } else if (result.createdMilestoneId) {
-        onSuccess(result.createdMilestoneId)
-      }
-    }
-  }
+export const FormView: React.FC<FormViewProps> = (props) => {
+  const { onSuccess } = props
+  const [values, dispatch] = useAtom(FormState.atom)
+  const env = useAtomValue(EnvState.atom)
+  const [conf, setConf] = useAtom(ConfState.atom)
+  const t = i18n(env.lang)
 
   return (
     <div className="modal__content">
@@ -64,8 +36,8 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
             size={10}
             className="input-text"
             autoComplete="off"
-            value={DateUtil.dateString(state.startDate)}
-            onChange={(e) => dispatch({ src: "startDate", value: dateOrNull(e) })}
+            value={DateUtil.dateString(values.startDate)}
+            onChange={(e) => dispatch(FormState.Action.SetStartDate(dateOrNull(e)))}
           />
           <span>&nbsp;〜&nbsp;</span>
           <DateInput
@@ -73,8 +45,9 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
             size={10}
             className="input-text"
             autoComplete="off"
-            value={DateUtil.dateString(state.endDate)}
-            onChange={(e) => dispatch({ src: "endDate", value: dateOrNull(e) })}
+            min={DateUtil.dateString(values.startDate)}
+            value={DateUtil.dateString(values.endDate)}
+            onChange={(e) => dispatch(FormState.Action.SetEndDate(dateOrNull(e)))}
           />
         </Row>
       </div>
@@ -83,29 +56,29 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
           {t.milestoneName}
         </label>
         <Row>
-          <input
+          <TextInput
             id={id("title")}
             type="text"
             size={10}
             className="input-text"
             autoComplete="off"
-            value={state.title}
-            onChange={(e) => dispatch({ src: "title", value: e.target.value })}
+            value={values.title}
+            onChange={(e) => dispatch(FormState.Action.SetTitle(e.target.value))}
           />
           <InputFollower>
             <input
               type="checkbox"
-              checked={state.titleAuto}
+              checked={values.titleAuto}
               id={id("titleAuto")}
               className="input-checkbox"
-              onChange={(e) => dispatch({ src: "titleAuto", value: e.target.checked })}
+              onChange={(e) => dispatch(FormState.Action.SetTitleAuto(e.target.checked))}
             />
             <label htmlFor={id("titleAuto")} className="checkboxLabel">
               {t.auto}
             </label>
           </InputFollower>
         </Row>
-        {state.sameTitleExists && (
+        {values.sameTitleExists && (
           <div className="message message--error _mg-b-15">
             <span className="message__icon">
               <svg role="image" className="icon -medium">
@@ -116,11 +89,11 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
           </div>
         )}
       </div>
-      {state.selectedMilestone && (
+      {values.selectedMilestone && (
         <div className="form-element__item">
           <fieldset>
             <legend>
-              {t.selecting} <MilestoneDisplay>{state.selectedMilestone.name}</MilestoneDisplay>
+              {t.selecting} <MilestoneDisplay>{values.selectedMilestone.name}</MilestoneDisplay>
             </legend>
             <PlainList>
               <PlainListItem>
@@ -129,8 +102,12 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
                     type="checkbox"
                     id={id("moveUnclosed")}
                     className="input-checkbox"
-                    onChange={(e) => dispatch({ src: "moveUnclosed", value: e.target.checked })}
-                    checked={state.moveUnclosed}
+                    onChange={(e) =>
+                      setConf((c) => {
+                        c.moveUnclosed = e.target.checked
+                      })
+                    }
+                    checked={conf.moveUnclosed}
                   />
                   <label htmlFor={id("moveUnclosed")} className="checkboxLabel">
                     {t.moveUnclosed}
@@ -143,8 +120,12 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
                     type="checkbox"
                     id={id("archiveCurrent")}
                     className="input-checkbox"
-                    onChange={(e) => dispatch({ src: "archiveCurrent", value: e.target.checked })}
-                    checked={state.archiveCurrent}
+                    onChange={(e) =>
+                      setConf((c) => {
+                        c.archiveCurrent = e.target.checked
+                      })
+                    }
+                    checked={conf.archiveCurrent}
                   />
                   <label htmlFor={id("archiveCurrent")} className="checkboxLabel">
                     {t.archive}
@@ -157,20 +138,25 @@ export const MilestoneForm: React.FC<MilestoneFormProps> = (props) => {
       )}
       <div>
         <Row className="--spacing">
-          <button type="button" disabled={!state.submittable} className="button button--primary" onClick={onSubmit}>
+          <button
+            type="button"
+            disabled={!values.submittable}
+            className="button button--primary"
+            onClick={() => dispatch(FormState.Action.Submit(onSuccess))}
+          >
             {t.submit}
           </button>
-          {state.submitting && <div className="loading--circle -small"></div>}
-          <SubmittingMessage>{state.submittingMessage}</SubmittingMessage>
+          {values.submitting && <div className="loading--circle -small"></div>}
+          <SubmittingMessage>{values.submittingMessage}</SubmittingMessage>
         </Row>
-        {state.submitErrorMessage && (
+        {values.submitErrorMessage && (
           <div className="message message--error _mg-b-15">
             <span className="message__icon">
               <svg role="image" className="icon -medium">
                 <use xlinkHref="/images/svg/sprite.symbol.svg#icon_alert"></use>
               </svg>
             </span>
-            <div className="message__content">{state.submitErrorMessage}</div>
+            <div className="message__content">{values.submitErrorMessage}</div>
           </div>
         )}
       </div>

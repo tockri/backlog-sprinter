@@ -3,7 +3,8 @@ import { atom } from "jotai"
 
 import { produce } from "immer"
 import { CustomField, CustomFieldTypes, CustomNumberField, isNumberField } from "../../../backlog/ProjectInfoApi"
-import { Api } from "./Api"
+
+import { Api } from "@/content/backlog/state/Api"
 import { AppConfState } from "./AppConfState"
 import { EnvState } from "./EnvState"
 import { CustomFieldsState, IssueTypesState } from "./ProjectInfoState"

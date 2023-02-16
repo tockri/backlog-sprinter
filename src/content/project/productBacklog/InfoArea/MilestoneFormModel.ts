@@ -1,3 +1,4 @@
+import { UserLang } from "@/content/types"
 import produce, { Immutable } from "immer"
 import { useAtomValue, useSetAtom } from "jotai"
 import React from "react"
@@ -5,7 +6,6 @@ import { DateUtil } from "../../../../util/DateUtil"
 import { AddMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
 import { EnvState } from "../../app/state/EnvState"
 import { MilestonesState } from "../../app/state/ProjectInfoState"
-import { UserLang } from "../../types"
 import { ItemSelectionState } from "../state/ItemSelectionState"
 import { PBIListState } from "../state/PBIListState"
 

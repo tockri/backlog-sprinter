@@ -1,10 +1,11 @@
+import { UserLang } from "@/content/types"
 import React from "react"
 import { createRoot } from "react-dom/client"
 import { MessageBroker } from "../util/MessageBroker"
 import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
 import SprintIcon from "./images/sprint.svg"
 import { ProjectApp } from "./project/app/View"
-import { i18n, ProjectEnv, UserLang } from "./project/types"
+import { i18n, ProjectEnv } from "./project/types"
 import { jsxToElement } from "./ui/JSXUtil"
 
 const broker = new MessageBroker<ProjectEnv>()

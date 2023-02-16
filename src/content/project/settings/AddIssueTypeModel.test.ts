@@ -2,7 +2,8 @@
  * @jest-environment jsdom
  */
 import { IssueTypeColor } from "@/content/backlog/ProjectInfoApi"
-import { Api } from "@/content/project/app/state/Api"
+
+import { Api } from "@/content/backlog/state/Api"
 import { AppConfState } from "@/content/project/app/state/AppConfState"
 import { EnvState } from "@/content/project/app/state/EnvState"
 import { useAddIssueTypeModel } from "@/content/project/settings/AddIssueTypeModel"

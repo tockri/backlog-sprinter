@@ -4,7 +4,8 @@ import { atom } from "jotai"
 
 import { IssueType, IssueTypeColor } from "../../../backlog/ProjectInfoApi"
 import { JotaiUtil } from "../../../util/JotaiUtil"
-import { Api } from "./Api"
+
+import { Api } from "@/content/backlog/state/Api"
 import { AppConfState } from "./AppConfState"
 import { EnvState } from "./EnvState"
 

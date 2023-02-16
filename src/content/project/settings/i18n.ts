@@ -1,4 +1,4 @@
-import { UserLang } from "../types"
+import { UserLang } from "@/content/types"
 
 const ja = {
   issueTypeLabel: "プロダクトバックログを表す課題種別",

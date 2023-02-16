@@ -1,3 +1,4 @@
+import { UserLang } from "@/content/types"
 import { Immutable, produce } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
@@ -7,7 +8,6 @@ import { AppConfState } from "../app/state/AppConfState"
 import { EnvState } from "../app/state/EnvState"
 import { OrderCustomFieldAction, OrderCustomFieldState } from "../app/state/OrderCustomFieldState"
 import { IssueTypesState } from "../app/state/ProjectInfoState"
-import { UserLang } from "../types"
 import { i18n } from "./i18n"
 import { AddIssueTypeFormState } from "./state/State"
 

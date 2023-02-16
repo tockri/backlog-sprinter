@@ -32,7 +32,7 @@ export type Project = Immutable<{
 
 export type ProjectInfoWithMilestones = Immutable<{
   project: Project
-  versions: ReadonlyArray<Version>
+  milestones: ReadonlyArray<Version>
   statuses: ReadonlyArray<Status>
 }>
 
@@ -40,10 +40,10 @@ const getProjectInfoWithMilestones = async (projectKey: string): Promise<Project
   const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
   const versionsP = BacklogApiRequest.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
   const statusesP = BacklogApiRequest.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
-  const [versions, statuses] = await Promise.all([versionsP, statusesP])
+  const [milestones, statuses] = await Promise.all([versionsP, statusesP])
   return {
     project,
-    versions,
+    milestones,
     statuses
   }
 }

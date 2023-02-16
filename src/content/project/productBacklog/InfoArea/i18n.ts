@@ -1,3 +1,5 @@
+import { UserLang } from "@/content/types"
+
 const ja = {
   childIssue: "子課題",
   addMilestone: "マイルストーンの新規作成",
@@ -23,7 +25,5 @@ const en: typeof ja = {
 }
 
 const resources = { ja, en }
-
-import { UserLang } from "../../types"
 
 export const i18n = (lang: UserLang) => resources[lang]

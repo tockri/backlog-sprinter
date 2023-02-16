@@ -1,4 +1,4 @@
-export type UserLang = "ja" | "en"
+import { UserLang } from "@/content/types"
 
 export type ProjectEnv = {
   readonly projectKey: string

@@ -1,6 +1,6 @@
-import { UserLang } from "./i18n"
+import { UserLang } from "@/content/types"
 
-export type MilestoneFormInfo = {
+export type BoardEnv = {
   projectKey: string
   selectedMilestoneId: number
   lang: UserLang

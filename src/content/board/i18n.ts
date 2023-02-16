@@ -1,3 +1,5 @@
+import { UserLang } from "@/content/types"
+
 const ja = {
   selecting: "選択中：",
   updating: "更新中：",
@@ -25,7 +27,5 @@ const en: typeof ja = {
 }
 
 const resources = { ja, en }
-
-export type UserLang = keyof typeof resources
 
 export const i18n = (lang: UserLang) => resources[lang]

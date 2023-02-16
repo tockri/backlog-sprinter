@@ -1,5 +1,5 @@
 import { atom } from "jotai"
-import { BacklogApi, RealBacklogApi } from "../../../backlog/BacklogApiForReact"
+import { BacklogApi, RealBacklogApi } from "../BacklogApiForReact"
 
 const backlogApiAtom = atom<BacklogApi>(RealBacklogApi)
 

@@ -1,18 +1,20 @@
+import { MessageBroker } from "@/util/MessageBroker"
+import { Waiter } from "@/util/Waiter"
 import React from "react"
 import ReactDomClient from "react-dom/client"
-import { MessageBroker } from "../util/MessageBroker"
-import { Waiter } from "../util/Waiter"
 import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
-import { BoardApp, FormInfo, Lang } from "./board/App"
+import { BoardEnv } from "./board/types"
+import { BoardView } from "./board/View"
+import { UserLang } from "./types"
 import { jsxToElement } from "./ui/JSXUtil"
 
-const broker = new MessageBroker<FormInfo>()
+const broker = new MessageBroker<BoardEnv>()
 
-const makeFormInfo = (): FormInfo => {
+const makeFormInfo = (): BoardEnv => {
   const url = new URL(location.href)
   const projectKey = url.pathname.split("/")[2]
   const selectedMilestoneId = parseInt(url.searchParams.get("milestone") || "0")
-  const lang: Lang = document.documentElement.lang === "ja" ? "ja" : "en"
+  const lang: UserLang = document.documentElement.lang === "ja" ? "ja" : "en"
 
   return {
     projectKey,
@@ -28,7 +30,7 @@ const renderApp = () => {
     const reactRoot = ReactDomClient.createRoot(rootElem)
     reactRoot.render(
       <BacklogApiContext.Provider value={RealBacklogApi}>
-        <BoardApp broker={broker} />
+        <BoardView broker={broker} />
       </BacklogApiContext.Provider>
     )
   }

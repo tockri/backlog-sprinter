@@ -28,7 +28,23 @@ const asyncAtomFromParent = <T, U>(
   return main
 }
 
-type ActionAtom<Value, Action> = WritableAtom<Promise<Value>, [Action], Promise<void>>
+export type Handler<Value, Action> = (curr: Value, get: Getter, set: Setter, action: Action) => Value
+
+const atomWithAction = <Value, Action>(
+  read: Read<Value>,
+  handler: Handler<Value, Action>
+): WritableAtom<Value, [Action], void> => {
+  const store = atom<Value | null>(null)
+  const main = atom<Value, [Action], void>(
+    (get) => get(store) || read(get),
+    (get, set, action: Action) => {
+      set(store, handler(get(main), get, set, action))
+    }
+  )
+  return main
+}
+
+type AsyncActionAtom<Value, Action> = WritableAtom<Promise<Value>, [Action], Promise<void>>
 
 export type AsyncRead<Value> = (get: Getter) => Promise<Value>
 
@@ -42,7 +58,7 @@ export type AsyncHandler<Value, Action> = (
 const asyncAtomWithAction = <Value, Action>(
   read: AsyncRead<Value>,
   handler: AsyncHandler<Value, Action>
-): ActionAtom<Value, Action> => {
+): AsyncActionAtom<Value, Action> => {
   const store = atom<Value | null>(null)
   const main = atom<Promise<Value>, [Action], Promise<void>>(
     async (get) => get(store) || (await read(get)),
@@ -59,7 +75,7 @@ const asyncAtomFamilyWithAction = <Param, Value, Action>(
     param: Param,
     storeAtom: AtomFamily<Param, WritableAtom<Value | null, [Value], void>>
   ) => AsyncHandler<Value, Action>
-): AtomFamily<Param, ActionAtom<Value, Action>> => {
+): AtomFamily<Param, AsyncActionAtom<Value, Action>> => {
   /* eslint @typescript-eslint/no-unused-vars: 0 */
   const store = atomFamily((param: Param) => atom<Value | null>(null))
   const main = atomFamily((param: Param) =>
@@ -75,6 +91,7 @@ const asyncAtomFamilyWithAction = <Param, Value, Action>(
 
 export const JotaiUtil = {
   isValue,
+  atomWithAction,
   asyncAtomFromParent,
   asyncAtomWithAction,
   asyncAtomFamilyWithAction

@@ -2,7 +2,8 @@ import { JotaiUtil } from "@/content/util/JotaiUtil"
 import produce from "immer"
 import { WritableDraft } from "immer/dist/types/types-external"
 import { AddIssueInput, Issue } from "../../../backlog/IssueApi"
-import { Api } from "../../app/state/Api"
+
+import { Api } from "@/content/backlog/state/Api"
 import { ProjectState } from "../../app/state/ProjectInfoState"
 
 type CreateAction = {
