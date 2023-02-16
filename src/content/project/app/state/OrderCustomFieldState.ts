@@ -2,7 +2,7 @@ import { WritableDraft } from "immer/dist/types/types-external"
 import { atom } from "jotai"
 
 import { produce } from "immer"
-import { CustomField, CustomFieldTypes, CustomNumberField, isNumberField } from "../../../backlog/ProjectInfo"
+import { CustomField, CustomFieldTypes, CustomNumberField, isNumberField } from "../../../backlog/ProjectInfoApi"
 import { Api } from "./Api"
 import { AppConfState } from "./AppConfState"
 import { EnvState } from "./EnvState"

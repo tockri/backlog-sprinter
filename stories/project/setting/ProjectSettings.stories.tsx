@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-import { IssueTypeColor } from "@/content/backlog/ProjectInfo"
+import { IssueTypeColor } from "@/content/backlog/ProjectInfoApi"
 import { AppConfState } from "@/content/project/app/state/AppConfState"
 import { AddIssueTypeFormState } from "@/content/project/settings/state/State"
 import { ProjectSettings } from "@/content/project/settings/View"

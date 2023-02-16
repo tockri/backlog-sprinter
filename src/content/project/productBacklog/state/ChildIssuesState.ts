@@ -1,7 +1,7 @@
 import { JotaiUtil } from "@/content/util/JotaiUtil"
 import produce from "immer"
 import { WritableDraft } from "immer/dist/types/types-external"
-import { AddIssueInput, IssueData } from "../../../backlog/Issue"
+import { AddIssueInput, Issue } from "../../../backlog/IssueApi"
 import { Api } from "../../app/state/Api"
 import { ProjectState } from "../../app/state/ProjectInfoState"
 
@@ -11,7 +11,7 @@ type CreateAction = {
 }
 type MoveAction = {
   type: "Move"
-  issue: IssueData
+  issue: Issue
   destinationIssueId: number
 }
 export type ChildIssuesAction = CreateAction | MoveAction
@@ -32,7 +32,7 @@ const mainAtom = JotaiUtil.asyncAtomFamilyWithAction(
       set(
         storeAtom(destinationIssueId),
         produce(currDst, (draft) => {
-          draft.push(updated as WritableDraft<IssueData>)
+          draft.push(updated as WritableDraft<Issue>)
         })
       )
 
@@ -54,7 +54,7 @@ export const ChildIssuesState = {
       type: "Create",
       input
     }),
-    Move: (issue: IssueData, destinationIssueId: number): MoveAction => ({
+    Move: (issue: Issue, destinationIssueId: number): MoveAction => ({
       type: "Move",
       issue,
       destinationIssueId

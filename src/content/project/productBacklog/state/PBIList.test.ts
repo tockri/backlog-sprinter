@@ -1,7 +1,7 @@
 import produce from "immer"
 import { ArrayUtil } from "../../../../util/ArrayUtil"
 import { NestedList, NLLocation, NLMoveAction } from "../../../../util/NestedList"
-import { Version } from "../../../backlog/ProjectInfo"
+import { IssueTypeColor, Version } from "../../../backlog/ProjectInfoApi"
 import { IssueDataWithOrder, PBIList, PBIListFunc, PBIListMovedEvent } from "./PBIList"
 
 // -------------------- preparation --------------------------
@@ -31,6 +31,13 @@ const fakeIssue = (id: number, versionId: number | null, order: number | null): 
   estimatedHours: null,
   actualHours: null,
   parentIssueId: null,
+  issueType: {
+    id: 2,
+    color: IssueTypeColor.pill__issue_type_1,
+    name: "test type",
+    projectId: 1,
+    displayOrder: 1000
+  },
   order
 })
 const makeFakeBacklog = (

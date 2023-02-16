@@ -6,8 +6,8 @@ import { ArrayUtil } from "@/util/ArrayUtil"
 import { DateUtil } from "@/util/DateUtil"
 import { NLLocation, NLMoveAction } from "@/util/NestedList"
 import { Waiter } from "@/util/Waiter"
-import { EditIssueInput, IssueData } from "../../../backlog/Issue"
-import { AddMilestoneInput, CustomNumberField, EditMilestoneInput, Version } from "../../../backlog/ProjectInfo"
+import { EditIssueInput, Issue } from "../../../backlog/IssueApi"
+import { AddMilestoneInput, CustomNumberField, EditMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
 import { AsyncHandler, AsyncRead, JotaiUtil } from "../../../util/JotaiUtil"
 import { Api } from "../../app/state/Api"
 import { AppConfState } from "../../app/state/AppConfState"
@@ -79,9 +79,9 @@ const updateIssues = async (
   customField: CustomNumberField,
   events: ReadonlyArray<PBIListMovedEvent>,
   api: BacklogApi
-): Promise<ReadonlyArray<IssueData>> => {
+): Promise<ReadonlyArray<Issue>> => {
   const chunked = ArrayUtil.chunk(events, 5)
-  const updated: IssueData[] = []
+  const updated: Issue[] = []
 
   for (let i = 0; i < chunked.length; i++) {
     const chunk = chunked[i]

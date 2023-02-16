@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
-import { IssueData } from "../../../backlog/Issue"
+import { Issue } from "../../../backlog/IssueApi"
 import { HBox } from "../../../ui/Box"
 import { Draggable } from "../../../ui/DragAndDrop"
 import { EnvState } from "../../app/state/EnvState"
@@ -36,7 +36,7 @@ export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => 
 }
 
 type ChildIssueViewProps = {
-  issue: IssueData
+  issue: Issue
   dispatch: (action: ChildIssuesAction) => void
 }
 

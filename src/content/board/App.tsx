@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { ProjectInfoWithMilestones } from "../backlog/ProjectInfo"
+import { ProjectInfoWithMilestones } from "../backlog/ProjectInfoApi"
 
 import { MessageBroker } from "../../util/MessageBroker"
 import { BacklogApiContext } from "../backlog/BacklogApiForReact"

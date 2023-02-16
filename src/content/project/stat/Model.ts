@@ -1,7 +1,7 @@
 import { Immutable } from "immer"
 import { useAtomValue } from "jotai"
 import { DateUtil } from "../../../util/DateUtil"
-import { Version } from "../../backlog/ProjectInfo"
+import { Version } from "../../backlog/ProjectInfoApi"
 import { MilestonesState } from "../app/state/ProjectInfoState"
 
 type StatModel = Immutable<{

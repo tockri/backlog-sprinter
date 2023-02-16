@@ -1,6 +1,6 @@
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai/index"
-import { IssueType, IssueTypeColor } from "../../backlog/ProjectInfo"
+import { IssueType, IssueTypeColor } from "../../backlog/ProjectInfoApi"
 import { EnvState } from "../app/state/EnvState"
 import { IssueTypesState } from "../app/state/ProjectInfoState"
 import { UserLang } from "../types"

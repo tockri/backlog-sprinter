@@ -28,12 +28,21 @@ const asyncAtomFromParent = <T, U>(
   return main
 }
 
+type ActionAtom<Value, Action> = WritableAtom<Promise<Value>, [Action], Promise<void>>
+
 export type AsyncRead<Value> = (get: Getter) => Promise<Value>
-export type AsyncHandler<Value, Action> = (curr: Value, get: Getter, set: Setter, action: Action) => Promise<Value>
 
-const awaited = async <T>(p: Promise<T> | T): Promise<T> => (p instanceof Promise ? await p : p)
+export type AsyncHandler<Value, Action> = (
+  curr: Value,
+  get: Getter,
+  set: Setter,
+  action: Action
+) => Promise<Value> | Value
 
-const asyncAtomWithAction = <Value, Action>(read: AsyncRead<Value>, handler: AsyncHandler<Value, Action>) => {
+const asyncAtomWithAction = <Value, Action>(
+  read: AsyncRead<Value>,
+  handler: AsyncHandler<Value, Action>
+): ActionAtom<Value, Action> => {
   const store = atom<Value | null>(null)
   const main = atom<Promise<Value>, [Action], Promise<void>>(
     async (get) => get(store) || (await read(get)),
@@ -44,23 +53,13 @@ const asyncAtomWithAction = <Value, Action>(read: AsyncRead<Value>, handler: Asy
   return main
 }
 
-export type AsyncReadWithParam<Param, Value> = (param: Param, get: Getter) => Promise<Value>
-export type AsyncHandlerWithParam<Param, Value, Action> = (
-  param: Param,
-  curr: Value,
-  get: Getter,
-  set: Setter,
-  action: Action,
-  storeAtom: AtomFamily<Param, WritableAtom<Value | null, [Value], void>>
-) => Promise<Value>
-
 const asyncAtomFamilyWithAction = <Param, Value, Action>(
   read: (param: Param) => AsyncRead<Value>,
   handler: (
     param: Param,
     storeAtom: AtomFamily<Param, WritableAtom<Value | null, [Value], void>>
   ) => AsyncHandler<Value, Action>
-) => {
+): AtomFamily<Param, ActionAtom<Value, Action>> => {
   /* eslint @typescript-eslint/no-unused-vars: 0 */
   const store = atomFamily((param: Param) => atom<Value | null>(null))
   const main = atomFamily((param: Param) =>

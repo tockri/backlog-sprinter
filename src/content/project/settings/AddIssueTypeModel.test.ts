@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { IssueTypeColor } from "@/content/backlog/ProjectInfo"
+import { IssueTypeColor } from "@/content/backlog/ProjectInfoApi"
 import { Api } from "@/content/project/app/state/Api"
 import { AppConfState } from "@/content/project/app/state/AppConfState"
 import { EnvState } from "@/content/project/app/state/EnvState"

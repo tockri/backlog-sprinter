@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from "jotai"
-import { EditMilestoneInput, Version } from "../../../backlog/ProjectInfo"
+import { EditMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
 import { EnvState } from "../../app/state/EnvState"
 import { MilestonesState } from "../../app/state/ProjectInfoState"
 import { UserLang } from "../../types"

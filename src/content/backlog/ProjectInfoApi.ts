@@ -260,7 +260,7 @@ const createIssueType = async (input: IssueTypeInput): Promise<IssueType> => {
   })
 }
 
-const ProjectInfo = {
+export const RealProjectInfoApi = {
   getProjectInfoWithMilestones,
   getProjectInfoWithCustomFields,
   createCustomField,
@@ -271,6 +271,4 @@ const ProjectInfo = {
   createIssueType
 }
 
-export type ProjectInfoApi = typeof ProjectInfo
-
-export const RealProjectInfo = ProjectInfo
+export type ProjectInfoApi = typeof RealProjectInfoApi

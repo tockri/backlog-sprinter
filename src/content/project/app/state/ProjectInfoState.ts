@@ -2,7 +2,7 @@ import { Immutable, produce } from "immer"
 import { WritableDraft } from "immer/dist/types/types-external"
 import { atom } from "jotai"
 
-import { IssueType, IssueTypeColor } from "../../../backlog/ProjectInfo"
+import { IssueType, IssueTypeColor } from "../../../backlog/ProjectInfoApi"
 import { JotaiUtil } from "../../../util/JotaiUtil"
 import { Api } from "./Api"
 import { AppConfState } from "./AppConfState"

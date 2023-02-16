@@ -1,5 +1,5 @@
 import { DateUtil } from "../../../util/DateUtil"
-import { ProjectInfoWithMilestones, Version } from "../../backlog/ProjectInfo"
+import { ProjectInfoWithMilestones, Version } from "../../backlog/ProjectInfoApi"
 
 export type PartialViewState = {
   sprintDays: number

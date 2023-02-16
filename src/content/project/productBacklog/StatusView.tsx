@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { useAtomValue } from "jotai"
 import React from "react"
-import { Status } from "../../backlog/ProjectInfo"
+import { Status } from "../../backlog/ProjectInfoApi"
 import { StatusesState } from "../app/state/ProjectInfoState"
 
 type StatusViewProps = {
