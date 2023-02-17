@@ -80,6 +80,7 @@ const asyncAtomFamilyWithAction = <Param, Value, Action>(
   ) => AsyncHandler<Value, Action>
 ): AtomFamily<Param, AsyncActionAtom<Value, Action>> => {
   /* eslint @typescript-eslint/no-unused-vars: 0 */
+  // noinspection JSUnusedLocalSymbols
   const store = atomFamily((param: Param) => atom<Value | null>(null))
   const main = atomFamily((param: Param) =>
     atom<Promise<Value>, [Action], Promise<void>>(
