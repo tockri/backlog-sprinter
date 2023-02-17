@@ -65,12 +65,17 @@ const searchChildren = async (project: Project, parentIssueId: number): Promise<
   ])
 }
 
-const searchClosed = async (project: Project, updatedSince: Date): Promise<ReadonlyArray<Issue>> => {
+const searchClosed = async (
+  projectId: number,
+  updatedSince: Date,
+  updatedUntil: Date
+): Promise<ReadonlyArray<Issue>> => {
   return await BacklogApiRequest.get<ReadonlyArray<Issue>>("/api/v2/issues", [
     {
-      "projectId[]": "" + project.id,
+      "projectId[]": "" + projectId,
       "statusId[]": "4",
       updatedSince: DateUtil.dateString(updatedSince),
+      updatedUntil: DateUtil.dateString(updatedUntil),
       count: "100"
     }
   ])
