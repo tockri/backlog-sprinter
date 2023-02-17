@@ -146,16 +146,15 @@ export const FormView: React.FC<FormViewProps> = (props) => {
           >
             {t.submit}
           </button>
-          {values.submittingMessage ||
-            (values.submitting && (
-              <>
-                <div className="loading--circle -small"></div>
-                <SubmittingMessage>
-                  {t.updating}
-                  {values.submittingMessage}
-                </SubmittingMessage>
-              </>
-            ))}
+          {values.submitting && (
+            <>
+              <div className="loading--circle -small"></div>
+              <SubmittingMessage>
+                {t.updating}
+                {values.submittingMessage}
+              </SubmittingMessage>
+            </>
+          )}
         </Row>
         {values.submitErrorMessage && (
           <div className="message message--error _mg-b-15">

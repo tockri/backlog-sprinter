@@ -124,10 +124,6 @@ const submit: AsyncHandler<FormValues, Submit> = async (curr, get, set, action, 
       })
     )
   }
-  update((d) => {
-    d.submitting = true
-    d.submittable = false
-  })
   const milestoneInput: AddMilestoneInput = {
     name: curr.title,
     startDate: curr.startDate,
@@ -139,6 +135,10 @@ const submit: AsyncHandler<FormValues, Submit> = async (curr, get, set, action, 
   const statuses = await get(StatusesState.atom)
   const conf = get(ConfState.atom)
   try {
+    update((d) => {
+      d.submitting = true
+      d.submittable = false
+    })
     const createdMilestone = await api.projectInfo.addMilestone(project.id, milestoneInput)
     if (curr.selectedMilestone) {
       if (conf.moveUnclosed) {
