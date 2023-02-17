@@ -174,17 +174,17 @@ const pbEditIssue: AsyncHandler<PBIList, EditIssueAction> = async (prev, get, se
   })
 }
 
-const mainAtom = JotaiUtil.asyncAtomWithAction<PBIList, PBIListAction>(pbRead, (prev, get, set, action) => {
+const mainAtom = JotaiUtil.asyncAtomWithAction<PBIList, PBIListAction>(pbRead, (prev, get, set, action, storeAtom) => {
   if (action.type === "NLMove") {
-    return pbMove(prev, get, set, action)
+    return pbMove(prev, get, set, action, storeAtom)
   } else if (action.type === "AddIssue") {
-    return pbAddIssue(prev, get, set, action)
+    return pbAddIssue(prev, get, set, action, storeAtom)
   } else if (action.type === "AddMilestone") {
-    return pbAddMilestone(prev, get, set, action)
+    return pbAddMilestone(prev, get, set, action, storeAtom)
   } else if (action.type === "EditMilestone") {
-    return pbEditMilestone(prev, get, set, action)
+    return pbEditMilestone(prev, get, set, action, storeAtom)
   } else if (action.type === "EditIssue") {
-    return pbEditIssue(prev, get, set, action)
+    return pbEditIssue(prev, get, set, action, storeAtom)
   } else {
     throw new Error(`unknown type : ${action}`)
   }

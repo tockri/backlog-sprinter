@@ -48,11 +48,14 @@ type AsyncActionAtom<Value, Action> = WritableAtom<Promise<Value>, [Action], Pro
 
 export type AsyncRead<Value> = (get: Getter) => Promise<Value>
 
+// Copied from jotai/core/atom.d.ts
+type SetStateAction<Value> = Value | ((prev: Value) => Value)
 export type AsyncHandler<Value, Action> = (
   curr: Value,
   get: Getter,
   set: Setter,
-  action: Action
+  action: Action,
+  storeAtom: WritableAtom<Value | null, [SetStateAction<Value | null>], void>
 ) => Promise<Value> | Value
 
 const asyncAtomWithAction = <Value, Action>(
@@ -63,7 +66,7 @@ const asyncAtomWithAction = <Value, Action>(
   const main = atom<Promise<Value>, [Action], Promise<void>>(
     async (get) => get(store) || (await read(get)),
     async (get, set, action: Action) => {
-      set(store, await handler(await get(main), get, set, action))
+      set(store, await handler(await get(main), get, set, action, store))
     }
   )
   return main
@@ -82,7 +85,7 @@ const asyncAtomFamilyWithAction = <Param, Value, Action>(
     atom<Promise<Value>, [Action], Promise<void>>(
       async (get) => get(store(param)) || (await read(param)(get)),
       async (get, set, action: Action) => {
-        set(store(param), await handler(param, store)(await get(main(param)), get, set, action))
+        set(store(param), await handler(param, store)(await get(main(param)), get, set, action, store(param)))
       }
     )
   )

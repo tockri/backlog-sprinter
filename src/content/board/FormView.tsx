@@ -2,10 +2,10 @@ import { Conf, ConfState } from "@/content/board/state/ConfState"
 import { EnvState } from "@/content/board/state/EnvState"
 import { FormState, FormValues } from "@/content/board/state/FormState"
 import { TextInput } from "@/content/ui/TextInput"
+import { DateUtil } from "@/util/DateUtil"
 import styled from "@emotion/styled"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
-import { DateUtil } from "../../util/DateUtil"
 import { i18n } from "./i18n"
 
 type FormViewProps = {
@@ -146,8 +146,16 @@ export const FormView: React.FC<FormViewProps> = (props) => {
           >
             {t.submit}
           </button>
-          {values.submitting && <div className="loading--circle -small"></div>}
-          <SubmittingMessage>{values.submittingMessage}</SubmittingMessage>
+          {values.submittingMessage ||
+            (values.submitting && (
+              <>
+                <div className="loading--circle -small"></div>
+                <SubmittingMessage>
+                  {t.updating}
+                  {values.submittingMessage}
+                </SubmittingMessage>
+              </>
+            ))}
         </Row>
         {values.submitErrorMessage && (
           <div className="message message--error _mg-b-15">
