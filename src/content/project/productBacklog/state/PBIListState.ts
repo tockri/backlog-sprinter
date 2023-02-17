@@ -10,7 +10,7 @@ import { EditIssueInput, Issue } from "../../../backlog/IssueApi"
 import { AddMilestoneInput, CustomNumberField, EditMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
 import { AsyncHandler, AsyncRead, JotaiUtil } from "../../../util/JotaiUtil"
 
-import { Api } from "@/content/backlog/state/Api"
+import { ApiState } from "@/content/state/ApiState"
 import { AppConfState } from "../../app/state/AppConfState"
 import { OrderCustomFieldState } from "../../app/state/OrderCustomFieldState"
 import { IssueTypesState, MilestonesState, ProjectState, StatusesState } from "../../app/state/ProjectInfoState"
@@ -46,7 +46,7 @@ const pbRead: AsyncRead<PBIList> = async (get) => {
   const orderCustomField = await get(OrderCustomFieldState.atom)
   if (orderCustomField) {
     const project = await get(ProjectState.atom)
-    const api = get(Api.atom)
+    const api = get(ApiState.atom)
     const conf = get(AppConfState.atom)
     const milestones = await get(MilestonesState.atom)
     const today = new Date()
@@ -67,7 +67,7 @@ const pbMove: AsyncHandler<PBIList, NLMoveAction> = async (prev, get, set, actio
     events.push(...PBIListFunc.mutateByMovingAction(draft, action))
   })
   if (events.length) {
-    const api = get(Api.atom)
+    const api = get(ApiState.atom)
     const orderCustomField = await get(OrderCustomFieldState.atom)
     if (orderCustomField) {
       await updateIssues(orderCustomField, events, api).then()
@@ -110,7 +110,7 @@ const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set,
   const orderCustomField = await get(OrderCustomFieldState.atom)
   if (issueType && orderCustomField) {
     const project = await get(ProjectState.atom)
-    const api = get(Api.atom)
+    const api = get(ApiState.atom)
     const order = PBIListFunc.getNewOrder(prev, action.milestone)
     const created = await api.issue.addIssue({
       projectId: project.id,
@@ -131,7 +131,7 @@ const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set,
 }
 
 const pbAddMilestone: AsyncHandler<PBIList, AddMilestoneAction> = async (prev, get, set, action) => {
-  const api = get(Api.atom)
+  const api = get(ApiState.atom)
   const project = await get(ProjectState.atom)
   const created = await api.projectInfo.addMilestone(project.id, action.input)
   const milestones = await get(MilestonesState.atom)
@@ -147,7 +147,7 @@ const pbAddMilestone: AsyncHandler<PBIList, AddMilestoneAction> = async (prev, g
 }
 
 const pbEditMilestone: AsyncHandler<PBIList, EditMilestoneAction> = async (prev, get, set, action) => {
-  const api = get(Api.atom)
+  const api = get(ApiState.atom)
   const project = await get(ProjectState.atom)
   const updated = await api.projectInfo.editMilestone(project.id, action.milestoneId, action.input)
 
@@ -165,7 +165,7 @@ const pbEditMilestone: AsyncHandler<PBIList, EditMilestoneAction> = async (prev,
 }
 
 const pbEditIssue: AsyncHandler<PBIList, EditIssueAction> = async (prev, get, set, action) => {
-  const api = get(Api.atom)
+  const api = get(ApiState.atom)
   const { issueId, input } = action
   await api.issue.editIssue(issueId, input)
   const statuses = await get(StatusesState.atom)
@@ -174,17 +174,17 @@ const pbEditIssue: AsyncHandler<PBIList, EditIssueAction> = async (prev, get, se
   })
 }
 
-const mainAtom = JotaiUtil.asyncAtomWithAction<PBIList, PBIListAction>(pbRead, (prev, get, set, action, storeAtom) => {
+const mainAtom = JotaiUtil.asyncAtomWithAction<PBIList, PBIListAction>(pbRead, () => (prev, get, set, action) => {
   if (action.type === "NLMove") {
-    return pbMove(prev, get, set, action, storeAtom)
+    return pbMove(prev, get, set, action)
   } else if (action.type === "AddIssue") {
-    return pbAddIssue(prev, get, set, action, storeAtom)
+    return pbAddIssue(prev, get, set, action)
   } else if (action.type === "AddMilestone") {
-    return pbAddMilestone(prev, get, set, action, storeAtom)
+    return pbAddMilestone(prev, get, set, action)
   } else if (action.type === "EditMilestone") {
-    return pbEditMilestone(prev, get, set, action, storeAtom)
+    return pbEditMilestone(prev, get, set, action)
   } else if (action.type === "EditIssue") {
-    return pbEditIssue(prev, get, set, action, storeAtom)
+    return pbEditIssue(prev, get, set, action)
   } else {
     throw new Error(`unknown type : ${action}`)
   }

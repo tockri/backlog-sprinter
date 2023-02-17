@@ -1,12 +1,13 @@
 import { AddMilestoneInput, Version } from "@/content/backlog/ProjectInfoApi"
-import { Api } from "@/content/backlog/state/Api"
 import { ConfState } from "@/content/board/state/ConfState"
 import { EnvState } from "@/content/board/state/EnvState"
 import { MilestonesState, ProjectState, StatusesState } from "@/content/board/state/ProjectInfoState"
-import { AsyncHandler, JotaiUtil } from "@/content/util/JotaiUtil"
+import { ApiState } from "@/content/state/ApiState"
+import { AsyncHandler, JotaiUtil, StoreAtom } from "@/content/util/JotaiUtil"
 import { DateUtil } from "@/util/DateUtil"
 import produce, { Immutable } from "immer"
 import { WritableDraft } from "immer/dist/types/types-external"
+import { Getter, Setter } from "jotai"
 
 export type FormValues = Immutable<{
   selectedMilestone: Version | null
@@ -114,7 +115,7 @@ const titleAuto: AsyncHandler<FormValues, SetTitleAuto> = async (curr, get, set,
   })
 }
 
-const submit: AsyncHandler<FormValues, Submit> = async (curr, get, set, action, storeAtom) => {
+const submit = async (curr: FormValues, get: Getter, set: Setter, action: Submit, storeAtom: StoreAtom<FormValues>) => {
   const update = (recipe: (d: WritableDraft<FormValues>) => void) => {
     set(storeAtom, (c) =>
       produce(c, (d) => {
@@ -130,15 +131,11 @@ const submit: AsyncHandler<FormValues, Submit> = async (curr, get, set, action, 
     releaseDueDate: curr.endDate,
     description: ""
   }
-  const api = get(Api.atom)
+  const api = get(ApiState.atom)
   const project = await get(ProjectState.atom)
   const statuses = await get(StatusesState.atom)
   const conf = get(ConfState.atom)
   try {
-    update((d) => {
-      d.submitting = true
-      d.submittable = false
-    })
     const createdMilestone = await api.projectInfo.addMilestone(project.id, milestoneInput)
     if (curr.selectedMilestone) {
       if (conf.moveUnclosed) {
@@ -198,21 +195,21 @@ const mainAtom = JotaiUtil.asyncAtomWithAction<FormValues, Action>(
       submittingMessage: null
     }
   },
-  (curr, get, set, action, storeAtom) => {
+  (storeAtom) => (curr, get, set, action) => {
     switch (action.type) {
       case "Init":
         return curr
       case "StartDate":
-        return startDate(curr, get, set, action, storeAtom)
+        return startDate(curr, get, set, action)
       case "EndDate":
-        return endDate(curr, get, set, action, storeAtom)
+        return endDate(curr, get, set, action)
       case "Title":
-        return title(curr, get, set, action, storeAtom)
+        return title(curr, get, set, action)
       case "TitleAuto":
-        return titleAuto(curr, get, set, action, storeAtom)
+        return titleAuto(curr, get, set, action)
       case "Submit":
-        submit(curr, get, set, action, storeAtom)
-        return curr
+        submit(curr, get, set, action, storeAtom).then()
+        return { ...curr, submitting: true, submittable: false }
     }
   }
 )

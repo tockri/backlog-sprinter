@@ -15,3 +15,9 @@ const searchWiki = async (projectId: number, keyword: string): Promise<ReadonlyA
     keyword
   })
 }
+
+export const RealWikiApi = {
+  searchWiki
+}
+
+export type WikiApi = typeof RealWikiApi

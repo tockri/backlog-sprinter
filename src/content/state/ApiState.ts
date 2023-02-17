@@ -1,8 +1,8 @@
 import { atom } from "jotai"
-import { BacklogApi, RealBacklogApi } from "../BacklogApiForReact"
+import { BacklogApi, RealBacklogApi } from "../backlog/BacklogApiForReact"
 
 const backlogApiAtom = atom<BacklogApi>(RealBacklogApi)
 
-export const Api = {
+export const ApiState = {
   atom: backlogApiAtom
 }

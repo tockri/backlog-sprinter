@@ -3,7 +3,7 @@ import produce from "immer"
 import { WritableDraft } from "immer/dist/types/types-external"
 import { AddIssueInput, Issue } from "../../../backlog/IssueApi"
 
-import { Api } from "@/content/backlog/state/Api"
+import { ApiState } from "@/content/state/ApiState"
 import { ProjectState } from "../../app/state/ProjectInfoState"
 
 type CreateAction = {
@@ -19,14 +19,14 @@ export type ChildIssuesAction = CreateAction | MoveAction
 
 const mainAtom = JotaiUtil.asyncAtomFamilyWithAction(
   (parentIssueId: number) => async (get) => {
-    const api = get(Api.atom)
+    const api = get(ApiState.atom)
     const project = await get(ProjectState.atom)
     return await api.issue.searchChildren(project, parentIssueId)
   },
   (parentIssueId, storeAtom) => async (curr, get, set, action: ChildIssuesAction) => {
     if (action.type === "Move") {
       const { issue, destinationIssueId } = action
-      const api = get(Api.atom)
+      const api = get(ApiState.atom)
 
       const updated = await api.issue.editIssue(issue.id, { parentIssueId: destinationIssueId })
       const currDst = await get(mainAtom(destinationIssueId))

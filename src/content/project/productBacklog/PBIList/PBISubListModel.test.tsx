@@ -2,12 +2,12 @@
  * @jest-environment jsdom
  */
 
-import { Api } from "@/content/backlog/state/Api"
 import { AppConfState } from "@/content/project/app/state/AppConfState"
 import { EnvState } from "@/content/project/app/state/EnvState"
 import { usePBISubListModel } from "@/content/project/productBacklog/PBIList/PBISubListModel"
 import { PBIListState } from "@/content/project/productBacklog/state/PBIListState"
 import { AddIssueTypeFormState } from "@/content/project/settings/state/State"
+import { ApiState } from "@/content/state/ApiState"
 import { MockConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
 import { TestMockApi } from "@test/mock/TestMockApi"
@@ -32,7 +32,7 @@ describe("PBISubListModel", () => {
       (set) => {
         set(AppConfState.atom, MockConf)
         set(EnvState.atom, MockEnv)
-        set(Api.atom, TestMockApi)
+        set(ApiState.atom, TestMockApi)
         set(AddIssueTypeFormState.atom, (curr) => ({ ...curr, creating: true }))
       },
       () => <TestView tester={tester} />

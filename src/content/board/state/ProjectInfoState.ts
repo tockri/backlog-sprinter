@@ -1,13 +1,13 @@
 import { atom } from "jotai"
 
-import { Api } from "@/content/backlog/state/Api"
+import { ApiState } from "@/content/state/ApiState"
 
 import { JotaiUtil } from "@/content/util/JotaiUtil"
 import { EnvState } from "./EnvState"
 
 const projectInfoAtom = atom(async (get) => {
   const env = get(EnvState.atom)
-  const api = get(Api.atom)
+  const api = get(ApiState.atom)
   return await api.projectInfo.getProjectInfoWithMilestones(env.projectKey)
 })
 const projectAtom = JotaiUtil.asyncAtomFromParent(projectInfoAtom, (pi) => pi.project)

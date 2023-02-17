@@ -5,13 +5,13 @@ import { atom } from "jotai"
 import { IssueType, IssueTypeColor } from "../../../backlog/ProjectInfoApi"
 import { JotaiUtil } from "../../../util/JotaiUtil"
 
-import { Api } from "@/content/backlog/state/Api"
+import { ApiState } from "@/content/state/ApiState"
 import { AppConfState } from "./AppConfState"
 import { EnvState } from "./EnvState"
 
 const projectInfoAtom = atom(async (get) => {
   const env = get(EnvState.atom)
-  const api = get(Api.atom)
+  const api = get(ApiState.atom)
   return await api.projectInfo.getProjectInfoWithCustomFields(env.projectKey)
 })
 const projectAtom = JotaiUtil.asyncAtomFromParent(projectInfoAtom, (pi) => pi.project)
@@ -33,7 +33,7 @@ const issueTypesAtom = atom(
   (get) => get(issueTypesStoreAtom),
   async (get, set, action: IssueTypesAction) => {
     if (action.type === "Create") {
-      const api = get(Api.atom)
+      const api = get(ApiState.atom)
       const project = await get(projectAtom)
       const created = await api.projectInfo.createIssueType({
         projectId: project.id,

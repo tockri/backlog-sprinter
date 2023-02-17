@@ -4,7 +4,7 @@ import { atom } from "jotai"
 import { produce } from "immer"
 import { CustomField, CustomFieldTypes, CustomNumberField, isNumberField } from "../../../backlog/ProjectInfoApi"
 
-import { Api } from "@/content/backlog/state/Api"
+import { ApiState } from "@/content/state/ApiState"
 import { AppConfState } from "./AppConfState"
 import { EnvState } from "./EnvState"
 import { CustomFieldsState, IssueTypesState } from "./ProjectInfoState"
@@ -39,7 +39,7 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
   },
   async (get, set, action) => {
     const env = get(EnvState.atom)
-    const api = get(Api.atom)
+    const api = get(ApiState.atom)
     if (action.type === "OCCreate") {
       const issueTypeId = get(AppConfState.atom).pbiIssueTypeId
       if (issueTypeId) {

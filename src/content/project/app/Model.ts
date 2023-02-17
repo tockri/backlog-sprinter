@@ -1,11 +1,11 @@
+import { MessageBroker } from "@/util/MessageBroker"
 import { Immutable, produce } from "immer"
 import { createStore, useAtom, useAtomValue } from "jotai"
 import React from "react"
-import { MessageBroker } from "../../../util/MessageBroker"
 import { BacklogApiContext } from "../../backlog/BacklogApiForReact"
 import { ProjectEnv } from "../types"
 
-import { Api } from "@/content/backlog/state/Api"
+import { ApiState } from "@/content/state/ApiState"
 import { UserLang } from "@/content/types"
 import { AppConfState, Tabs } from "./state/AppConfState"
 import { EnvState } from "./state/EnvState"
@@ -25,7 +25,7 @@ export const useAppModel = (broker: MessageBroker<ProjectEnv>): AppModel => {
 
   React.useEffect(() => {
     if (!env) {
-      jotaiStore.set(Api.atom, api)
+      jotaiStore.set(ApiState.atom, api)
       broker.subscribe("Project", (env) => {
         setEnv(env)
         jotaiStore.set(EnvState.atom, env)
