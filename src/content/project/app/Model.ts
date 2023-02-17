@@ -7,9 +7,9 @@ import { ProjectEnv } from "../types"
 
 import { ApiState } from "@/content/state/ApiState"
 import { UserLang } from "@/content/types"
-import { AppConfState, Tabs } from "./state/AppConfState"
 import { EnvState } from "./state/EnvState"
 import { OrderCustomFieldState } from "./state/OrderCustomFieldState"
+import { ProjectConfState, Tabs } from "./state/ProjectConfState"
 
 type AppModel = {
   clear: () => void
@@ -52,7 +52,7 @@ type InnerModel = Immutable<{
 
 export const useInnerModel = (): InnerModel => {
   const env = useAtomValue(EnvState.atom)
-  const [config, setConfig] = useAtom(AppConfState.atom)
+  const [config, setConfig] = useAtom(ProjectConfState.atom)
   const orderCustomField = useAtomValue(OrderCustomFieldState.atom)
   const selectedTab = orderCustomField ? config.selectedTab : Tabs.Settings
   return {

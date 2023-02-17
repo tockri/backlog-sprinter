@@ -70,15 +70,6 @@ export const ProjectSettings: React.FC = () => {
           <div>{t.setIssueType}</div>
         )}
       </div>
-      <H2>{t.velocityTitle}</H2>
-      {model.velocityWikiId ? (
-        <strong>not impl</strong>
-      ) : (
-        <div>
-          {t.wikiNotSelected}
-          <Button>{t.selectLabel}</Button>
-        </div>
-      )}
     </Root>
   )
 }

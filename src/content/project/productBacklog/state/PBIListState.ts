@@ -11,7 +11,7 @@ import { AddMilestoneInput, CustomNumberField, EditMilestoneInput, Version } fro
 import { AsyncHandler, AsyncRead, JotaiUtil } from "../../../util/JotaiUtil"
 
 import { ApiState } from "@/content/state/ApiState"
-import { AppConfState } from "../../app/state/AppConfState"
+import { BspConfState } from "@/content/state/BspConfState"
 import { OrderCustomFieldState } from "../../app/state/OrderCustomFieldState"
 import { IssueTypesState, MilestonesState, ProjectState, StatusesState } from "../../app/state/ProjectInfoState"
 import { PBIList, PBIListFunc, PBIListMovedEvent } from "./PBIList"
@@ -47,14 +47,14 @@ const pbRead: AsyncRead<PBIList> = async (get) => {
   if (orderCustomField) {
     const project = await get(ProjectState.atom)
     const api = get(ApiState.atom)
-    const conf = get(AppConfState.atom)
+    const bspConf = get(BspConfState.atom)
     const milestones = await get(MilestonesState.atom)
     const today = new Date()
     const milestoneFilter = milestones.filter(
       (ms) =>
         !ms.archived && ms.startDate && ms.releaseDueDate && DateUtil.diffDays(today, new Date(ms.releaseDueDate)) > -3
     )
-    const list = await api.issue.searchInIssueTypeAndMilestones(project, conf.pbiIssueTypeId, milestoneFilter)
+    const list = await api.issue.searchInIssueTypeAndMilestones(project, bspConf.pbiIssueTypeId, milestoneFilter)
     return PBIListFunc.nestIssues(list, orderCustomField)
   } else {
     throw new Error("orderCustomField is not set.")
@@ -105,8 +105,8 @@ const updateIssues = async (
 }
 
 const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set, action) => {
-  const conf = get(AppConfState.atom)
-  const issueType = (await get(IssueTypesState.atom)).find((it) => it.id === conf.pbiIssueTypeId)
+  const bspConf = get(BspConfState.atom)
+  const issueType = (await get(IssueTypesState.atom)).find((it) => it.id === bspConf.pbiIssueTypeId)
   const orderCustomField = await get(OrderCustomFieldState.atom)
   if (issueType && orderCustomField) {
     const project = await get(ProjectState.atom)

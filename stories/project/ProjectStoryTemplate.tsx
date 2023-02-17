@@ -1,5 +1,5 @@
-import { AppConfState } from "@/content/project/app/state/AppConfState"
 import { EnvState } from "@/content/project/app/state/EnvState"
+import { ProjectConfState } from "@/content/project/app/state/ProjectConfState"
 import { ApiState } from "@/content/state/ApiState"
 import { Loading } from "@/content/ui/Loading"
 import styled from "@emotion/styled"
@@ -19,7 +19,7 @@ export type ProjectStoryTemplateProps = Immutable<{
 
 export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ initialValues, children }) => {
   const store = createStore()
-  store.set(AppConfState.atom, MockConf)
+  store.set(ProjectConfState.atom, MockConf)
   store.set(EnvState.atom, MockEnv)
   store.set(ApiState.atom, MockApi)
   initialValues.forEach(([atm, value]) => {

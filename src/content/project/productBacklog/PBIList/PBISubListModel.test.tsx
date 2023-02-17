@@ -2,13 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { AppConfState } from "@/content/project/app/state/AppConfState"
 import { EnvState } from "@/content/project/app/state/EnvState"
+import { ProjectConfState } from "@/content/project/app/state/ProjectConfState"
 import { usePBISubListModel } from "@/content/project/productBacklog/PBIList/PBISubListModel"
 import { PBIListState } from "@/content/project/productBacklog/state/PBIListState"
 import { AddIssueTypeFormState } from "@/content/project/settings/state/State"
 import { ApiState } from "@/content/state/ApiState"
-import { MockConf } from "@test/mock/MockConf"
+import { BspConfState } from "@/content/state/BspConfState"
+import { MockBspConf, MockConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
 import { TestMockApi } from "@test/mock/TestMockApi"
 import { CustomHookTester } from "@test/util/CustomHookTester"
@@ -30,7 +31,8 @@ describe("PBISubListModel", () => {
     const tester = CustomHookTester.create(usePBISubListModel)
     await tester.renderComponent(
       (set) => {
-        set(AppConfState.atom, MockConf)
+        set(ProjectConfState.atom, MockConf)
+        set(BspConfState.atom, MockBspConf)
         set(EnvState.atom, MockEnv)
         set(ApiState.atom, TestMockApi)
         set(AddIssueTypeFormState.atom, (curr) => ({ ...curr, creating: true }))

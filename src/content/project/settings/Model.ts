@@ -1,10 +1,10 @@
+import { BspConfState } from "@/content/state/BspConfState"
 import { UserLang } from "@/content/types"
 import { Immutable, produce } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
 import { CustomNumberField, IssueType } from "../../backlog/ProjectInfoApi"
-import { AppConfState } from "../app/state/AppConfState"
 import { EnvState } from "../app/state/EnvState"
 import { OrderCustomFieldAction, OrderCustomFieldState } from "../app/state/OrderCustomFieldState"
 import { IssueTypesState } from "../app/state/ProjectInfoState"
@@ -14,7 +14,6 @@ import { AddIssueTypeFormState } from "./state/State"
 type SettingModel = Immutable<{
   lang: UserLang
   pbiIssueTypeId: number
-  velocityWikiId: number
   issueTypes: IssueType[]
   selectIssueType: (issueTypeId: number) => void
   orderCustomField: CustomNumberField | null
@@ -26,7 +25,7 @@ type SettingModel = Immutable<{
 }>
 
 export const useSettingModel = (): SettingModel => {
-  const [conf, setConf] = useAtom(AppConfState.atom)
+  const [conf, setConf] = useAtom(BspConfState.atom)
   const { lang } = useAtomValue(EnvState.atom)
   const issueTypes = useAtomValue(IssueTypesState.atom)
   const [orderCustomField, orderCustomFieldsDispatch] = useAtom(OrderCustomFieldState.atom)
@@ -36,7 +35,6 @@ export const useSettingModel = (): SettingModel => {
   return {
     lang,
     pbiIssueTypeId: conf.pbiIssueTypeId,
-    velocityWikiId: conf.velocityWikiId,
     issueTypes,
     selectIssueType: (issueTypeId: number) => {
       setConf((curr) =>

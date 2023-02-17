@@ -6,7 +6,7 @@ import { IssueType, IssueTypeColor } from "../../../backlog/ProjectInfoApi"
 import { JotaiUtil } from "../../../util/JotaiUtil"
 
 import { ApiState } from "@/content/state/ApiState"
-import { AppConfState } from "./AppConfState"
+import { BspConfState } from "@/content/state/BspConfState"
 import { EnvState } from "./EnvState"
 
 const projectInfoAtom = atom(async (get) => {
@@ -40,7 +40,7 @@ const issueTypesAtom = atom(
         name: action.name,
         color: action.color
       })
-      set(AppConfState.atom, (conf) =>
+      set(BspConfState.atom, (conf) =>
         produce(conf, (c) => {
           c.pbiIssueTypeId = created.id
         })

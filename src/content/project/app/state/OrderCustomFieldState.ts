@@ -5,7 +5,7 @@ import { produce } from "immer"
 import { CustomField, CustomFieldTypes, CustomNumberField, isNumberField } from "../../../backlog/ProjectInfoApi"
 
 import { ApiState } from "@/content/state/ApiState"
-import { AppConfState } from "./AppConfState"
+import { BspConfState } from "@/content/state/BspConfState"
 import { EnvState } from "./EnvState"
 import { CustomFieldsState, IssueTypesState } from "./ProjectInfoState"
 
@@ -21,9 +21,9 @@ export type OrderCustomFieldAction = Create | Delete
 const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction], Promise<void>>(
   async (get) => {
     const customFields = await get(CustomFieldsState.atom)
-    const setting = get(AppConfState.atom)
+    const conf = get(BspConfState.atom)
     const issueTypes = await get(IssueTypesState.atom)
-    const issueType = issueTypes.find((it) => it.id === setting.pbiIssueTypeId)
+    const issueType = issueTypes.find((it) => it.id === conf.pbiIssueTypeId)
     if (issueType) {
       return (
         (customFields.find(
@@ -41,7 +41,7 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
     const env = get(EnvState.atom)
     const api = get(ApiState.atom)
     if (action.type === "OCCreate") {
-      const issueTypeId = get(AppConfState.atom).pbiIssueTypeId
+      const issueTypeId = get(BspConfState.atom).pbiIssueTypeId
       if (issueTypeId) {
         const created = await api.projectInfo.createCustomField(env.projectKey, {
           typeId: CustomFieldTypes.Number,
@@ -50,7 +50,7 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
           description: "",
           required: false
         })
-        set(CustomFieldsState.atom, (customFields) =>
+        await set(CustomFieldsState.atom, (customFields) =>
           produce(customFields, (draft) => {
             draft.push(created as WritableDraft<CustomField>)
           })
@@ -60,7 +60,7 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
       const curr = await get(mainAtom)
       if (curr) {
         const deleted = await api.projectInfo.deleteCustomField(env.projectKey, curr.id)
-        set(CustomFieldsState.atom, (customFields) =>
+        await set(CustomFieldsState.atom, (customFields) =>
           produce(customFields, (draft) => {
             const idx = draft.findIndex((cf) => cf.id === deleted.id)
             if (idx >= 0) {
