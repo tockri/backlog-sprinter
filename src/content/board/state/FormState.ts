@@ -3,6 +3,7 @@ import { BoardConfState } from "@/content/board/state/BoardConfState"
 import { EnvState } from "@/content/board/state/EnvState"
 import { MilestonesState, ProjectState, StatusesState } from "@/content/board/state/ProjectInfoState"
 import { ApiState } from "@/content/state/ApiState"
+import { VelocityState } from "@/content/state/VelocityState"
 import { AsyncHandler, JotaiUtil, StoreAtom } from "@/content/util/JotaiUtil"
 import { DateUtil } from "@/util/DateUtil"
 import produce, { Immutable } from "immer"
@@ -155,6 +156,14 @@ const submit = async (curr: FormValues, get: Getter, set: Setter, action: Submit
       }
       if (conf.archiveCurrent) {
         await api.projectInfo.archiveMilestone(project.id, curr.selectedMilestone)
+      }
+      if (conf.recordVelocity) {
+        await set(
+          VelocityState.atom,
+          VelocityState.Action.Record(curr.selectedMilestone, (saved) => {
+            console.log("Wiki saved", { saved })
+          })
+        )
       }
     }
     update((d) => {

@@ -132,6 +132,24 @@ export const FormView: React.FC<FormViewProps> = (props) => {
                   </label>
                 </div>
               </PlainListItem>
+              <PlainListItem>
+                <div className="form-element__item">
+                  <input
+                    type="checkbox"
+                    id={id("recordVelocity")}
+                    className="input-checkbox"
+                    onChange={(e) =>
+                      setConf((c) => {
+                        c.recordVelocity = e.target.checked
+                      })
+                    }
+                    checked={conf.recordVelocity}
+                  />
+                  <label htmlFor={id("recordVelocity")} className="checkboxLabel">
+                    {t.recordVelocity}
+                  </label>
+                </div>
+              </PlainListItem>
             </PlainList>
           </fieldset>
         </div>
