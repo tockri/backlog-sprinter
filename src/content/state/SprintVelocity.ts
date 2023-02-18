@@ -53,19 +53,21 @@ const appendRecord = (
   ]
 }
 
+const D = /^\d+$/
+const F = /^\d+(\.\d+)?$/
+const IDs = /^[\d,]+$/
+
 const parse = (line: string): SprintVelocity | null => {
-  const m = line.match(/^[|](\d+)[|](\d{4}-\d{2}-\d{2})[|]([\d.]+)[|]([\d.]+)[|] *([\d,]*) *[|]$/)
-  if (m) {
-    try {
-      const id = parseInt(m[1])
-      const endDate = DateUtil.parseDate(m[2])
-      const pbiVelocity = parseFloat(m[3])
-      const otherVelocity = parseFloat(m[4])
-      const issueIds = m[5] ? m[5].split(",").map((e) => parseInt(e)) : []
-      return endDate ? { id, endDate, pbiVelocity, otherVelocity, issueIds } : null
-    } catch (e) {
-      return null
-    }
+  const elems = line.split("|").map((s) => s.trim())
+  if (elems.length === 7) {
+    const id = elems[1].match(D) ? parseInt(elems[1]) : null
+    const endDate = DateUtil.parseDate(elems[2])
+    const pbiVelocity = elems[3].match(F) ? parseFloat(elems[3]) : null
+    const otherVelocity = elems[4].match(F) ? parseFloat(elems[4]) : null
+    const issueIds = elems[5].match(IDs) ? elems[5].split(",").map((e) => parseInt(e)) : []
+    return id !== null && endDate !== null && pbiVelocity !== null && otherVelocity !== null && issueIds !== null
+      ? { id, endDate, pbiVelocity, otherVelocity, issueIds }
+      : null
   }
   return null
 }

@@ -38,9 +38,8 @@ const mainAtom = JotaiUtil.asyncAtomWithAction(
       if (startDate && endDate) {
         const api = get(ApiState.atom)
         const project = await get(ProjectState.atom)
-        const existing = await loadVelocity(api, project.id)
         const issues = await api.issue.searchClosed(project.id, startDate, DateUtil.addDays(endDate, 1))
-        const updated = await saveVelocity(api, project.id, existing, issues, milestone)
+        const updated = await saveVelocity(api, project.id, curr, issues, milestone)
         action.onSuccess && action.onSuccess(updated)
         return updated
       }
@@ -67,20 +66,19 @@ const saveVelocity = async (
   issues: ReadonlyArray<Issue>,
   milestone: Version
 ): Promise<WikiVelocity> => {
-  const { wiki, velocity } = existing
-  const toSave = VelocityUtil.appendRecord(milestone, issues, 0, velocity)
+  const { wiki: existingWiki, velocity: existingRecords } = existing
+  const velocity = VelocityUtil.appendRecord(milestone, issues, 0, existingRecords)
   const content = `# Velocity
 |ID|Date|PBI|Others|Issue Ids|
 |--|--|--|--|--|
-${VelocityUtil.toStringAll(toSave)}
+${VelocityUtil.toStringAll(velocity)}
 
 !!DO NOT EDIT (backlog-sprinter-velocity-record) DO NOT EDIT!!
 `
-  if (wiki) {
-    return { wiki: await api.wiki.edit(wiki, wiki.name, content), velocity: toSave }
-  } else {
-    return { wiki: await api.wiki.add(projectId, "backlog-sprinter-velocity", content), velocity: toSave }
-  }
+  const wiki = existingWiki
+    ? await api.wiki.edit(existingWiki, existingWiki.name, content)
+    : await api.wiki.add(projectId, "backlog-sprinter-velocity", content)
+  return { wiki, velocity }
 }
 
 export const VelocityState = {
