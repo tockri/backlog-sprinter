@@ -69,6 +69,9 @@ const saveVelocity = async (
   const { wiki: existingWiki, velocity: existingRecords } = existing
   const velocity = VelocityUtil.appendRecord(milestone, issues, 0, existingRecords)
   const content = `# Velocity
+
+(You can change title as you like)
+  
 |ID|Date|PBI|Others|Issue Ids|
 |--|--|--|--|--|
 ${VelocityUtil.toStringAll(velocity)}

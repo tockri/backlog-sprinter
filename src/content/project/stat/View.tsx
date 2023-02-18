@@ -29,36 +29,69 @@ const Chart = styled.div({
   paddingBottom: 12
 })
 
+const buildData = (data: VelocityChartData, key: "PBI" | "Others") =>
+  data.map((record, i) => {
+    const mva =
+      i === 0
+        ? record[key]
+        : i === 1
+        ? (data[0][key] + data[1][key]) / 2.0
+        : (data[i - 2][key] + data[i - 1][key] + record[key]) / 3.0
+    return {
+      name: record.name,
+      [key]: record[key],
+      "3-week Moving Average": mva
+    }
+  })
+
 export const VelocityChart: React.FC<{ data: VelocityChartData }> = ({ data }) => {
   return (
-    <ChartBox>
-      <ChartTitle>Velocity</ChartTitle>
-      <LineChart
-        width={445}
-        height={200}
-        data={data}
-        margin={{
-          top: 15,
-          right: -10,
-          left: -20,
-          bottom: 0
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis yAxisId="left" label={{ value: "PBI", position: "insideTopRight", offset: 0 }} padding={{ top: 20 }} />
-        <YAxis
-          yAxisId="right"
-          label={{ value: "Others", position: "insideTopLeft", offset: 0 }}
-          padding={{ top: 20 }}
-          orientation="right"
-        />
-        <Tooltip />
-        <Legend align="right" />
-        <Line yAxisId="left" type="monotone" dataKey="PBI" stroke="#8884d8" />
-        <Line yAxisId="right" type="monotone" dataKey="Others" stroke="#82ca9d" />
-      </LineChart>
-    </ChartBox>
+    <>
+      <ChartBox>
+        <ChartTitle>PBI Velocity</ChartTitle>
+        <LineChart
+          width={445}
+          height={200}
+          data={buildData(data, "PBI")}
+          margin={{
+            top: 15,
+            right: -10,
+            left: -20,
+            bottom: 10
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" height={20} />
+          <YAxis />
+          <Tooltip />
+          <Legend align="right" />
+          <Line type="monotone" dataKey="PBI" stroke="#f8c4c0" strokeDasharray="4 2" />
+          <Line type="monotone" dataKey="3-week Moving Average" stroke="#d88488" />
+        </LineChart>
+      </ChartBox>
+      <ChartBox>
+        <ChartTitle>Others Velocity</ChartTitle>
+        <LineChart
+          width={445}
+          height={200}
+          data={buildData(data, "Others")}
+          margin={{
+            top: 15,
+            right: -10,
+            left: -20,
+            bottom: 10
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" height={20} />
+          <YAxis />
+          <Tooltip />
+          <Legend align="right" height={0} margin={{ bottom: 10 }} />
+          <Line type="monotone" dataKey="Others" stroke="#c2cafd" strokeDasharray="4 2" />
+          <Line type="monotone" dataKey="3-week Moving Average" stroke="#8288ed" />
+        </LineChart>
+      </ChartBox>
+    </>
   )
 }
 

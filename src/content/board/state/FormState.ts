@@ -11,7 +11,6 @@ import { WritableDraft } from "immer/dist/types/types-external"
 import { Getter, Setter } from "jotai"
 
 export type FormValues = Immutable<{
-  selectedMilestone: Version | null
   startDate: Date | null
   endDate: Date | null
   title: string
@@ -136,11 +135,12 @@ const submit = async (curr: FormValues, get: Getter, set: Setter, action: Submit
   const project = await get(ProjectState.atom)
   const statuses = await get(StatusesState.atom)
   const conf = get(BoardConfState.atom)
+  const selectedMilestone = await get(BoardEnvState.selectedMilestoneAtom)
   try {
     const createdMilestone = await api.projectInfo.addMilestone(project.id, milestoneInput)
-    if (curr.selectedMilestone) {
+    if (selectedMilestone) {
       if (conf.moveUnclosed) {
-        const unclosed = await api.issue.searchUnclosedInMilestone(project.id, statuses, curr.selectedMilestone.id)
+        const unclosed = await api.issue.searchUnclosedInMilestone(project.id, statuses, selectedMilestone.id)
         await api.issue.bulkChangeMilestone(
           unclosed.map((i) => i.id),
           createdMilestone.id,
@@ -155,12 +155,12 @@ const submit = async (curr: FormValues, get: Getter, set: Setter, action: Submit
         )
       }
       if (conf.archiveCurrent) {
-        await api.projectInfo.archiveMilestone(project.id, curr.selectedMilestone)
+        await api.projectInfo.archiveMilestone(project.id, selectedMilestone)
       }
       if (conf.recordVelocity) {
         await set(
           VelocityState.atom,
-          VelocityState.Action.Record(curr.selectedMilestone, (saved) => {
+          VelocityState.Action.Record(selectedMilestone, (saved) => {
             console.log("Wiki saved", { saved })
           })
         )
@@ -191,6 +191,7 @@ const mainAtom = JotaiUtil.asyncAtomWithAction<FormValues, Action>(
     const endDate = DateUtil.addDays(startDate, Math.max(conf.sprintDays, 0))
     const title = makeAutoTitle(startDate, endDate)
     const sameTitleExists = checkSameTitle(title, milestones)
+    console.log("FormState.atom getter", { env })
     return {
       selectedMilestone: milestones.find((v) => v.id === env.selectedMilestoneId) || null,
       startDate,

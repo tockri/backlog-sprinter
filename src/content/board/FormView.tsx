@@ -20,6 +20,7 @@ export const FormView: React.FC<FormViewProps> = (props) => {
   const { onSuccess } = props
   const [values, dispatch] = useAtom(FormState.atom)
   const env = useAtomValue(BoardEnvState.atom)
+  const selectedMilestone = useAtomValue(BoardEnvState.selectedMilestoneAtom)
   const [conf, setConf] = useAtom(BoardConfState.atom)
   const t = i18n(env.lang)
 
@@ -89,11 +90,11 @@ export const FormView: React.FC<FormViewProps> = (props) => {
           </div>
         )}
       </div>
-      {values.selectedMilestone && (
+      {selectedMilestone && (
         <div className="form-element__item">
           <fieldset>
             <legend>
-              {t.selecting} <MilestoneDisplay>{values.selectedMilestone.name}</MilestoneDisplay>
+              {t.selecting} <MilestoneDisplay>{selectedMilestone.name}</MilestoneDisplay>
             </legend>
             <PlainList>
               <PlainListItem>
