@@ -11,7 +11,7 @@ export type SprintVelocity = Immutable<{
   issueIds: number[]
 }>
 
-export type VelocityData = ReadonlyArray<SprintVelocity>
+export type VelocityRecords = ReadonlyArray<SprintVelocity>
 
 const calcPoint = (issue: Issue): number => issue.actualHours || issue.estimatedHours || 1
 
@@ -19,8 +19,8 @@ const appendRecord = (
   milestone: Version,
   issues: ReadonlyArray<Issue>,
   pbiIssueTypeId: number,
-  existing: ReadonlyArray<SprintVelocity>
-): VelocityData => {
+  existing: VelocityRecords
+): VelocityRecords => {
   const endDate = DateUtil.parseDate(milestone.releaseDueDate)
   if (!endDate) {
     console.error("releaseDueDate is null", milestone)
@@ -54,14 +54,14 @@ const appendRecord = (
 }
 
 const parse = (line: string): SprintVelocity | null => {
-  const m = line.match(/^[|](\d+)[|](\d{4}-\d{2}-\d{2})[|]([\d.]+)[|]([\d.]+)[|]([\d,]*)[|]$/)
+  const m = line.match(/^[|](\d+)[|](\d{4}-\d{2}-\d{2})[|]([\d.]+)[|]([\d.]+)[|] *([\d,]*) *[|]$/)
   if (m) {
     try {
       const id = parseInt(m[1])
       const endDate = DateUtil.parseDate(m[2])
       const pbiVelocity = parseFloat(m[3])
       const otherVelocity = parseFloat(m[4])
-      const issueIds = m[5].split(",").map((e) => parseInt(e))
+      const issueIds = m[5] ? m[5].split(",").map((e) => parseInt(e)) : []
       return endDate ? { id, endDate, pbiVelocity, otherVelocity, issueIds } : null
     } catch (e) {
       return null
@@ -70,7 +70,7 @@ const parse = (line: string): SprintVelocity | null => {
   return null
 }
 
-const parseAll = (data: string): VelocityData => {
+const parseAll = (data: string): VelocityRecords => {
   const ret: Array<SprintVelocity> = []
   data.split("\n").forEach((line) => {
     const s = VelocityUtil.parse(line)
@@ -82,10 +82,10 @@ const parseAll = (data: string): VelocityData => {
 }
 
 const toString = (s: SprintVelocity): string => {
-  return `|${s.id}|${DateUtil.dateString(s.endDate)}|${s.pbiVelocity}|${s.otherVelocity}|${s.issueIds.join(",")}|`
+  return `|${s.id}|${DateUtil.dateString(s.endDate)}|${s.pbiVelocity}|${s.otherVelocity}| ${s.issueIds.join(",")} |`
 }
 
-const toStringAll = (sprints: VelocityData): string => sprints.map(VelocityUtil.toString).join("\n")
+const toStringAll = (sprints: VelocityRecords): string => sprints.map(VelocityUtil.toString).join("\n")
 
 export const VelocityUtil = {
   appendRecord,
