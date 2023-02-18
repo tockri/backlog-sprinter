@@ -5,4 +5,4 @@ const backlogApiAtom = atom<BacklogApi>(RealBacklogApi)
 
 export const ApiState = {
   atom: backlogApiAtom
-}
+} as const

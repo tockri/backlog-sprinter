@@ -1,5 +1,5 @@
 import { BacklogApi, FakeBacklogApi } from "@/content/backlog/BacklogApiForReact"
-import { AddIssueInput, EditIssueInput, Issue, IssueApi, IssueDataUtil } from "@/content/backlog/IssueApi"
+import { AddIssueInput, EditIssueInput, Issue, IssueApi, IssueUtil } from "@/content/backlog/IssueApi"
 import { ProjectInfoApi } from "@/content/backlog/ProjectInfoApi"
 import produce from "immer"
 import { MockData } from "./MockApi-data"
@@ -51,7 +51,7 @@ const editIssue: IssueApi["editIssue"] = async (issueId: number, input: EditIssu
   const issue = MockData.productBacklogBT.find((i) => i.id === issueId) as Issue
   const statuses = MockData.projectInfoBT.statuses
   return produce(issue, (d) => {
-    IssueDataUtil.mutateByIssueInput(d, input, statuses)
+    IssueUtil.mutateByIssueInput(d, input, statuses)
   })
 }
 

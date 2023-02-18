@@ -1,6 +1,6 @@
 import { WritableDraft } from "immer/dist/internal"
 import { NestedList, NestedListData, NestMethods, NLMoveAction } from "../../../../util/NestedList"
-import { EditIssueInput, Issue, IssueDataUtil } from "../../../backlog/IssueApi"
+import { EditIssueInput, Issue, IssueUtil } from "../../../backlog/IssueApi"
 import { CustomNumberField, Status, Version } from "../../../backlog/ProjectInfoApi"
 
 export type IssueDataWithOrder = Issue & { readonly order: number | null }
@@ -200,7 +200,7 @@ const mutateByEditIssue = (
 ) => {
   const item = findIssue(data, issueId)
   if (item) {
-    IssueDataUtil.mutateByIssueInput(item, input, statuses)
+    IssueUtil.mutateByIssueInput(item, input, statuses)
   }
 }
 

@@ -7,4 +7,4 @@ export const EnvState = {
     selectedMilestoneId: 0,
     lang: "en"
   })
-}
+} as const

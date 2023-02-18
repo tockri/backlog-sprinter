@@ -13,4 +13,4 @@ const store = atomWithStorage<BspConf>("bsp.global.conf", InitialBspConf)
 
 export const BspConfState = {
   atom: store
-}
+} as const

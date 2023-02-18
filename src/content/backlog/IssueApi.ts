@@ -201,9 +201,9 @@ const addIssue = async (input: AddIssueInput): Promise<Issue> => {
   return await BacklogApiRequest.post("/api/v2/issues", params)
 }
 
-export const IssueDataUtil = {
+export const IssueUtil = {
   mutateByIssueInput
-}
+} as const
 
 export const RealIssueApi = {
   searchUnclosedInMilestone,
@@ -214,6 +214,6 @@ export const RealIssueApi = {
   changeMilestoneAndCustomFieldValue,
   editIssue,
   addIssue
-}
+} as const
 
 export type IssueApi = typeof RealIssueApi

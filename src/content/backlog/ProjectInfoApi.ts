@@ -269,6 +269,6 @@ export const RealProjectInfoApi = {
   editMilestone,
   archiveMilestone,
   createIssueType
-}
+} as const
 
 export type ProjectInfoApi = typeof RealProjectInfoApi

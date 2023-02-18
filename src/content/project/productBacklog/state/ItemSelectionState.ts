@@ -65,4 +65,4 @@ export const ItemSelectionState = {
     } as MilestoneAdding,
     Deselect: None
   }
-}
+} as const

@@ -1,14 +1,15 @@
 import { RealWikiApi, WikiApi } from "@/content/backlog/WikiApi"
 import { ObjectUtil } from "@/util/ObjectUtil"
+import { Immutable } from "immer"
 import React from "react"
 import { IssueApi, RealIssueApi } from "./IssueApi"
 import { ProjectInfoApi, RealProjectInfoApi } from "./ProjectInfoApi"
 
-export type BacklogApi = {
+export type BacklogApi = Immutable<{
   issue: IssueApi
   projectInfo: ProjectInfoApi
   wiki: WikiApi
-}
+}>
 
 const rejectFunc = (name: string) => () => {
   console.warn(`not implemented: ${name}`)

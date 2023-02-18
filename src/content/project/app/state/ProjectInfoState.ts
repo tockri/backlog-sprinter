@@ -56,19 +56,19 @@ const issueTypesAtom = atom(
 
 export const ProjectState = {
   atom: projectAtom
-}
+} as const
 
 export const StatusesState = {
   atom: statusesAtom
-}
+} as const
 
 export const MilestonesState = {
   atom: milestonesAtom
-}
+} as const
 
 export const CustomFieldsState = {
   atom: customFieldsAtom
-}
+} as const
 
 export const IssueTypesState = {
   atom: issueTypesAtom,
@@ -79,4 +79,4 @@ export const IssueTypesState = {
       color
     })
   }
-}
+} as const

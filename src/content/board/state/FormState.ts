@@ -1,5 +1,5 @@
 import { AddMilestoneInput, Version } from "@/content/backlog/ProjectInfoApi"
-import { ConfState } from "@/content/board/state/ConfState"
+import { BoardConfState } from "@/content/board/state/BoardConfState"
 import { EnvState } from "@/content/board/state/EnvState"
 import { MilestonesState, ProjectState, StatusesState } from "@/content/board/state/ProjectInfoState"
 import { ApiState } from "@/content/state/ApiState"
@@ -65,7 +65,7 @@ const setTitle = (d: WritableDraft<FormValues>, title: string, milestones: Reado
 }
 
 const startDate: AsyncHandler<FormValues, SetStartDate> = async (curr, get, set, action) => {
-  const conf = get(ConfState.atom)
+  const conf = get(BoardConfState.atom)
   const milestones = await get(MilestonesState.atom)
   return produce(curr, (d) => {
     d.startDate = action.value
@@ -86,7 +86,7 @@ const endDate: AsyncHandler<FormValues, SetEndDate> = async (curr, get, set, act
     d.endDate = end
     if (start && end) {
       if (start < end) {
-        set(ConfState.atom, (cf) => {
+        set(BoardConfState.atom, (cf) => {
           cf.sprintDays = DateUtil.diffDays(start, end)
         })
       }
@@ -134,7 +134,7 @@ const submit = async (curr: FormValues, get: Getter, set: Setter, action: Submit
   const api = get(ApiState.atom)
   const project = await get(ProjectState.atom)
   const statuses = await get(StatusesState.atom)
-  const conf = get(ConfState.atom)
+  const conf = get(BoardConfState.atom)
   try {
     const createdMilestone = await api.projectInfo.addMilestone(project.id, milestoneInput)
     if (curr.selectedMilestone) {
@@ -176,7 +176,7 @@ const submit = async (curr: FormValues, get: Getter, set: Setter, action: Submit
 const mainAtom = JotaiUtil.asyncAtomWithAction<FormValues, Action>(
   async (get) => {
     const env = get(EnvState.atom)
-    const conf = get(ConfState.atom)
+    const conf = get(BoardConfState.atom)
     const milestones = await get(MilestonesState.atom)
     const startDate = DateUtil.beginningOfDay(new Date())
     const endDate = DateUtil.addDays(startDate, Math.max(conf.sprintDays, 0))
@@ -229,4 +229,4 @@ export const FormState = {
       onSuccess
     })
   }
-}
+} as const

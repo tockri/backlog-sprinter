@@ -21,4 +21,4 @@ const store = atomWithStorage<ProjectConf>("bsp.project.conf", InitialAppConf)
 
 export const ProjectConfState = {
   atom: store
-}
+} as const

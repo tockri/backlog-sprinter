@@ -14,4 +14,4 @@ export const AddIssueTypeFormState = {
     name: "PBI",
     color: IssueTypeColor.pill__issue_type_1
   })
-}
+} as const

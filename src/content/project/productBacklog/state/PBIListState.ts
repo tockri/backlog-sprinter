@@ -219,4 +219,4 @@ export const PBIListState = {
       dst
     })
   }
-}
+} as const

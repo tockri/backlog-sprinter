@@ -16,12 +16,12 @@ const milestonesAtom = JotaiUtil.asyncAtomFromParent(projectInfoAtom, (pi) => pi
 
 export const ProjectState = {
   atom: projectAtom
-}
+} as const
 
 export const StatusesState = {
   atom: statusesAtom
-}
+} as const
 
 export const MilestonesState = {
   atom: milestonesAtom
-}
+} as const

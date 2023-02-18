@@ -1,4 +1,4 @@
-import { Conf, ConfState } from "@/content/board/state/ConfState"
+import { BoardConf, BoardConfState } from "@/content/board/state/BoardConfState"
 import { EnvState } from "@/content/board/state/EnvState"
 import { FormState, FormValues } from "@/content/board/state/FormState"
 import { TextInput } from "@/content/ui/TextInput"
@@ -14,13 +14,13 @@ type FormViewProps = {
 
 const dateOrNull = (e: { target: { value: string } }) => DateUtil.parseDate(e.target.value)
 
-const id = (suffix: keyof (FormValues & Conf)) => `bsp-milestone-${suffix}`
+const id = (suffix: keyof (FormValues & BoardConf)) => `bsp-milestone-${suffix}`
 
 export const FormView: React.FC<FormViewProps> = (props) => {
   const { onSuccess } = props
   const [values, dispatch] = useAtom(FormState.atom)
   const env = useAtomValue(EnvState.atom)
-  const [conf, setConf] = useAtom(ConfState.atom)
+  const [conf, setConf] = useAtom(BoardConfState.atom)
   const t = i18n(env.lang)
 
   return (

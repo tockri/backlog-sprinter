@@ -36,4 +36,4 @@ export const BackgroundMessageUtil = {
   isGetBlgAccessToken,
   isRefreshBlgAccessToken,
   isClearStorage
-}
+} as const

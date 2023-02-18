@@ -83,4 +83,4 @@ export const OrderCustomFieldState = {
       type: "OCDelete"
     })
   }
-}
+} as const

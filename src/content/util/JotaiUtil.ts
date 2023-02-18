@@ -100,4 +100,4 @@ export const JotaiUtil = {
   asyncAtomFromParent,
   asyncAtomWithAction,
   asyncAtomFamilyWithAction
-}
+} as const

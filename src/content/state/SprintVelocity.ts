@@ -3,7 +3,7 @@ import { Version } from "@/content/backlog/ProjectInfoApi"
 import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
 
-export type Sprint = Immutable<{
+export type SprintVelocity = Immutable<{
   id: number
   endDate: Date
   pbiVelocity: number
@@ -11,14 +11,16 @@ export type Sprint = Immutable<{
   issueIds: number[]
 }>
 
+export type VelocityData = ReadonlyArray<SprintVelocity>
+
 const calcPoint = (issue: Issue): number => issue.actualHours || issue.estimatedHours || 1
 
-const build = (
+const appendRecord = (
   milestone: Version,
   issues: ReadonlyArray<Issue>,
   pbiIssueTypeId: number,
-  existing: ReadonlyArray<Sprint>
-): ReadonlyArray<Sprint> => {
+  existing: ReadonlyArray<SprintVelocity>
+): VelocityData => {
   const endDate = DateUtil.parseDate(milestone.releaseDueDate)
   if (!endDate) {
     console.error("releaseDueDate is null", milestone)
@@ -51,7 +53,7 @@ const build = (
   ]
 }
 
-const parse = (line: string): Sprint | null => {
+const parse = (line: string): SprintVelocity | null => {
   const m = line.match(/^[|](\d+)[|](\d{4}-\d{2}-\d{2})[|]([\d.]+)[|]([\d.]+)[|]([\d,]*)[|]$/)
   if (m) {
     try {
@@ -68,10 +70,10 @@ const parse = (line: string): Sprint | null => {
   return null
 }
 
-const parseAll = (data: string): ReadonlyArray<Sprint> => {
-  const ret: Array<Sprint> = []
+const parseAll = (data: string): VelocityData => {
+  const ret: Array<SprintVelocity> = []
   data.split("\n").forEach((line) => {
-    const s = SprintUtil.parse(line)
+    const s = VelocityUtil.parse(line)
     if (s) {
       ret.push(s)
     }
@@ -79,20 +81,16 @@ const parseAll = (data: string): ReadonlyArray<Sprint> => {
   return ret
 }
 
-const toString = (s: Sprint): string => {
+const toString = (s: SprintVelocity): string => {
   return `|${s.id}|${DateUtil.dateString(s.endDate)}|${s.pbiVelocity}|${s.otherVelocity}|${s.issueIds.join(",")}|`
 }
 
-const toStringAll = (sprints: ReadonlyArray<Sprint>): string => sprints.map(SprintUtil.toString).join("\n")
+const toStringAll = (sprints: VelocityData): string => sprints.map(VelocityUtil.toString).join("\n")
 
-export const SprintUtil = {
-  build,
-
+export const VelocityUtil = {
+  appendRecord,
   parseAll,
-
   parse,
-
   toString,
-
   toStringAll
-}
+} as const
