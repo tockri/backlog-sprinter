@@ -4,7 +4,7 @@ import { ProjectInfoApi } from "@/content/backlog/ProjectInfoApi"
 import produce from "immer"
 import { MockData } from "./MockApi-data"
 
-const createIssueType: ProjectInfoApi["createIssueType"] = (input) =>
+const createIssueType: ProjectInfoApi["addIssueType"] = (input) =>
   Promise.resolve({
     ...MockData.projectInfoBT.issueTypes[0],
     id: 100000,
@@ -27,7 +27,7 @@ const changeMilestoneAndCustomFieldValue: IssueApi["changeMilestoneAndCustomFiel
   })
 }
 
-const addIssue: IssueApi["addIssue"] = (input: AddIssueInput) =>
+const addIssue: IssueApi["add"] = (input: AddIssueInput) =>
   Promise.resolve(
     produce(MockData.productBacklogBT[0], (d) => {
       d.id = 200000
@@ -47,7 +47,7 @@ const addIssue: IssueApi["addIssue"] = (input: AddIssueInput) =>
     })
   )
 
-const editIssue: IssueApi["editIssue"] = async (issueId: number, input: EditIssueInput) => {
+const editIssue: IssueApi["edit"] = async (issueId: number, input: EditIssueInput) => {
   const issue = MockData.productBacklogBT.find((i) => i.id === issueId) as Issue
   const statuses = MockData.projectInfoBT.statuses
   return produce(issue, (d) => {
@@ -56,11 +56,15 @@ const editIssue: IssueApi["editIssue"] = async (issueId: number, input: EditIssu
 }
 
 export const MockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
-  draft.projectInfo.getProjectInfoWithCustomFields = () => Promise.resolve(MockData.projectInfoBT)
-  draft.projectInfo.createIssueType = createIssueType
+  draft.projectInfo.getProject = () => Promise.resolve(MockData.projectInfoBT.project)
+  draft.projectInfo.getMilestones = () => Promise.resolve(MockData.projectInfoBT.milestones)
+  draft.projectInfo.getStatuses = () => Promise.resolve(MockData.projectInfoBT.statuses)
+  draft.projectInfo.getIssueTypes = () => Promise.resolve(MockData.projectInfoBT.issueTypes)
+  draft.projectInfo.getCustomFields = () => Promise.resolve(MockData.projectInfoBT.customFields)
+  draft.projectInfo.addIssueType = createIssueType
   draft.issue.searchInIssueTypeAndMilestones = () => Promise.resolve(MockData.productBacklogBT)
   draft.issue.changeMilestoneAndCustomFieldValue = changeMilestoneAndCustomFieldValue
-  draft.issue.addIssue = addIssue
-  draft.issue.editIssue = editIssue
+  draft.issue.add = addIssue
+  draft.issue.edit = editIssue
   draft.issue.searchChildren = () => Promise.resolve(MockData.childIssuesBT)
 })

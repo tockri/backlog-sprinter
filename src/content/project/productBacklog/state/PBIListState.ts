@@ -1,5 +1,4 @@
 import produce from "immer"
-import { WritableDraft } from "immer/dist/types/types-external"
 
 import { BacklogApi } from "@/content/backlog/BacklogApiForReact"
 import { ArrayUtil } from "@/util/ArrayUtil"
@@ -12,8 +11,8 @@ import { AsyncHandler, AsyncRead, JotaiUtil } from "../../../util/JotaiUtil"
 
 import { ApiState } from "@/content/state/ApiState"
 import { BspConfState } from "@/content/state/BspConfState"
+import { IssueTypesState, MilestonesState, ProjectState, StatusesState } from "../../../state/ProjectInfoState"
 import { OrderCustomFieldState } from "../../app/state/OrderCustomFieldState"
-import { IssueTypesState, MilestonesState, ProjectState, StatusesState } from "../../app/state/ProjectInfoState"
 import { PBIList, PBIListFunc, PBIListMovedEvent } from "./PBIList"
 
 type AddIssueAction = {
@@ -112,7 +111,7 @@ const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set,
     const project = await get(ProjectState.atom)
     const api = get(ApiState.atom)
     const order = PBIListFunc.getNewOrder(prev, action.milestone)
-    const created = await api.issue.addIssue({
+    const created = await api.issue.add({
       projectId: project.id,
       issueTypeId: issueType.id,
       summary: action.summary,
@@ -131,43 +130,40 @@ const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set,
 }
 
 const pbAddMilestone: AsyncHandler<PBIList, AddMilestoneAction> = async (prev, get, set, action) => {
-  const api = get(ApiState.atom)
-  const project = await get(ProjectState.atom)
-  const created = await api.projectInfo.addMilestone(project.id, action.input)
-  const milestones = await get(MilestonesState.atom)
+  let created: Version | null = null
   await set(
     MilestonesState.atom,
-    produce(milestones, (c) => {
-      c.push(created as WritableDraft<Version>)
+    MilestonesState.Action.Add(action.input, (ms) => {
+      created = ms
     })
   )
+
   return produce(prev, (draft) => {
-    PBIListFunc.mutateByAddingMilestone(draft, created)
+    if (created) {
+      PBIListFunc.mutateByAddingMilestone(draft, created)
+    }
   })
 }
 
 const pbEditMilestone: AsyncHandler<PBIList, EditMilestoneAction> = async (prev, get, set, action) => {
-  const api = get(ApiState.atom)
-  const project = await get(ProjectState.atom)
-  const updated = await api.projectInfo.editMilestone(project.id, action.milestoneId, action.input)
-
-  await set(MilestonesState.atom, (milestones) =>
-    produce(milestones, (c) => {
-      const idx = c.findIndex((ms) => ms.id === updated.id)
-      if (idx >= 0) {
-        c.splice(idx, 1, updated as WritableDraft<Version>)
-      }
+  let updated: Version | null = null
+  await set(
+    MilestonesState.atom,
+    MilestonesState.Action.Edit(action.milestoneId, action.input, (ms) => {
+      updated = ms
     })
   )
   return produce(prev, (draft) => {
-    PBIListFunc.mutateByEditingMilestone(draft, updated)
+    if (updated) {
+      PBIListFunc.mutateByEditingMilestone(draft, updated)
+    }
   })
 }
 
 const pbEditIssue: AsyncHandler<PBIList, EditIssueAction> = async (prev, get, set, action) => {
   const api = get(ApiState.atom)
   const { issueId, input } = action
-  await api.issue.editIssue(issueId, input)
+  await api.issue.edit(issueId, input)
   const statuses = await get(StatusesState.atom)
   return produce(prev, (draft) => {
     PBIListFunc.mutateByEditingIssue(draft, statuses, issueId, input)

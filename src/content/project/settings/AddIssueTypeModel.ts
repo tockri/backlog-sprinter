@@ -2,8 +2,8 @@ import { UserLang } from "@/content/types"
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai/index"
 import { IssueType, IssueTypeColor } from "../../backlog/ProjectInfoApi"
-import { EnvState } from "../app/state/EnvState"
-import { IssueTypesState } from "../app/state/ProjectInfoState"
+import { EnvState } from "../../state/EnvState"
+import { IssueTypesState } from "../../state/ProjectInfoState"
 import { AddIssueTypeFormState, AddIssueTypeFormValue } from "./state/State"
 
 type AddIssueTypeModel = Immutable<{

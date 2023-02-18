@@ -1,10 +1,10 @@
 import { BoardEnv } from "@/content/board/types"
 import { atom } from "jotai"
 
-export const EnvState = {
+export const BoardEnvState = {
   atom: atom<BoardEnv>({
-    projectKey: "",
     selectedMilestoneId: 0,
-    lang: "en"
+    lang: "en",
+    projectKey: ""
   })
 } as const

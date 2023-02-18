@@ -4,7 +4,7 @@ import { WritableDraft } from "immer/dist/types/types-external"
 import { AddIssueInput, Issue } from "../../../backlog/IssueApi"
 
 import { ApiState } from "@/content/state/ApiState"
-import { ProjectState } from "../../app/state/ProjectInfoState"
+import { ProjectState } from "../../../state/ProjectInfoState"
 
 type CreateAction = {
   type: "Create"
@@ -28,7 +28,7 @@ const mainAtom = JotaiUtil.asyncAtomFamilyWithAction(
       const { issue, destinationIssueId } = action
       const api = get(ApiState.atom)
 
-      const updated = await api.issue.editIssue(issue.id, { parentIssueId: destinationIssueId })
+      const updated = await api.issue.edit(issue.id, { parentIssueId: destinationIssueId })
       const currDst = await get(mainAtom(destinationIssueId))
       set(
         storeAtom(destinationIssueId),

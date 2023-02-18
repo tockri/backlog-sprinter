@@ -86,7 +86,7 @@ atomのSetterにロジック＋IOを詰め込んでしまう方法。
 
 一連の処理を1関数の中に収めてしまえるのが嬉しい。
 
-Setter例：[ProjectInfoState.ts](../../src/content/project/app/state/ProjectInfoState.ts)内、`issueTypesAtom` のSetter
+Setter例：[ProjectInfoState.ts](src/content/state/ProjectInfoState.ts)内、`issueTypesAtom` のSetter
 
 ※ 説明用のため、実際のコードとは異なる
 

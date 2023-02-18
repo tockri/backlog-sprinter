@@ -2,13 +2,13 @@
  * @jest-environment jsdom
  */
 
-import { EnvState } from "@/content/project/app/state/EnvState"
 import { ProjectConfState } from "@/content/project/app/state/ProjectConfState"
 import { usePBISubListModel } from "@/content/project/productBacklog/PBIList/PBISubListModel"
 import { PBIListState } from "@/content/project/productBacklog/state/PBIListState"
 import { AddIssueTypeFormState } from "@/content/project/settings/state/State"
 import { ApiState } from "@/content/state/ApiState"
 import { BspConfState } from "@/content/state/BspConfState"
+import { EnvState } from "@/content/state/EnvState"
 import { MockBspConf, MockConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
 import { TestMockApi } from "@test/mock/TestMockApi"
@@ -82,7 +82,7 @@ describe("PBISubListModel", () => {
     await tester.act(async (model) => {
       await model.addNewIssue("issue adding test")
     })
-    expect(TestMockApi.issue.addIssue).toBeCalledWith({
+    expect(TestMockApi.issue.add).toBeCalledWith({
       projectId: projectId,
       milestoneId: milestoneId,
       issueTypeId: 389286,

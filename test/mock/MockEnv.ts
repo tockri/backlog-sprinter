@@ -1,4 +1,4 @@
-import { ProjectEnv } from "@/content/project/types"
+import { ProjectEnv } from "@/content/types"
 
 export const MockEnv: ProjectEnv = {
   projectKey: "BT",

@@ -1,8 +1,8 @@
 import { AddMilestoneInput, Version } from "@/content/backlog/ProjectInfoApi"
 import { BoardConfState } from "@/content/board/state/BoardConfState"
-import { EnvState } from "@/content/board/state/EnvState"
-import { MilestonesState, ProjectState, StatusesState } from "@/content/board/state/ProjectInfoState"
+import { BoardEnvState } from "@/content/board/state/BoardEnvState"
 import { ApiState } from "@/content/state/ApiState"
+import { MilestonesState, ProjectState, StatusesState } from "@/content/state/ProjectInfoState"
 import { VelocityState } from "@/content/state/VelocityState"
 import { AsyncHandler, JotaiUtil, StoreAtom } from "@/content/util/JotaiUtil"
 import { DateUtil } from "@/util/DateUtil"
@@ -184,7 +184,7 @@ const submit = async (curr: FormValues, get: Getter, set: Setter, action: Submit
 
 const mainAtom = JotaiUtil.asyncAtomWithAction<FormValues, Action>(
   async (get) => {
-    const env = get(EnvState.atom)
+    const env = get(BoardEnvState.atom)
     const conf = get(BoardConfState.atom)
     const milestones = await get(MilestonesState.atom)
     const startDate = DateUtil.beginningOfDay(new Date())

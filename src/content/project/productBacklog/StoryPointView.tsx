@@ -4,9 +4,9 @@ import React from "react"
 import { Tooltip } from "react-tooltip"
 import "react-tooltip/dist/react-tooltip.min.css"
 import { Issue } from "../../backlog/IssueApi"
+import { EnvState } from "../../state/EnvState"
 import { HBox } from "../../ui/Box"
 import { cnu } from "../../ui/cnu"
-import { EnvState } from "../app/state/EnvState"
 
 import { i18n } from "./i18n"
 

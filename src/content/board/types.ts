@@ -1,8 +1,7 @@
-import { UserLang } from "@/content/types"
+import { ProjectEnv } from "@/content/types"
 import { Immutable } from "immer"
 
-export type BoardEnv = Immutable<{
-  projectKey: string
-  selectedMilestoneId: number
-  lang: UserLang
-}>
+export type BoardEnv = ProjectEnv &
+  Immutable<{
+    selectedMilestoneId: number
+  }>

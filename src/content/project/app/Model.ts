@@ -3,11 +3,11 @@ import { Immutable, produce } from "immer"
 import { createStore, useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { BacklogApiContext } from "../../backlog/BacklogApiForReact"
-import { ProjectEnv } from "../types"
+import { ProjectEnv } from "../../types"
 
 import { ApiState } from "@/content/state/ApiState"
 import { UserLang } from "@/content/types"
-import { EnvState } from "./state/EnvState"
+import { EnvState } from "../../state/EnvState"
 import { OrderCustomFieldState } from "./state/OrderCustomFieldState"
 import { ProjectConfState, Tabs } from "./state/ProjectConfState"
 

@@ -5,9 +5,9 @@ import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
 import { CustomNumberField, IssueType } from "../../backlog/ProjectInfoApi"
-import { EnvState } from "../app/state/EnvState"
+import { EnvState } from "../../state/EnvState"
+import { IssueTypesState } from "../../state/ProjectInfoState"
 import { OrderCustomFieldAction, OrderCustomFieldState } from "../app/state/OrderCustomFieldState"
-import { IssueTypesState } from "../app/state/ProjectInfoState"
 import { i18n } from "./i18n"
 import { AddIssueTypeFormState } from "./state/State"
 
@@ -17,7 +17,7 @@ type SettingModel = Immutable<{
   issueTypes: IssueType[]
   selectIssueType: (issueTypeId: number) => void
   orderCustomField: CustomNumberField | null
-  createCustomField: () => void
+  addCustomField: () => void
   deleteCustomField: () => void
   errorMessageOnCustomField: string | null
   startCreatingIssueType: () => void
@@ -44,7 +44,7 @@ export const useSettingModel = (): SettingModel => {
       )
     },
     orderCustomField,
-    createCustomField: createCustomField(lang, orderCustomFieldsDispatch, setErrorMessage),
+    addCustomField: createCustomField(lang, orderCustomFieldsDispatch, setErrorMessage),
     deleteCustomField: deleteCustomField(lang, orderCustomFieldsDispatch, setErrorMessage),
     errorMessageOnCustomField: errorMessage,
     startCreatingIssueType: () =>

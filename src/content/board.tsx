@@ -10,16 +10,16 @@ import { jsxToElement } from "./ui/JSXUtil"
 
 const broker = new MessageBroker<BoardEnv>()
 
-const makeFormInfo = (): BoardEnv => {
+const makeBoardEnv = (): BoardEnv => {
   const url = new URL(location.href)
-  const projectKey = url.pathname.split("/")[2]
   const selectedMilestoneId = parseInt(url.searchParams.get("milestone") || "0")
+  const projectKey = url.pathname.split("/")[2]
   const lang: UserLang = document.documentElement.lang === "ja" ? "ja" : "en"
 
   return {
     projectKey,
-    selectedMilestoneId,
-    lang
+    lang,
+    selectedMilestoneId
   }
 }
 
@@ -51,7 +51,7 @@ const makePortalButton = () => {
       </button>
     )
     button.onclick = () => {
-      broker.dispatch(makeFormInfo())
+      broker.dispatch(makeBoardEnv())
     }
     fieldDiv.appendChild(button)
   }

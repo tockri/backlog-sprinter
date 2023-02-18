@@ -49,7 +49,7 @@ type AsyncActionAtom<Value, Action> = WritableAtom<Promise<Value>, [Action], Pro
 export type AsyncRead<Value> = (get: Getter) => Promise<Value>
 
 // Copied from jotai/core/atom.d.ts
-type SetStateAction<Value> = Value | ((prev: Value) => Value)
+export type SetStateAction<Value> = Value | ((prev: Value) => Value)
 
 export type StoreAtom<Value> = WritableAtom<Value | null, [SetStateAction<Value | null>], void>
 export type AsyncHandler<Value, Action> = (

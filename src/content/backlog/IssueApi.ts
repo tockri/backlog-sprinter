@@ -122,7 +122,7 @@ export type EditIssueInput = Immutable<{
   parentIssueId?: number | null
 }>
 
-const editIssue = async (issueId: number, input: EditIssueInput): Promise<Issue> => {
+const edit = async (issueId: number, input: EditIssueInput): Promise<Issue> => {
   const { summary, description, estimatedHours, actualHours, statusId, parentIssueId } = input
   const params: Record<string, string> = {}
   if (summary !== undefined) {
@@ -182,7 +182,7 @@ export type AddIssueInput = Immutable<{
   }
 }>
 
-const addIssue = async (input: AddIssueInput): Promise<Issue> => {
+const add = async (input: AddIssueInput): Promise<Issue> => {
   const params: Record<string, string> = {}
   params["projectId"] = String(input.projectId)
   params["issueTypeId"] = String(input.issueTypeId)
@@ -212,8 +212,8 @@ export const RealIssueApi = {
   searchClosed,
   bulkChangeMilestone,
   changeMilestoneAndCustomFieldValue,
-  editIssue,
-  addIssue
+  edit,
+  add
 } as const
 
 export type IssueApi = typeof RealIssueApi
