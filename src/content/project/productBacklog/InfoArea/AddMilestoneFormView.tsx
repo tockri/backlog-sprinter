@@ -1,15 +1,15 @@
+import { DateUtil } from "@/util/DateUtil"
 import styled from "@emotion/styled"
 import React from "react"
 import { Tooltip } from "react-tooltip"
-import { DateUtil } from "../../../../util/DateUtil"
 import { HBox, VBox } from "../../../ui/Box"
 import { Button } from "../../../ui/Button"
 import { cnu } from "../../../ui/cnu"
 import { TextArea, TextInput } from "../../../ui/TextInput"
+import { useMilestoneFormModel } from "./AddMilestoneFormModel"
 import { i18n } from "./i18n"
-import { useMilestoneFormModel } from "./MilestoneFormModel"
 
-export const MilestoneFormView: React.FC = () => {
+export const AddMilestoneFormView: React.FC = () => {
   const model = React.useCallback(useMilestoneFormModel, [])()
   const { lang, values, submittable, isNameDup } = model
   const t = i18n(lang)

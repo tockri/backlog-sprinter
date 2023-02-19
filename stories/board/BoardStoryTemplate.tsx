@@ -36,6 +36,7 @@ export const BoardStoryTemplate: React.FC<BoardStoryTemplateProps> = ({ initialV
 }
 
 const Root = styled.div({
+  border: "20px solid #e0e0e0",
   " *": {
     fontSize: 13
   }

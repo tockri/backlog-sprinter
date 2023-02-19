@@ -1,5 +1,6 @@
 import { FormView } from "@/content/board/FormView"
 import { BoardEnvState } from "@/content/board/state/BoardEnvState"
+import { FormState } from "@/content/board/state/FormState"
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import { MockEnv } from "@test/mock/MockEnv"
 import React from "react"
@@ -30,6 +31,26 @@ export const Selected: Story = {
         ...MockEnv,
         selectedMilestoneId: 245742
       })
+    }
+  }
+}
+
+export const Submitting: Story = {
+  args: {
+    initialValues: (set) => {
+      set(FormState.atom, { type: "TestSubmitting", message: "BD-123 更新中テスト" }).then()
+    }
+  }
+}
+
+export const SubmittingLong: Story = {
+  args: {
+    initialValues: (set) => {
+      set(FormState.atom, {
+        type: "TestSubmitting",
+        message:
+          "BD-123 とても長いタイトルの課題更新中テストとても長いタイトルの課題更新中テストとても長いタイトルの課題更新中テスト"
+      }).then()
     }
   }
 }

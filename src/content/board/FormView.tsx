@@ -1,6 +1,10 @@
 import { BoardConf, BoardConfState } from "@/content/board/state/BoardConfState"
 import { BoardEnvState } from "@/content/board/state/BoardEnvState"
 import { FormState, FormValues } from "@/content/board/state/FormState"
+import { HBox, VBox } from "@/content/ui/Box"
+import { Button } from "@/content/ui/Button"
+import { ErrorMessage } from "@/content/ui/ErrorMessage"
+import { Loading } from "@/content/ui/Loading"
 import { TextInput } from "@/content/ui/TextInput"
 import { DateUtil } from "@/util/DateUtil"
 import styled from "@emotion/styled"
@@ -25,17 +29,14 @@ export const FormView: React.FC<FormViewProps> = (props) => {
   const t = i18n(env.lang)
 
   return (
-    <div className="modal__content">
-      <div className="form-element__item">
-        <label className="form-element__label" htmlFor={id("startDate")}>
-          {t.period}
-        </label>
+    <Root>
+      <ElementItem>
+        <Label htmlFor={id("startDate")}>{t.period}</Label>
         <Row>
           <DateInput
             id={id("startDate")}
             type="date"
             size={10}
-            className="input-text"
             autoComplete="off"
             value={DateUtil.dateString(values.startDate)}
             onChange={(e) => dispatch(FormState.Action.SetStartDate(dateOrNull(e)))}
@@ -44,24 +45,21 @@ export const FormView: React.FC<FormViewProps> = (props) => {
           <DateInput
             type="date"
             size={10}
-            className="input-text"
             autoComplete="off"
             min={DateUtil.dateString(values.startDate)}
             value={DateUtil.dateString(values.endDate)}
             onChange={(e) => dispatch(FormState.Action.SetEndDate(dateOrNull(e)))}
           />
         </Row>
-      </div>
-      <div className="form-element__item">
-        <label className="form-element__label" htmlFor={id("title")}>
-          {t.milestoneName}
-        </label>
+      </ElementItem>
+      <ElementItem>
+        <Label htmlFor={id("title")}>{t.milestoneName}</Label>
         <Row>
           <TextInput
             id={id("title")}
             type="text"
             size={10}
-            className="input-text"
+            style={{ flexGrow: 1 }}
             autoComplete="off"
             value={values.title}
             onChange={(e) => dispatch(FormState.Action.SetTitle(e.target.value))}
@@ -74,154 +72,160 @@ export const FormView: React.FC<FormViewProps> = (props) => {
               className="input-checkbox"
               onChange={(e) => dispatch(FormState.Action.SetTitleAuto(e.target.checked))}
             />
-            <label htmlFor={id("titleAuto")} className="checkboxLabel">
-              {t.auto}
-            </label>
+            <CheckboxLabel htmlFor={id("titleAuto")}>{t.auto}</CheckboxLabel>
           </InputFollower>
         </Row>
-        {values.sameTitleExists && (
-          <div className="message message--error _mg-b-15">
-            <span className="message__icon">
-              <svg role="image" className="icon -medium">
-                <use xlinkHref="/images/svg/sprite.symbol.svg#icon_alert"></use>
-              </svg>
-            </span>
-            <div className="message__content">{t.sameTitleExists}</div>
-          </div>
-        )}
-      </div>
+        {values.sameTitleExists && <ErrorMessage message={t.sameTitleExists} />}
+      </ElementItem>
       {selectedMilestone && (
-        <div className="form-element__item">
-          <fieldset>
-            <legend>
+        <ElementItem>
+          <FieldSet>
+            <Legend>
               {t.selecting} <MilestoneDisplay>{selectedMilestone.name}</MilestoneDisplay>
-            </legend>
+            </Legend>
             <PlainList>
               <PlainListItem>
-                <div className="form-element__item">
-                  <input
-                    type="checkbox"
-                    id={id("moveUnclosed")}
-                    className="input-checkbox"
-                    onChange={(e) =>
-                      setConf((c) => {
-                        c.moveUnclosed = e.target.checked
-                      })
-                    }
-                    checked={conf.moveUnclosed}
-                  />
-                  <label htmlFor={id("moveUnclosed")} className="checkboxLabel">
-                    {t.moveUnclosed}
-                  </label>
-                </div>
+                <input
+                  type="checkbox"
+                  id={id("moveUnclosed")}
+                  className="input-checkbox"
+                  onChange={(e) =>
+                    setConf((c) => {
+                      c.moveUnclosed = e.target.checked
+                    })
+                  }
+                  checked={conf.moveUnclosed}
+                />
+                <CheckboxLabel htmlFor={id("moveUnclosed")}>{t.moveUnclosed}</CheckboxLabel>
               </PlainListItem>
               <PlainListItem>
-                <div className="form-element__item">
-                  <input
-                    type="checkbox"
-                    id={id("archiveCurrent")}
-                    className="input-checkbox"
-                    onChange={(e) =>
-                      setConf((c) => {
-                        c.archiveCurrent = e.target.checked
-                      })
-                    }
-                    checked={conf.archiveCurrent}
-                  />
-                  <label htmlFor={id("archiveCurrent")} className="checkboxLabel">
-                    {t.archive}
-                  </label>
-                </div>
+                <input
+                  type="checkbox"
+                  id={id("archiveCurrent")}
+                  className="input-checkbox"
+                  onChange={(e) =>
+                    setConf((c) => {
+                      c.archiveCurrent = e.target.checked
+                    })
+                  }
+                  checked={conf.archiveCurrent}
+                />
+                <CheckboxLabel htmlFor={id("archiveCurrent")}>{t.archive}</CheckboxLabel>
               </PlainListItem>
               <PlainListItem>
-                <div className="form-element__item">
-                  <input
-                    type="checkbox"
-                    id={id("recordVelocity")}
-                    className="input-checkbox"
-                    onChange={(e) =>
-                      setConf((c) => {
-                        c.recordVelocity = e.target.checked
-                      })
-                    }
-                    checked={conf.recordVelocity}
-                  />
-                  <label htmlFor={id("recordVelocity")} className="checkboxLabel">
-                    {t.recordVelocity}
-                  </label>
-                </div>
+                <input
+                  type="checkbox"
+                  id={id("recordVelocity")}
+                  className="input-checkbox"
+                  onChange={(e) =>
+                    setConf((c) => {
+                      c.recordVelocity = e.target.checked
+                    })
+                  }
+                  checked={conf.recordVelocity}
+                />
+                <CheckboxLabel htmlFor={id("recordVelocity")}>{t.recordVelocity}</CheckboxLabel>
               </PlainListItem>
             </PlainList>
-          </fieldset>
-        </div>
+          </FieldSet>
+        </ElementItem>
       )}
       <div>
-        <Row className="--spacing">
-          <button
+        <ButtonBox>
+          <Button
             type="button"
             disabled={!values.submittable}
-            className="button button--primary"
             onClick={() => dispatch(FormState.Action.Submit(onSuccess))}
           >
             {t.submit}
-          </button>
+          </Button>
           {values.submitting && (
             <>
-              <div className="loading--circle -small"></div>
+              <Loading size="x-small" />
               <SubmittingMessage>
                 {t.updating}
                 {values.submittingMessage}
               </SubmittingMessage>
             </>
           )}
-        </Row>
-        {values.submitErrorMessage && (
-          <div className="message message--error _mg-b-15">
-            <span className="message__icon">
-              <svg role="image" className="icon -medium">
-                <use xlinkHref="/images/svg/sprite.symbol.svg#icon_alert"></use>
-              </svg>
-            </span>
-            <div className="message__content">{values.submitErrorMessage}</div>
-          </div>
-        )}
+        </ButtonBox>
+        {values.submitErrorMessage && <ErrorMessage message={values.submitErrorMessage} />}
       </div>
-    </div>
+    </Root>
   )
 }
 
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  &.--spacing {
-    column-gap: 1em;
+const Root = styled(VBox)({
+  boxSizing: "border-box",
+  padding: 20,
+  gap: 8,
+  " *": {
+    boxSizing: "border-box"
   }
-`
+})
 
-const DateInput = styled.input`
-  width: 10em;
-`
+const ElementItem = styled.div({})
 
-const PlainList = styled.ul`
-  padding-left: 16px;
-`
+const Row = styled(HBox)({
+  justifyContent: "flex-start",
+  alignItems: "center"
+})
 
-const PlainListItem = styled.li`
-  list-style: none;
-`
+const Label = styled.label({
+  margin: "4 0"
+})
 
-const MilestoneDisplay = styled.span`
-  font-weight: bold;
-`
-const SubmittingMessage = styled.div`
-  padding: 6px 0;
-`
+const CheckboxLabel = styled.label({
+  display: "inline-block",
+  paddingLeft: 15,
+  cursor: "pointer"
+})
 
-const InputFollower = styled.div`
-  white-space: nowrap;
-  padding-left: 1em;
-  label {
-    white-space: nowrap;
+const DateInput = styled(TextInput)({
+  width: "10em"
+})
+
+const PlainList = styled.ul({
+  paddingLeft: 16
+})
+
+const PlainListItem = styled.li({
+  listStyle: "none",
+  margin: "4px 0"
+})
+
+const MilestoneDisplay = styled.span({
+  fontWeight: "bold"
+})
+
+const InputFollower = styled.div({
+  whiteSpace: "nowrap",
+  paddingLeft: "1em",
+  " *": {
+    whiteSpace: "nowrap"
   }
-`
+})
+
+const FieldSet = styled.fieldset({
+  border: "1px solid silver",
+  margin: "0 2px",
+  padding: "0.35em 0.625em 0.75em"
+})
+
+const Legend = styled.legend({
+  padding: "0 0.3em"
+})
+
+const ButtonBox = styled(HBox)({
+  alignItems: "flex-start",
+  justifyContent: "flex-start",
+  gap: 12,
+  " button": {
+    whiteSpace: "nowrap"
+  }
+})
+
+const SubmittingMessage = styled.div({
+  paddingLeft: 6,
+  alignSelf: "center"
+})

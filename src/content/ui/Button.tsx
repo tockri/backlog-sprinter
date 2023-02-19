@@ -1,18 +1,20 @@
 import styled from "@emotion/styled"
+import React from "react"
 
-export const Button = styled.button({
+const StyledButton = styled.button({
+  display: "inline-block",
   boxSizing: "border-box",
-  padding: "4px 12px",
-  border: "1px solid #a0a0a0",
-  backgroundColor: "#eeeeee",
-  color: "#666666",
+  padding: "0 15px",
   borderRadius: 4,
   appearance: "button",
   "&[disabled]": {
-    backgroundColor: "#cccccc",
     color: "#999999"
   },
   "&:active": {
     boxShadow: "inset 1px 1px 2px #aaaaaa"
   }
 })
+
+export const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = (props) => (
+  <StyledButton className="button button--primary" {...props} />
+)

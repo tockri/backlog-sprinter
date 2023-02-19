@@ -51,7 +51,12 @@ type Submit = {
   onSuccess: (newMilestoneId: number) => void
 }
 
-type Action = SetStartDate | SetEndDate | SetTitle | SetTitleAuto | Submit | Init
+type TestSubmitting = {
+  type: "TestSubmitting"
+  message: string
+}
+
+type Action = SetStartDate | SetEndDate | SetTitle | SetTitleAuto | Submit | Init | TestSubmitting
 
 const makeAutoTitle = (startDate: Date, endDate: Date): string =>
   `${DateUtil.shortDateString(startDate)} ~ ${DateUtil.shortDateString(endDate)} sprint`
@@ -184,16 +189,13 @@ const submit = async (curr: FormValues, get: Getter, set: Setter, action: Submit
 
 const mainAtom = JotaiUtil.asyncAtomWithAction<FormValues, Action>(
   async (get) => {
-    const env = get(BoardEnvState.atom)
     const conf = get(BoardConfState.atom)
     const milestones = await get(MilestonesState.atom)
     const startDate = DateUtil.beginningOfDay(new Date())
     const endDate = DateUtil.addDays(startDate, Math.max(conf.sprintDays, 0))
     const title = makeAutoTitle(startDate, endDate)
     const sameTitleExists = checkSameTitle(title, milestones)
-    console.log("FormState.atom getter", { env })
     return {
-      selectedMilestone: milestones.find((v) => v.id === env.selectedMilestoneId) || null,
       startDate,
       endDate,
       title: makeAutoTitle(startDate, endDate),
@@ -220,6 +222,8 @@ const mainAtom = JotaiUtil.asyncAtomWithAction<FormValues, Action>(
       case "Submit":
         submit(curr, get, set, action, storeAtom).then()
         return { ...curr, submitting: true, submittable: false }
+      case "TestSubmitting":
+        return { ...curr, submitting: true, submittingMessage: action.message }
     }
   }
 )

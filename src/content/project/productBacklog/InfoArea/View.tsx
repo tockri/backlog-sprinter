@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import React from "react"
+import { AddMilestoneFormView } from "./AddMilestoneFormView"
 import { useInfoAreaModel } from "./IssueAreaModel"
 import { IssueAreaView } from "./IssueAreaView"
-import { MilestoneFormView } from "./MilestoneFormView"
 import { MilestoneView } from "./MilestoneView"
 
 export const InfoAreaView: React.FC = () => {
@@ -23,7 +23,7 @@ export const InfoAreaView: React.FC = () => {
   } else if (type === "MilestoneAdding") {
     return (
       <Area>
-        <MilestoneFormView />
+        <AddMilestoneFormView />
       </Area>
     )
   } else {
