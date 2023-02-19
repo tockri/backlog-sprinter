@@ -1,7 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
-import { IssueTypeColor } from "@/content/backlog/ProjectInfo"
-import { AppConfState } from "@/content/project/app/state/AppConfState"
+import { IssueTypeColor } from "@/content/backlog/ProjectInfoApi"
+import { ProjectConfState } from "@/content/project/app/state/ProjectConfState"
 import { AddIssueTypeFormState } from "@/content/project/settings/state/State"
 import { ProjectSettings } from "@/content/project/settings/View"
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
@@ -22,7 +22,7 @@ export const Default: Story = {
   args: {
     initialValues: [
       [
-        AppConfState.atom,
+        ProjectConfState.atom,
         {
           selectedTab: 0,
           pbiIssueTypeId: 0
@@ -42,7 +42,7 @@ export const Creating: Story = {
   args: {
     initialValues: [
       [
-        AppConfState.atom,
+        ProjectConfState.atom,
         {
           selectedTab: 0,
           pbiIssueTypeId: 0

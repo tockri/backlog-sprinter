@@ -1,11 +1,9 @@
 import { atom } from "jotai"
-import { ProjectEnv } from "../../types"
-
-type Env = ProjectEnv
+import { ProjectEnv } from "../types"
 
 export const EnvState = {
-  atom: atom<Env>({
+  atom: atom<ProjectEnv>({
     lang: "en",
     projectKey: ""
   })
-}
+} as const

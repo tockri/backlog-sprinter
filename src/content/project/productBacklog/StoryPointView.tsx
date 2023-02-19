@@ -3,15 +3,15 @@ import { useAtomValue } from "jotai"
 import React from "react"
 import { Tooltip } from "react-tooltip"
 import "react-tooltip/dist/react-tooltip.min.css"
-import { IssueData } from "../../backlog/Issue"
+import { Issue } from "../../backlog/IssueApi"
+import { EnvState } from "../../state/EnvState"
 import { HBox } from "../../ui/Box"
 import { cnu } from "../../ui/cnu"
-import { EnvState } from "../app/state/EnvState"
 
 import { i18n } from "./i18n"
 
 type StoryPointViewProps = {
-  issue: IssueData
+  issue: Issue
   variant?: "view" | "edit"
   onEstimateFix?: (value: number) => void
   onActualFix?: (value: number) => void

@@ -29,4 +29,4 @@ const refreshBlgAccessToken = (hostname: string): Promise<string> =>
 export const BackgroundClient = {
   getBlgAccessToken,
   refreshBlgAccessToken
-}
+} as const

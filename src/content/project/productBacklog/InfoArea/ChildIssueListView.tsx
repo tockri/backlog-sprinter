@@ -1,10 +1,10 @@
 import styled from "@emotion/styled"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
-import { IssueData } from "../../../backlog/Issue"
+import { Issue } from "../../../backlog/IssueApi"
+import { EnvState } from "../../../state/EnvState"
 import { HBox } from "../../../ui/Box"
 import { Draggable } from "../../../ui/DragAndDrop"
-import { EnvState } from "../../app/state/EnvState"
 
 import { ChildIssuesAction, ChildIssuesState } from "../state/ChildIssuesState"
 import { StatusView } from "../StatusView"
@@ -36,7 +36,7 @@ export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => 
 }
 
 type ChildIssueViewProps = {
-  issue: IssueData
+  issue: Issue
   dispatch: (action: ChildIssuesAction) => void
 }
 

@@ -1,7 +1,7 @@
 // noinspection SpellCheckingInspection,DuplicatedCode
 
-import { IssueData } from "@/content/backlog/Issue"
-import { CustomField, IssueTypeColor, Project, ProjectInfoWithCustomFields } from "@/content/backlog/ProjectInfo"
+import { Issue } from "@/content/backlog/IssueApi"
+import { CustomField, IssueTypeColor, Project, ProjectInfoWithCustomFields } from "@/content/backlog/ProjectInfoApi"
 
 const projectInfoBT: ProjectInfoWithCustomFields = {
   project: {
@@ -667,7 +667,7 @@ const productBacklogBT = [
     attachments: [],
     sharedFiles: [],
     stars: []
-  } as IssueData,
+  } as Issue,
   {
     id: 7177956,
     projectId: 78386,
@@ -886,7 +886,7 @@ const productBacklogBT = [
     sharedFiles: [],
     stars: []
   }
-] as IssueData[]
+] as Issue[]
 
 const childIssuesBT = [
   {
@@ -1106,8 +1106,8 @@ const childIssuesBT = [
     attachments: [],
     sharedFiles: [],
     stars: []
-  } as IssueData
-] as IssueData[]
+  } as Issue
+] as Issue[]
 
 export const MockData = {
   projectInfoBT,

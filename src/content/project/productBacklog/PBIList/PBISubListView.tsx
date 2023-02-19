@@ -1,4 +1,4 @@
-import { IssueData } from "@/content/backlog/Issue"
+import { Issue } from "@/content/backlog/IssueApi"
 import { VBox } from "@/content/ui/Box"
 import { cnu } from "@/content/ui/cnu"
 import { Droppable } from "@/content/ui/DragAndDrop"
@@ -33,8 +33,8 @@ const canArrange =
   }
 
 const canMove =
-  (issue: IssueData) =>
-  (dragging: IssueData): boolean => {
+  (issue: Issue) =>
+  (dragging: Issue): boolean => {
     return dragging.parentIssueId !== issue.id
   }
 

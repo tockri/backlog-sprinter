@@ -1,6 +1,6 @@
 import { Immutable } from "immer"
 import { atomWithImmer } from "jotai-immer"
-import { IssueTypeColor } from "../../../backlog/ProjectInfo"
+import { IssueTypeColor } from "../../../backlog/ProjectInfoApi"
 
 export type AddIssueTypeFormValue = Immutable<{
   creating: boolean
@@ -14,4 +14,4 @@ export const AddIssueTypeFormState = {
     name: "PBI",
     color: IssueTypeColor.pill__issue_type_1
   })
-}
+} as const

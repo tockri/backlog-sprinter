@@ -1,6 +1,7 @@
 const path = require("path")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const ESLintPlugin = require("eslint-webpack-plugin")
+const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin")
 
 const srcDir = path.join(__dirname, "src")
 const dstDir = process.env.DST_DIR || path.join(__dirname, "dist")
@@ -41,7 +42,8 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"]
+    extensions: [".tsx", ".ts", ".js"],
+    plugins: [new TsconfigPathsPlugin({})]
   },
   plugins: [
     new CopyWebpackPlugin({

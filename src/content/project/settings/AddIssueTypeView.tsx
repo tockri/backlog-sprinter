@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import React from "react"
-import { IssueTypeColor, issueTypeColorClass } from "../../backlog/ProjectInfo"
+import { IssueTypeColor, issueTypeColorClass } from "../../backlog/ProjectInfoApi"
 import { HBox, VBox } from "../../ui/Box"
 import { Button } from "../../ui/Button"
 import { cnu } from "../../ui/cnu"

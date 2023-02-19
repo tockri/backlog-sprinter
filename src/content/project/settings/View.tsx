@@ -14,7 +14,7 @@ export const ProjectSettings: React.FC = () => {
   return (
     <Root>
       <H2>{t.issueTypeLabel}</H2>
-      <div className="form-element__item">
+      <div>
         {model.isCreatingIssueType ? (
           <AddIssueTypeView />
         ) : (
@@ -44,7 +44,7 @@ export const ProjectSettings: React.FC = () => {
         )}
       </div>
       <H2>{t.customFieldTitle}</H2>
-      <div className="form-element__item">
+      <div>
         {model.pbiIssueTypeId ? (
           model.orderCustomField ? (
             <div>
@@ -62,7 +62,7 @@ export const ProjectSettings: React.FC = () => {
           ) : (
             <div>
               {t.customFieldNotExist}
-              <Button onClick={() => model.createCustomField()}>{t.createLabel}</Button>
+              <Button onClick={() => model.addCustomField()}>{t.createLabel}</Button>
               <div>{model.errorMessageOnCustomField}</div>
             </div>
           )

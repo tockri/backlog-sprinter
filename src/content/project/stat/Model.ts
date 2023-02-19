@@ -1,17 +1,23 @@
-import { Immutable } from "immer"
+import { VelocityRecords } from "@/content/state/SprintVelocity"
+import { VelocityState } from "@/content/state/VelocityState"
 import { useAtomValue } from "jotai"
 import { DateUtil } from "../../../util/DateUtil"
-import { Version } from "../../backlog/ProjectInfo"
-import { MilestonesState } from "../app/state/ProjectInfoState"
+import { Version } from "../../backlog/ProjectInfoApi"
+import { MilestonesState } from "../../state/ProjectInfoState"
 
-type StatModel = Immutable<{
-  statMilestones: Version[]
-}>
+export type VelocityChartData = { name: string; PBI: number; Others: number }[]
 
-export const useModel = (): StatModel => {
+type StatModel = {
+  readonly statMilestones: ReadonlyArray<Version>
+  readonly chartData: VelocityChartData
+}
+
+export const useStatModel = (): StatModel => {
   const milestones = useAtomValue(MilestonesState.atom)
+  const wikiVelocity = useAtomValue(VelocityState.atom)
   return {
-    statMilestones: filterMilestones(milestones)
+    statMilestones: filterMilestones(milestones),
+    chartData: makeChartData(wikiVelocity.velocity)
   }
 }
 
@@ -33,4 +39,12 @@ const filterMilestones = (milestones: ReadonlyArray<Version>): Version[] => {
         return 0
       }
     })
+}
+
+const makeChartData = (velocity: VelocityRecords): VelocityChartData => {
+  return velocity.map((sv) => ({
+    name: DateUtil.shortDateString(sv.endDate),
+    PBI: sv.pbiVelocity,
+    Others: sv.otherVelocity
+  }))
 }

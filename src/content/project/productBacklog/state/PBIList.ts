@@ -1,9 +1,9 @@
 import { WritableDraft } from "immer/dist/internal"
 import { NestedList, NestedListData, NestMethods, NLMoveAction } from "../../../../util/NestedList"
-import { EditIssueInput, IssueData, IssueDataUtil } from "../../../backlog/Issue"
-import { CustomNumberField, Status, Version } from "../../../backlog/ProjectInfo"
+import { EditIssueInput, Issue, IssueUtil } from "../../../backlog/IssueApi"
+import { CustomNumberField, Status, Version } from "../../../backlog/ProjectInfoApi"
 
-export type IssueDataWithOrder = IssueData & { readonly order: number | null }
+export type IssueDataWithOrder = Issue & { readonly order: number | null }
 export type PBIList = NestedListData<Version, IssueDataWithOrder>
 
 export type PBIListMovedEvent = {
@@ -26,14 +26,14 @@ const nest = (items: ReadonlyArray<IssueDataWithOrder>): PBIList => {
   return NestedList.nest<Version, IssueDataWithOrder>(items, pbiNestMethods)
 }
 
-const nestIssues = (issues: ReadonlyArray<IssueData>, orderCustomField: CustomNumberField): PBIList =>
+const nestIssues = (issues: ReadonlyArray<Issue>, orderCustomField: CustomNumberField): PBIList =>
   nest(issues.map(withOrder(orderCustomField)))
 
 const withOrder =
   (orderCustomField: CustomNumberField) =>
-  (issue: IssueData): IssueDataWithOrder => ({ ...issue, order: getOrderValue(orderCustomField, issue) })
+  (issue: Issue): IssueDataWithOrder => ({ ...issue, order: getOrderValue(orderCustomField, issue) })
 
-const getOrderValue = (orderCustomField: CustomNumberField, issue: IssueData): number | null => {
+const getOrderValue = (orderCustomField: CustomNumberField, issue: Issue): number | null => {
   const field = issue.customFields.find((cf) => cf.id === orderCustomField.id)
   if (field) {
     return field.value !== null ? Number(field.value) : null
@@ -159,7 +159,7 @@ const mutateByMove = (data: WritableDraft<PBIList>, action: NLMoveAction): PBILi
   return eventStore.values()
 }
 
-const mutateByAddIssue = (data: WritableDraft<PBIList>, created: IssueData, orderCustomField: CustomNumberField) => {
+const mutateByAddIssue = (data: WritableDraft<PBIList>, created: Issue, orderCustomField: CustomNumberField) => {
   const subList = data.subLists.find((sl) => sl.head?.id === created.milestone[0]?.id)
   if (subList) {
     subList.items.push(withOrder(orderCustomField)(created) as WritableDraft<IssueDataWithOrder>)
@@ -200,7 +200,7 @@ const mutateByEditIssue = (
 ) => {
   const item = findIssue(data, issueId)
   if (item) {
-    IssueDataUtil.mutateByIssueInput(item, input, statuses)
+    IssueUtil.mutateByIssueInput(item, input, statuses)
   }
 }
 

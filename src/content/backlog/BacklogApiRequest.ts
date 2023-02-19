@@ -1,13 +1,14 @@
+import { Immutable } from "immer"
 import { BackgroundClient } from "../../background/client"
 import { Either, EitherT } from "../../util/Either"
 
-export type ErrorData = {
-  readonly errors: ReadonlyArray<{
-    readonly message: string
-    readonly code: number
-    readonly moreInfo: string
-  }>
-}
+export type ErrorData = Immutable<{
+  errors: {
+    message: string
+    code: number
+    moreInfo: string
+  }[]
+}>
 
 const send = async <T extends object>(
   url: URL,
@@ -99,4 +100,4 @@ export const BacklogApiRequest = {
   delete: sendUrlOnly("DELETE"),
   post: sendFormData("POST"),
   patch: sendFormData("PATCH")
-}
+} as const

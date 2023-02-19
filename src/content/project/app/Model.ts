@@ -1,13 +1,15 @@
+import { MessageBroker } from "@/util/MessageBroker"
 import { Immutable, produce } from "immer"
 import { createStore, useAtom, useAtomValue } from "jotai"
 import React from "react"
-import { MessageBroker } from "../../../util/MessageBroker"
 import { BacklogApiContext } from "../../backlog/BacklogApiForReact"
-import { ProjectEnv, UserLang } from "../types"
-import { Api } from "./state/Api"
-import { AppConfState, Tabs } from "./state/AppConfState"
-import { EnvState } from "./state/EnvState"
+import { ProjectEnv } from "../../types"
+
+import { ApiState } from "@/content/state/ApiState"
+import { UserLang } from "@/content/types"
+import { EnvState } from "../../state/EnvState"
 import { OrderCustomFieldState } from "./state/OrderCustomFieldState"
+import { ProjectConfState, Tabs } from "./state/ProjectConfState"
 
 type AppModel = {
   clear: () => void
@@ -23,7 +25,7 @@ export const useAppModel = (broker: MessageBroker<ProjectEnv>): AppModel => {
 
   React.useEffect(() => {
     if (!env) {
-      jotaiStore.set(Api.atom, api)
+      jotaiStore.set(ApiState.atom, api)
       broker.subscribe("Project", (env) => {
         setEnv(env)
         jotaiStore.set(EnvState.atom, env)
@@ -50,7 +52,7 @@ type InnerModel = Immutable<{
 
 export const useInnerModel = (): InnerModel => {
   const env = useAtomValue(EnvState.atom)
-  const [config, setConfig] = useAtom(AppConfState.atom)
+  const [config, setConfig] = useAtom(ProjectConfState.atom)
   const orderCustomField = useAtomValue(OrderCustomFieldState.atom)
   const selectedTab = orderCustomField ? config.selectedTab : Tabs.Settings
   return {

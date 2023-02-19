@@ -1,12 +1,9 @@
-import { WritableDraft } from "immer/dist/types/types-external"
 import { atom } from "jotai"
 
-import { produce } from "immer"
-import { CustomField, CustomFieldTypes, CustomNumberField, isNumberField } from "../../../backlog/ProjectInfo"
-import { Api } from "./Api"
-import { AppConfState } from "./AppConfState"
-import { EnvState } from "./EnvState"
-import { CustomFieldsState, IssueTypesState } from "./ProjectInfoState"
+import { CustomFieldTypes, CustomNumberField, isNumberField } from "../../../backlog/ProjectInfoApi"
+
+import { BspConfState } from "@/content/state/BspConfState"
+import { CustomFieldsState, IssueTypesState } from "../../../state/ProjectInfoState"
 
 type Create = {
   type: "OCCreate"
@@ -20,9 +17,9 @@ export type OrderCustomFieldAction = Create | Delete
 const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction], Promise<void>>(
   async (get) => {
     const customFields = await get(CustomFieldsState.atom)
-    const setting = get(AppConfState.atom)
+    const conf = get(BspConfState.atom)
     const issueTypes = await get(IssueTypesState.atom)
-    const issueType = issueTypes.find((it) => it.id === setting.pbiIssueTypeId)
+    const issueType = issueTypes.find((it) => it.id === conf.pbiIssueTypeId)
     if (issueType) {
       return (
         (customFields.find(
@@ -37,36 +34,24 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
     }
   },
   async (get, set, action) => {
-    const env = get(EnvState.atom)
-    const api = get(Api.atom)
     if (action.type === "OCCreate") {
-      const issueTypeId = get(AppConfState.atom).pbiIssueTypeId
+      const issueTypeId = get(BspConfState.atom).pbiIssueTypeId
       if (issueTypeId) {
-        const created = await api.projectInfo.createCustomField(env.projectKey, {
-          typeId: CustomFieldTypes.Number,
-          name: `__PBI_ORDER__${issueTypeId}__`,
-          applicableIssueTypes: [issueTypeId],
-          description: "",
-          required: false
-        })
-        set(CustomFieldsState.atom, (customFields) =>
-          produce(customFields, (draft) => {
-            draft.push(created as WritableDraft<CustomField>)
+        await set(
+          CustomFieldsState.atom,
+          CustomFieldsState.Action.Add({
+            typeId: CustomFieldTypes.Number,
+            name: `__PBI_ORDER__${issueTypeId}__`,
+            applicableIssueTypes: [issueTypeId],
+            description: "",
+            required: false
           })
         )
       }
     } else if (action.type === "OCDelete") {
       const curr = await get(mainAtom)
       if (curr) {
-        const deleted = await api.projectInfo.deleteCustomField(env.projectKey, curr.id)
-        set(CustomFieldsState.atom, (customFields) =>
-          produce(customFields, (draft) => {
-            const idx = draft.findIndex((cf) => cf.id === deleted.id)
-            if (idx >= 0) {
-              draft.splice(idx, 1)
-            }
-          })
-        )
+        await set(CustomFieldsState.atom, CustomFieldsState.Action.Delete(curr.id))
       }
     }
   }
@@ -82,4 +67,4 @@ export const OrderCustomFieldState = {
       type: "OCDelete"
     })
   }
-}
+} as const

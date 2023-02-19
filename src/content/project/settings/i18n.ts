@@ -1,4 +1,4 @@
-import { UserLang } from "../types"
+import { UserLang } from "@/content/types"
 
 const ja = {
   issueTypeLabel: "プロダクトバックログを表す課題種別",
@@ -15,7 +15,11 @@ const ja = {
   createIssueTypeName: "種別名",
   createIssueTypeColor: "背景色",
   cancelLabel: "キャンセル",
-  existing: "登録済み"
+  existing: "登録済み",
+  velocityTitle: "ベロシティを記録するWikiページ",
+  recordVelocityOn: (name: string) => `Wikiページ「${name}」に記録します。`,
+  wikiNotSelected: "Wikiページが指定されていません。",
+  selectLabel: "選択する"
 }
 
 const en: typeof ja = {
@@ -33,7 +37,11 @@ const en: typeof ja = {
   createIssueTypeName: "Name",
   createIssueTypeColor: "Color",
   cancelLabel: "Cancel",
-  existing: "Existing"
+  existing: "Existing",
+  velocityTitle: "Wiki to record velocity data",
+  recordVelocityOn: (name: string) => `Record data on the wiki page "${name}"`,
+  wikiNotSelected: "Wiki page is not selected.",
+  selectLabel: "Select"
 }
 
 const resources = { ja, en }

@@ -1,4 +1,4 @@
-import { UserLang } from "../types"
+import { UserLang } from "@/content/types"
 
 const ja = {
   productBacklog: "プロダクト\nバックログ",

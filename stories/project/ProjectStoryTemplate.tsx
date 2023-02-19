@@ -1,6 +1,6 @@
-import { Api } from "@/content/project/app/state/Api"
-import { AppConfState } from "@/content/project/app/state/AppConfState"
-import { EnvState } from "@/content/project/app/state/EnvState"
+import { ProjectConfState } from "@/content/project/app/state/ProjectConfState"
+import { ApiState } from "@/content/state/ApiState"
+import { EnvState } from "@/content/state/EnvState"
 import { Loading } from "@/content/ui/Loading"
 import styled from "@emotion/styled"
 import { MockApi } from "@test/mock/MockApi"
@@ -13,16 +13,16 @@ import React from "react"
 type Pair<T = any> = Immutable<[WritableAtom<T, [T], void> | PrimitiveAtom<T>, T]>
 
 export type ProjectStoryTemplateProps = Immutable<{
-  initialValues: Array<Pair>
+  initialValues?: Array<Pair>
   children: React.ReactNode
 }>
 
 export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ initialValues, children }) => {
   const store = createStore()
-  store.set(AppConfState.atom, MockConf)
+  store.set(ProjectConfState.atom, MockConf)
   store.set(EnvState.atom, MockEnv)
-  store.set(Api.atom, MockApi)
-  initialValues.forEach(([atm, value]) => {
+  store.set(ApiState.atom, MockApi)
+  initialValues?.forEach(([atm, value]) => {
     store.set(atm, value)
   })
   return (

@@ -1,8 +1,8 @@
+import { UserLang } from "@/content/types"
 import { useAtomValue, useSetAtom } from "jotai"
-import { EditMilestoneInput, Version } from "../../../backlog/ProjectInfo"
-import { EnvState } from "../../app/state/EnvState"
-import { MilestonesState } from "../../app/state/ProjectInfoState"
-import { UserLang } from "../../types"
+import { EditMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
+import { EnvState } from "../../../state/EnvState"
+import { MilestonesState } from "../../../state/ProjectInfoState"
 import { ItemSelectionState } from "../state/ItemSelectionState"
 import { PBIListState } from "../state/PBIListState"
 

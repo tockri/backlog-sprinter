@@ -1,5 +1,5 @@
 import { atom } from "jotai"
-import { MilestonesState } from "../../app/state/ProjectInfoState"
+import { MilestonesState } from "../../../state/ProjectInfoState"
 import { PBIListFunc } from "./PBIList"
 import { PBIListState } from "./PBIListState"
 
@@ -65,4 +65,4 @@ export const ItemSelectionState = {
     } as MilestoneAdding,
     Deselect: None
   }
-}
+} as const
