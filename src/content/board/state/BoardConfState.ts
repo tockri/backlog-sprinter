@@ -8,7 +8,7 @@ export type BoardConf = {
   recordVelocity: boolean
 }
 const storage = withImmer(
-  atomWithStorage<BoardConf>("board.conf", {
+  atomWithStorage<BoardConf>("bsp.BoardConf", {
     sprintDays: 6,
     moveUnclosed: false,
     archiveCurrent: false,

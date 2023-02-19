@@ -145,7 +145,7 @@ const issueTypesAtom = JotaiUtil.asyncAtomWithAction(
         name: action.name,
         color: action.color
       })
-      set(BspConfState.atom, (conf) =>
+      set(BspConfState.atom(project.projectKey), (conf) =>
         produce(conf, (c) => {
           c.pbiIssueTypeId = created.id
         })

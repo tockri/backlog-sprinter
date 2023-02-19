@@ -3,6 +3,7 @@ import { atom } from "jotai"
 import { CustomFieldTypes, CustomNumberField, isNumberField } from "../../../backlog/ProjectInfoApi"
 
 import { BspConfState } from "@/content/state/BspConfState"
+import { EnvState } from "@/content/state/EnvState"
 import { CustomFieldsState, IssueTypesState } from "../../../state/ProjectInfoState"
 
 type Create = {
@@ -17,7 +18,8 @@ export type OrderCustomFieldAction = Create | Delete
 const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction], Promise<void>>(
   async (get) => {
     const customFields = await get(CustomFieldsState.atom)
-    const conf = get(BspConfState.atom)
+    const env = get(EnvState.atom)
+    const conf = get(BspConfState.atom(env.projectKey))
     const issueTypes = await get(IssueTypesState.atom)
     const issueType = issueTypes.find((it) => it.id === conf.pbiIssueTypeId)
     if (issueType) {
@@ -35,7 +37,8 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
   },
   async (get, set, action) => {
     if (action.type === "OCCreate") {
-      const issueTypeId = get(BspConfState.atom).pbiIssueTypeId
+      const env = get(EnvState.atom)
+      const issueTypeId = get(BspConfState.atom(env.projectKey)).pbiIssueTypeId
       if (issueTypeId) {
         await set(
           CustomFieldsState.atom,

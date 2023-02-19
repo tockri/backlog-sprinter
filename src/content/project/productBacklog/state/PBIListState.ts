@@ -11,6 +11,7 @@ import { AsyncHandler, AsyncRead, JotaiUtil } from "../../../util/JotaiUtil"
 
 import { ApiState } from "@/content/state/ApiState"
 import { BspConfState } from "@/content/state/BspConfState"
+import { EnvState } from "@/content/state/EnvState"
 import { IssueTypesState, MilestonesState, ProjectState, StatusesState } from "../../../state/ProjectInfoState"
 import { OrderCustomFieldState } from "../../app/state/OrderCustomFieldState"
 import { PBIList, PBIListFunc, PBIListMovedEvent } from "./PBIList"
@@ -46,7 +47,7 @@ const pbRead: AsyncRead<PBIList> = async (get) => {
   if (orderCustomField) {
     const project = await get(ProjectState.atom)
     const api = get(ApiState.atom)
-    const bspConf = get(BspConfState.atom)
+    const bspConf = get(BspConfState.atom(project.projectKey))
     const milestones = await get(MilestonesState.atom)
     const today = new Date()
     const milestoneFilter = milestones.filter(
@@ -104,7 +105,8 @@ const updateIssues = async (
 }
 
 const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set, action) => {
-  const bspConf = get(BspConfState.atom)
+  const env = get(EnvState.atom)
+  const bspConf = get(BspConfState.atom(env.projectKey))
   const issueType = (await get(IssueTypesState.atom)).find((it) => it.id === bspConf.pbiIssueTypeId)
   const orderCustomField = await get(OrderCustomFieldState.atom)
   if (issueType && orderCustomField) {

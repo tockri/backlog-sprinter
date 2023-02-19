@@ -1,5 +1,5 @@
 import { Immutable } from "immer"
-import { atomWithStorage } from "jotai/utils"
+import { atomFamily, atomWithStorage } from "jotai/utils"
 
 export type BspConf = Immutable<{
   pbiIssueTypeId: number
@@ -9,8 +9,8 @@ const InitialBspConf: BspConf = {
   pbiIssueTypeId: 0
 }
 
-const store = atomWithStorage<BspConf>("bsp.global.conf", InitialBspConf)
+const storeFamily = atomFamily((projectKey: string) => atomWithStorage(`bsp.BspConf.${projectKey}`, InitialBspConf))
 
 export const BspConfState = {
-  atom: store
+  atom: storeFamily
 } as const

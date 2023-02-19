@@ -17,7 +17,7 @@ const InitialAppConf: ProjectConf = {
   selectedTab: Tabs.Backlog
 }
 
-const store = atomWithStorage<ProjectConf>("bsp.project.conf", InitialAppConf)
+const store = atomWithStorage<ProjectConf>("bsp.ProjectConf", InitialAppConf)
 
 export const ProjectConfState = {
   atom: store

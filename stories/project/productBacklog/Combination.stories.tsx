@@ -5,7 +5,6 @@ import { ProductBacklogView } from "@/content/project/productBacklog/View"
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import React from "react"
 
-import { StoryUtil } from "../../StoryUtil"
 import { ProjectStoryTemplate, ProjectStoryTemplateProps } from "../ProjectStoryTemplate"
 
 const Template: React.FC<ProjectStoryTemplateProps> = (props) => (
@@ -20,18 +19,32 @@ type Story = ComponentStoryObj<typeof Template>
 
 export const Default: Story = {
   args: {
-    initialValues: [[ItemSelectionState.atom, { type: "Issue", issueId: 12323242 }]]
+    initialValues: (set) => {
+      set(ItemSelectionState.atom, { type: "Issue", issueId: 12323242 })
+    }
   }
 }
 
-export const SomeEmptyFields = StoryUtil.produce(Default)((args) => {
-  args.initialValues = [[ItemSelectionState.atom, { type: "Issue", issueId: 12323249 }]]
-})
+export const SomeEmptyFields: Story = {
+  args: {
+    initialValues: (set) => {
+      set(ItemSelectionState.atom, { type: "Issue", issueId: 12323249 })
+    }
+  }
+}
 
-export const MilestoneSelected = StoryUtil.produce(Default)((args) => {
-  args.initialValues.push([ItemSelectionState.atom, { type: "Milestone", milestoneId: 245742 }])
-})
+export const MilestoneSelected: Story = {
+  args: {
+    initialValues: (set) => {
+      set(ItemSelectionState.atom, { type: "Milestone", milestoneId: 245742 })
+    }
+  }
+}
 
-export const MilestoneAdding = StoryUtil.produce(Default)((args) => {
-  args.initialValues.push([ItemSelectionState.atom, { type: "MilestoneAdding" }])
-})
+export const MilestoneAdding: Story = {
+  args: {
+    initialValues: (set) => {
+      set(ItemSelectionState.atom, { type: "MilestoneAdding" })
+    }
+  }
+}

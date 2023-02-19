@@ -32,7 +32,7 @@ describe("PBISubListModel", () => {
     await tester.renderComponent(
       (set) => {
         set(ProjectConfState.atom, MockConf)
-        set(BspConfState.atom, MockBspConf)
+        set(BspConfState.atom(MockEnv.projectKey), MockBspConf)
         set(EnvState.atom, MockEnv)
         set(ApiState.atom, TestMockApi)
         set(AddIssueTypeFormState.atom, (curr) => ({ ...curr, creating: true }))
