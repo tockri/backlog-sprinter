@@ -11,7 +11,7 @@ import { PBIListState } from "../state/PBIListState"
 
 type Values = Immutable<AddMilestoneInput>
 
-type AddMilestoneFormModel = {
+type AddMilestoneFormModel = Immutable<{
   values: Values
   lang: UserLang
   setName: (value: string) => void
@@ -22,7 +22,7 @@ type AddMilestoneFormModel = {
   cancel: () => void
   submit: () => void
   submittable: boolean
-}
+}>
 
 export const useMilestoneFormModel = (): AddMilestoneFormModel => {
   const { lang } = useAtomValue(EnvState.atom)
