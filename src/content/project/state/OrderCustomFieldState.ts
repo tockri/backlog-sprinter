@@ -17,9 +17,12 @@ export type OrderCustomFieldAction = Create | Delete
 
 const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction], Promise<void>>(
   async (get) => {
-    const customFields = await get(CustomFieldsState.atom)
     const env = get(BspEnvState.atom)
+    if (!env.projectKey) {
+      return null
+    }
     const conf = get(BspConfState.atom(env.projectKey))
+    const customFields = await get(CustomFieldsState.atom)
     const issueTypes = await get(IssueTypesState.atom)
     const issueType = issueTypes.find((it) => it.id === conf.pbiIssueTypeId)
     if (issueType) {

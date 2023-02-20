@@ -1,7 +1,7 @@
 import { AddMilestoneInput, Version } from "@/content/backlog/ProjectInfoApi"
 import { BoardConfState } from "@/content/board/state/BoardConfState"
-import { BoardEnvState } from "@/content/board/state/BoardEnvState"
 import { ApiState } from "@/content/state/ApiState"
+import { BspEnvState } from "@/content/state/BspEnvState"
 import { MilestonesState, ProjectState, StatusesState } from "@/content/state/ProjectInfoState"
 import { VelocityState } from "@/content/state/VelocityState"
 import { AsyncHandler, JotaiUtil, StoreAtom } from "@/content/util/JotaiUtil"
@@ -20,6 +20,7 @@ export type FormValues = Immutable<{
   submitting: boolean
   submittingMessage: string | null
   submitErrorMessage: string | null
+  selectedMilestone: Version | null
 }>
 
 type Init = {
@@ -136,11 +137,11 @@ const submit = async (curr: FormValues, get: Getter, set: Setter, action: Submit
     releaseDueDate: curr.endDate,
     description: ""
   }
+  const conf = get(BoardConfState.atom)
   const api = get(ApiState.atom)
   const project = await get(ProjectState.atom)
   const statuses = await get(StatusesState.atom)
-  const conf = get(BoardConfState.atom)
-  const selectedMilestone = await get(BoardEnvState.selectedMilestoneAtom)
+  const selectedMilestone = curr.selectedMilestone
   try {
     const createdMilestone = await api.projectInfo.addMilestone(project.id, milestoneInput)
     if (selectedMilestone) {
@@ -195,6 +196,8 @@ const mainAtom = JotaiUtil.asyncAtomWithAction<FormValues, Action>(
     const endDate = DateUtil.addDays(startDate, Math.max(conf.sprintDays, 0))
     const title = makeAutoTitle(startDate, endDate)
     const sameTitleExists = checkSameTitle(title, milestones)
+    const env = get(BspEnvState.atom)
+    const selectedMilestone = milestones.find((ms) => ms.id === env.selectedMilestoneId) || null
     return {
       startDate,
       endDate,
@@ -204,7 +207,8 @@ const mainAtom = JotaiUtil.asyncAtomWithAction<FormValues, Action>(
       submittable: !sameTitleExists,
       submitting: false,
       submitErrorMessage: null,
-      submittingMessage: null
+      submittingMessage: null,
+      selectedMilestone
     }
   },
   (storeAtom) => (curr, get, set, action) => {

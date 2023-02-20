@@ -19,13 +19,18 @@ import { BspEnvState } from "./BspEnvState"
 const projectAtom = atom(async (get) => {
   const env = get(BspEnvState.atom)
   const api = get(ApiState.atom)
-  return await api.projectInfo.getProject(env.projectKey)
+  if (env.projectKey) {
+    return await api.projectInfo.getProject(env.projectKey)
+  } else {
+    console.error("projectKey is empty")
+    throw new Error()
+  }
 })
 
 const statusesAtom = atom(async (get) => {
   const env = get(BspEnvState.atom)
   const api = get(ApiState.atom)
-  return await api.projectInfo.getStatuses(env.projectKey)
+  return env.projectKey ? await api.projectInfo.getStatuses(env.projectKey) : []
 })
 
 type AddMilestone = Immutable<{
@@ -52,7 +57,7 @@ const milestonesAtom = JotaiUtil.asyncAtomWithAction(
   async (get) => {
     const env = get(BspEnvState.atom)
     const api = get(ApiState.atom)
-    return await api.projectInfo.getMilestones(env.projectKey)
+    return env.projectKey ? await api.projectInfo.getMilestones(env.projectKey) : []
   },
   () => async (curr, get, set, action: MilestoneAction) => {
     if (action.type === "AddMilestone") {
@@ -97,7 +102,7 @@ const customFieldsAtom = JotaiUtil.asyncAtomWithAction(
   async (get) => {
     const env = get(BspEnvState.atom)
     const api = get(ApiState.atom)
-    return await api.projectInfo.getCustomFields(env.projectKey)
+    return env.projectKey ? await api.projectInfo.getCustomFields(env.projectKey) : []
   },
   () => async (curr, get, set, action: CustomFieldAction) => {
     if (action.type === "AddCustomField") {
@@ -134,7 +139,7 @@ const issueTypesAtom = JotaiUtil.asyncAtomWithAction(
   async (get) => {
     const env = get(BspEnvState.atom)
     const api = get(ApiState.atom)
-    return await api.projectInfo.getIssueTypes(env.projectKey)
+    return env.projectKey ? await api.projectInfo.getIssueTypes(env.projectKey) : []
   },
   () => async (curr, get, set, action: IssueTypesAction) => {
     if (action.type === "Create") {

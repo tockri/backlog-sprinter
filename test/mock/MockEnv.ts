@@ -1,12 +1,7 @@
-import { BoardEnv } from "@/content/board/types"
-import { BspEnv } from "@/content/types"
+import { BspEnv } from "@/content/state/BspEnvState"
 
 export const MockEnv: BspEnv = {
   projectKey: "BT",
-  lang: "ja"
-}
-
-export const MockBoardEnv: BoardEnv = {
-  ...MockEnv,
+  lang: "ja",
   selectedMilestoneId: 0
 }

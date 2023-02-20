@@ -1,8 +1,7 @@
-import { UserLang } from "@/content/types"
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai/index"
 import { IssueType, IssueTypeColor } from "../../backlog/ProjectInfoApi"
-import { BspEnvState } from "../../state/BspEnvState"
+import { BspEnvState, UserLang } from "../../state/BspEnvState"
 import { IssueTypesState } from "../../state/ProjectInfoState"
 import { AddIssueTypeFormState, AddIssueTypeFormValue } from "./state/State"
 

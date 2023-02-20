@@ -1,9 +1,18 @@
+import { Immutable } from "immer"
 import { atom } from "jotai"
-import { BspEnv } from "../types"
+
+export type UserLang = "en" | "ja"
+
+export type BspEnv = Immutable<{
+  projectKey: string
+  lang: UserLang
+  selectedMilestoneId: number
+}>
 
 export const BspEnvState = {
   atom: atom<BspEnv>({
     lang: "en",
-    projectKey: ""
+    projectKey: "",
+    selectedMilestoneId: 0
   })
 } as const

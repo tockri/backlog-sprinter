@@ -1,6 +1,7 @@
 import { FormView } from "@/content/board/FormView"
-import { BoardEnvState } from "@/content/board/state/BoardEnvState"
+
 import { FormState } from "@/content/board/state/FormState"
+import { BspEnvState } from "@/content/state/BspEnvState"
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import { MockEnv } from "@test/mock/MockEnv"
 import React from "react"
@@ -27,7 +28,7 @@ export const Default: Story = {
 export const Selected: Story = {
   args: {
     initialValues: (set) => {
-      set(BoardEnvState.atom, {
+      set(BspEnvState.atom, {
         ...MockEnv,
         selectedMilestoneId: 245742
       })

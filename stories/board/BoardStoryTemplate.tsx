@@ -1,12 +1,13 @@
 import { BoardConfState } from "@/content/board/state/BoardConfState"
-import { BoardEnvState } from "@/content/board/state/BoardEnvState"
+
 import { ApiState } from "@/content/state/ApiState"
 import { BspConfState } from "@/content/state/BspConfState"
+import { BspEnvState } from "@/content/state/BspEnvState"
 import { Loading } from "@/content/ui/Loading"
 import styled from "@emotion/styled"
 import { MockApi } from "@test/mock/MockApi"
 import { MockBoardConf, MockBspConf } from "@test/mock/MockConf"
-import { MockBoardEnv, MockEnv } from "@test/mock/MockEnv"
+import { MockEnv } from "@test/mock/MockEnv"
 import { Immutable } from "immer"
 import { createStore, Provider } from "jotai"
 import React from "react"
@@ -21,7 +22,7 @@ export type BoardStoryTemplateProps = Immutable<{
 
 export const BoardStoryTemplate: React.FC<BoardStoryTemplateProps> = ({ initialValues, children }) => {
   const store = createStore()
-  store.set(BoardEnvState.atom, MockBoardEnv)
+  store.set(BspEnvState.atom, MockEnv)
   store.set(BoardConfState.atom, MockBoardConf)
   store.set(BspConfState.atom(MockEnv.projectKey), MockBspConf)
   store.set(ApiState.atom, MockApi)
