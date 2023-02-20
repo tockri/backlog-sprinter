@@ -2,7 +2,7 @@ import { BacklogApiContext } from "@/content/backlog/BacklogApiForReact"
 import { BoardEnvState } from "@/content/board/state/BoardEnvState"
 import { BoardEnv } from "@/content/board/types"
 import { ApiState } from "@/content/state/ApiState"
-import { EnvState } from "@/content/state/EnvState"
+import { BspEnvState } from "@/content/state/BspEnvState"
 import { MessageBroker } from "@/util/MessageBroker"
 import { createStore } from "jotai"
 import React, { useEffect } from "react"
@@ -17,7 +17,7 @@ export const useBoardModel = (broker: MessageBroker<BoardEnv>) => {
     if (!env) {
       broker.subscribe("Board", async (env) => {
         setEnv(env)
-        jotaiStore.set(EnvState.atom, env)
+        jotaiStore.set(BspEnvState.atom, env)
         jotaiStore.set(BoardEnvState.atom, env)
       })
     }

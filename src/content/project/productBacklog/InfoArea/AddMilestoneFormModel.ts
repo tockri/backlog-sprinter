@@ -4,7 +4,7 @@ import produce, { Immutable } from "immer"
 import { useAtomValue, useSetAtom } from "jotai"
 import React from "react"
 import { AddMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
-import { EnvState } from "../../../state/EnvState"
+import { BspEnvState } from "../../../state/BspEnvState"
 import { MilestonesState } from "../../../state/ProjectInfoState"
 import { ItemSelectionState } from "../state/ItemSelectionState"
 import { PBIListState } from "../state/PBIListState"
@@ -25,7 +25,7 @@ type AddMilestoneFormModel = Immutable<{
 }>
 
 export const useMilestoneFormModel = (): AddMilestoneFormModel => {
-  const { lang } = useAtomValue(EnvState.atom)
+  const { lang } = useAtomValue(BspEnvState.atom)
   const [values, setValues] = React.useState<Values>({
     name: "",
     description: "",

@@ -1,7 +1,7 @@
-import { ProjectEnv } from "@/content/types"
+import { BspEnv } from "@/content/types"
 import { Immutable } from "immer"
 
-export type BoardEnv = ProjectEnv &
+export type BoardEnv = BspEnv &
   Immutable<{
     selectedMilestoneId: number
   }>

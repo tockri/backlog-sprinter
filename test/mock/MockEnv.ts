@@ -1,7 +1,7 @@
 import { BoardEnv } from "@/content/board/types"
-import { ProjectEnv } from "@/content/types"
+import { BspEnv } from "@/content/types"
 
-export const MockEnv: ProjectEnv = {
+export const MockEnv: BspEnv = {
   projectKey: "BT",
   lang: "ja"
 }

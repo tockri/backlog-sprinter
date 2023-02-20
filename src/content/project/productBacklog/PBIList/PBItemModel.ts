@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { NLLocation } from "../../../../util/NestedList"
-import { OrderCustomFieldState } from "../../app/state/OrderCustomFieldState"
+import { OrderCustomFieldState } from "../../state/OrderCustomFieldState"
 import { PBIListState } from "../state/PBIListState"
 
 import { ItemSelectionState } from "../state/ItemSelectionState"

@@ -2,7 +2,7 @@ import { UserLang } from "@/content/types"
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import { EditIssueInput, Issue } from "../../../backlog/IssueApi"
-import { EnvState } from "../../../state/EnvState"
+import { BspEnvState } from "../../../state/BspEnvState"
 import { ProjectState } from "../../../state/ProjectInfoState"
 import { ItemSelection, ItemSelectionState } from "../state/ItemSelectionState"
 import { PBIList, PBIListFunc } from "../state/PBIList"
@@ -30,7 +30,7 @@ export const useIssueAreaModel = (): IssueAreaModel => {
   const item = useAtomValue(ItemSelectionState.atom)
   const project = useAtomValue(ProjectState.atom)
   const [pbiList, dispatch] = useAtom(PBIListState.atom)
-  const { lang } = useAtomValue(EnvState.atom)
+  const { lang } = useAtomValue(BspEnvState.atom)
 
   const issue = item.type === "Issue" ? findIssue(pbiList, item.issueId) : null
 

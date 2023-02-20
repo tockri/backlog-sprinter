@@ -11,9 +11,9 @@ import { AsyncHandler, AsyncRead, JotaiUtil } from "../../../util/JotaiUtil"
 
 import { ApiState } from "@/content/state/ApiState"
 import { BspConfState } from "@/content/state/BspConfState"
-import { EnvState } from "@/content/state/EnvState"
+import { BspEnvState } from "@/content/state/BspEnvState"
 import { IssueTypesState, MilestonesState, ProjectState, StatusesState } from "../../../state/ProjectInfoState"
-import { OrderCustomFieldState } from "../../app/state/OrderCustomFieldState"
+import { OrderCustomFieldState } from "../../state/OrderCustomFieldState"
 import { PBIList, PBIListFunc, PBIListMovedEvent } from "./PBIList"
 
 type AddIssueAction = {
@@ -105,7 +105,7 @@ const updateIssues = async (
 }
 
 const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set, action) => {
-  const env = get(EnvState.atom)
+  const env = get(BspEnvState.atom)
   const bspConf = get(BspConfState.atom(env.projectKey))
   const issueType = (await get(IssueTypesState.atom)).find((it) => it.id === bspConf.pbiIssueTypeId)
   const orderCustomField = await get(OrderCustomFieldState.atom)

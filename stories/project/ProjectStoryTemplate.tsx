@@ -1,7 +1,7 @@
-import { ProjectConfState } from "@/content/project/app/state/ProjectConfState"
+import { ProjectConfState } from "@/content/project/state/ProjectConfState"
 import { ApiState } from "@/content/state/ApiState"
 import { BspConfState } from "@/content/state/BspConfState"
-import { EnvState } from "@/content/state/EnvState"
+import { BspEnvState } from "@/content/state/BspEnvState"
 import { Loading } from "@/content/ui/Loading"
 import styled from "@emotion/styled"
 import { MockApi } from "@test/mock/MockApi"
@@ -23,7 +23,7 @@ export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ init
   const store = createStore()
   store.set(ProjectConfState.atom, MockConf)
   store.set(BspConfState.atom(MockEnv.projectKey), MockBspConf)
-  store.set(EnvState.atom, MockEnv)
+  store.set(BspEnvState.atom, MockEnv)
   store.set(ApiState.atom, MockApi)
   initialValues && initialValues(store.set)
   return (

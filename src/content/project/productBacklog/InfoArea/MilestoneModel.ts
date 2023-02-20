@@ -1,7 +1,7 @@
 import { UserLang } from "@/content/types"
 import { useAtomValue, useSetAtom } from "jotai"
 import { EditMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
-import { EnvState } from "../../../state/EnvState"
+import { BspEnvState } from "../../../state/BspEnvState"
 import { MilestonesState } from "../../../state/ProjectInfoState"
 import { ItemSelectionState } from "../state/ItemSelectionState"
 import { PBIListState } from "../state/PBIListState"
@@ -17,7 +17,7 @@ export const useMilestoneModel = (): MilestoneModel => {
   const milestone = useAtomValue(ItemSelectionState.milestoneAtom)
   const dispatch = useSetAtom(PBIListState.atom)
   const milestones = useAtomValue(MilestonesState.atom)
-  const { lang } = useAtomValue(EnvState.atom)
+  const { lang } = useAtomValue(BspEnvState.atom)
   return {
     lang,
     milestone,

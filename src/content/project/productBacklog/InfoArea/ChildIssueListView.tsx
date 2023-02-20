@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { Issue } from "../../../backlog/IssueApi"
-import { EnvState } from "../../../state/EnvState"
+import { BspEnvState } from "../../../state/BspEnvState"
 import { HBox } from "../../../ui/Box"
 import { Draggable } from "../../../ui/DragAndDrop"
 
@@ -17,7 +17,7 @@ type ChildIssueListViewProps = {
 export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => {
   const { parentIssueId } = props
   const [children, dispatch] = useAtom(ChildIssuesState.atom(parentIssueId))
-  const env = useAtomValue(EnvState.atom)
+  const env = useAtomValue(BspEnvState.atom)
   const t = i18n(env.lang)
 
   return children.length === 0 ? null : (

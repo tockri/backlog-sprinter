@@ -3,12 +3,12 @@
  */
 import { IssueTypeColor } from "@/content/backlog/ProjectInfoApi"
 
-import { ProjectConfState } from "@/content/project/app/state/ProjectConfState"
 import { useAddIssueTypeModel } from "@/content/project/settings/AddIssueTypeModel"
 import { AddIssueTypeFormState, AddIssueTypeFormValue } from "@/content/project/settings/state/State"
+import { ProjectConfState } from "@/content/project/state/ProjectConfState"
 import { ApiState } from "@/content/state/ApiState"
 import { BspConfState } from "@/content/state/BspConfState"
-import { EnvState } from "@/content/state/EnvState"
+import { BspEnvState } from "@/content/state/BspEnvState"
 import { MockBspConf, MockConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
 import { TestMockApi } from "@test/mock/TestMockApi"
@@ -20,7 +20,7 @@ describe("AddIssueTypeModel", () => {
     await tester.renderFixture((set) => {
       set(ProjectConfState.atom, MockConf)
       set(BspConfState.atom(MockEnv.projectKey), MockBspConf)
-      set(EnvState.atom, MockEnv)
+      set(BspEnvState.atom, MockEnv)
       set(ApiState.atom, TestMockApi)
       set(AddIssueTypeFormState.atom, (curr) => ({ ...curr, creating: true }))
     })

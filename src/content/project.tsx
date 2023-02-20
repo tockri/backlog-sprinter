@@ -4,12 +4,12 @@ import { createRoot } from "react-dom/client"
 import { MessageBroker } from "../util/MessageBroker"
 import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
 import SprintIcon from "./images/sprint.svg"
-import { ProjectApp } from "./project/app/View"
 import { i18n } from "./project/i18n"
-import { ProjectEnv } from "./types"
+import { ProjectApp } from "./project/View"
+import { BspEnv } from "./types"
 import { jsxToElement } from "./ui/JSXUtil"
 
-const broker = new MessageBroker<ProjectEnv>()
+const broker = new MessageBroker<BspEnv>()
 
 const getButtonPlace = () => document.querySelector(".project-header__summary")
 

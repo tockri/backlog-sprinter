@@ -1,9 +1,9 @@
 // noinspection JSUnusedGlobalSymbols
 
 import { IssueTypeColor } from "@/content/backlog/ProjectInfoApi"
-import { ProjectConfState } from "@/content/project/app/state/ProjectConfState"
 import { AddIssueTypeFormState } from "@/content/project/settings/state/State"
 import { ProjectSettings } from "@/content/project/settings/View"
+import { ProjectConfState } from "@/content/project/state/ProjectConfState"
 import { BspConfState } from "@/content/state/BspConfState"
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
 import { MockEnv } from "@test/mock/MockEnv"
