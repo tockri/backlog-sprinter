@@ -1,9 +1,8 @@
-import { UserLang } from "@/content/types"
 import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import React from "react"
-import { EnvState } from "../../../state/EnvState"
+import { BspEnvState, UserLang } from "../../../state/BspEnvState"
 import { ItemSelectionState } from "../state/ItemSelectionState"
 import { PBIList } from "../state/PBIList"
 import { PBIListState } from "../state/PBIListState"
@@ -32,7 +31,7 @@ type HoverState = Immutable<{
 export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
   const [hover, setHover] = React.useState<HoverState | null>(null)
   const dispatch = useSetAtom(PBIListState.atom)
-  const { lang } = useAtomValue(EnvState.atom)
+  const { lang } = useAtomValue(BspEnvState.atom)
   const [sel, select] = useAtom(ItemSelectionState.atom)
   const milestone = subList.head
   const milestoneId = milestone?.id || 0

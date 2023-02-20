@@ -1,4 +1,4 @@
-import { UserLang } from "@/content/types"
+import { UserLang } from "@/content/state/BspEnvState"
 
 const ja = {
   childIssue: "子課題",

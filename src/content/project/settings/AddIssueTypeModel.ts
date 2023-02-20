@@ -1,8 +1,7 @@
-import { UserLang } from "@/content/types"
 import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai/index"
 import { IssueType, IssueTypeColor } from "../../backlog/ProjectInfoApi"
-import { EnvState } from "../../state/EnvState"
+import { BspEnvState, UserLang } from "../../state/BspEnvState"
 import { IssueTypesState } from "../../state/ProjectInfoState"
 import { AddIssueTypeFormState, AddIssueTypeFormValue } from "./state/State"
 
@@ -18,7 +17,7 @@ type AddIssueTypeModel = Immutable<{
 
 export const useAddIssueTypeModel = (): AddIssueTypeModel => {
   const [values, setValues] = useAtom(AddIssueTypeFormState.atom)
-  const { lang } = useAtomValue(EnvState.atom)
+  const { lang } = useAtomValue(BspEnvState.atom)
   const [issueTypes, dispatch] = useAtom(IssueTypesState.atom)
   return {
     values,

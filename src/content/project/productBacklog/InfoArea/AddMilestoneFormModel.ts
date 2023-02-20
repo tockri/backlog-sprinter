@@ -1,17 +1,16 @@
-import { UserLang } from "@/content/types"
+import { DateUtil } from "@/util/DateUtil"
 import produce, { Immutable } from "immer"
 import { useAtomValue, useSetAtom } from "jotai"
 import React from "react"
-import { DateUtil } from "../../../../util/DateUtil"
 import { AddMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
-import { EnvState } from "../../../state/EnvState"
+import { BspEnvState, UserLang } from "../../../state/BspEnvState"
 import { MilestonesState } from "../../../state/ProjectInfoState"
 import { ItemSelectionState } from "../state/ItemSelectionState"
 import { PBIListState } from "../state/PBIListState"
 
 type Values = Immutable<AddMilestoneInput>
 
-type MilestoneFormModel = {
+type AddMilestoneFormModel = Immutable<{
   values: Values
   lang: UserLang
   setName: (value: string) => void
@@ -22,10 +21,10 @@ type MilestoneFormModel = {
   cancel: () => void
   submit: () => void
   submittable: boolean
-}
+}>
 
-export const useMilestoneFormModel = (): MilestoneFormModel => {
-  const { lang } = useAtomValue(EnvState.atom)
+export const useMilestoneFormModel = (): AddMilestoneFormModel => {
+  const { lang } = useAtomValue(BspEnvState.atom)
   const [values, setValues] = React.useState<Values>({
     name: "",
     description: "",

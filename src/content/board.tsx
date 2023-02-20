@@ -1,37 +1,20 @@
-import { MessageBroker } from "@/util/MessageBroker"
 import { Waiter } from "@/util/Waiter"
+import { Provider } from "jotai"
 import React from "react"
 import ReactDomClient from "react-dom/client"
-import { BacklogApiContext, RealBacklogApi } from "./backlog/BacklogApiForReact"
-import { BoardEnv } from "./board/types"
 import { BoardView } from "./board/View"
-import { UserLang } from "./types"
-import { jsxToElement } from "./ui/JSXUtil"
-
-const broker = new MessageBroker<BoardEnv>()
-
-const makeBoardEnv = (): BoardEnv => {
-  const url = new URL(location.href)
-  const selectedMilestoneId = parseInt(url.searchParams.get("milestone") || "0")
-  const projectKey = url.pathname.split("/")[2]
-  const lang: UserLang = document.documentElement.lang === "ja" ? "ja" : "en"
-
-  return {
-    projectKey,
-    lang,
-    selectedMilestoneId
-  }
-}
+import { BspCommon } from "./BspCommon"
+import { JsxUtil } from "./ui/JsxUtil"
 
 const renderApp = () => {
   if (!document.querySelector(".bsp-form-root")) {
-    const rootElem = jsxToElement(<div className="bsp-form-root" />)
+    const rootElem = JsxUtil.jsxToElement(<div className="bsp-form-root" />)
     document.body.append(rootElem)
     const reactRoot = ReactDomClient.createRoot(rootElem)
     reactRoot.render(
-      <BacklogApiContext.Provider value={RealBacklogApi}>
-        <BoardView broker={broker} />
-      </BacklogApiContext.Provider>
+      <Provider store={BspCommon.jotaiStore}>
+        <BoardView />
+      </Provider>
     )
   }
 }
@@ -43,7 +26,7 @@ const makePortalButton = () => {
   const fieldDiv = milestoneH3?.nextElementSibling
   if (fieldDiv && !fieldDiv.classList.contains("bsp_milestone-field")) {
     fieldDiv.classList.add("bsp_milestone-field")
-    const button = jsxToElement<HTMLButtonElement>(
+    const button = JsxUtil.jsxToElement<HTMLButtonElement>(
       <button type="button" className="icon-button icon-button--default bsp_milestone-update">
         <svg role="image" className="icon -medium">
           <use xlinkHref="/images/svg/sprite.symbol.svg#icon_add"></use>
@@ -51,7 +34,7 @@ const makePortalButton = () => {
       </button>
     )
     button.onclick = () => {
-      broker.dispatch(makeBoardEnv())
+      BspCommon.start()
     }
     fieldDiv.appendChild(button)
   }
@@ -62,6 +45,4 @@ const initialize = () => {
   makePortalButton()
 }
 
-const isReady = (): boolean => !!getButtonPlace()
-
-Waiter.watchInfinitely(isReady, initialize)
+Waiter.watchInfinitely(() => !!getButtonPlace(), initialize)

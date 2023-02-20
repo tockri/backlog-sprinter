@@ -4,7 +4,7 @@ import React from "react"
 import { Tooltip } from "react-tooltip"
 import "react-tooltip/dist/react-tooltip.min.css"
 import { Issue } from "../../backlog/IssueApi"
-import { EnvState } from "../../state/EnvState"
+import { BspEnvState } from "../../state/BspEnvState"
 import { HBox } from "../../ui/Box"
 import { cnu } from "../../ui/cnu"
 
@@ -23,7 +23,7 @@ export const StoryPointView: React.FC<StoryPointViewProps> = (props) => {
 
 const Editor: React.FC<StoryPointViewProps> = (props) => {
   const { issue, onEstimateFix, onActualFix } = props
-  const env = useAtomValue(EnvState.atom)
+  const env = useAtomValue(BspEnvState.atom)
   const t = i18n(env.lang)
   const { actualHours, estimatedHours, status } = issue
   return (

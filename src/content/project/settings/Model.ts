@@ -1,13 +1,12 @@
 import { BspConfState } from "@/content/state/BspConfState"
-import { UserLang } from "@/content/types"
 import { Immutable, produce } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
 import { CustomNumberField, IssueType } from "../../backlog/ProjectInfoApi"
-import { EnvState } from "../../state/EnvState"
+import { BspEnvState, UserLang } from "../../state/BspEnvState"
 import { IssueTypesState } from "../../state/ProjectInfoState"
-import { OrderCustomFieldAction, OrderCustomFieldState } from "../app/state/OrderCustomFieldState"
+import { OrderCustomFieldAction, OrderCustomFieldState } from "../state/OrderCustomFieldState"
 import { i18n } from "./i18n"
 import { AddIssueTypeFormState } from "./state/State"
 
@@ -25,8 +24,8 @@ type SettingModel = Immutable<{
 }>
 
 export const useSettingModel = (): SettingModel => {
-  const [conf, setConf] = useAtom(BspConfState.atom)
-  const { lang } = useAtomValue(EnvState.atom)
+  const { projectKey, lang } = useAtomValue(BspEnvState.atom)
+  const [conf, setConf] = useAtom(BspConfState.atom(projectKey))
   const issueTypes = useAtomValue(IssueTypesState.atom)
   const [orderCustomField, orderCustomFieldsDispatch] = useAtom(OrderCustomFieldState.atom)
   const [errorMessage, setErrorMessage] = React.useState("")

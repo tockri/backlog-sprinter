@@ -1,6 +1,6 @@
+import { DateUtil } from "@/util/DateUtil"
 import styled from "@emotion/styled"
 import React from "react"
-import { DateUtil } from "../../../../util/DateUtil"
 import { HBox, VBox } from "../../../ui/Box"
 import { EditableField } from "../../../ui/EditableField"
 import { i18n } from "./i18n"
@@ -108,7 +108,10 @@ const nameEditStyle: Style = {
 const descriptionViewStyle: Style = {
   flexGrow: 1,
   backgroundColor: "#f0f0f0",
-  borderRadius: 4
+  borderRadius: 4,
+  whiteSpace: "pre-wrap",
+  lineHeight: 1.3,
+  padding: 4
 }
 
 const descriptionEditStyle: Style = {

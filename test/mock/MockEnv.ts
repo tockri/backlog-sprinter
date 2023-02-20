@@ -1,6 +1,7 @@
-import { ProjectEnv } from "@/content/types"
+import { BspEnv } from "@/content/state/BspEnvState"
 
-export const MockEnv: ProjectEnv = {
+export const MockEnv: BspEnv = {
   projectKey: "BT",
-  lang: "ja"
+  lang: "ja",
+  selectedMilestoneId: 0
 }
