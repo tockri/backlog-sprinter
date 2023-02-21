@@ -63,7 +63,9 @@ export const VelocityChart: React.FC<{ data: VelocityChartData }> = ({ data }) =
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" height={20} />
           <YAxis />
-          <Tooltip />
+          <Tooltip
+            formatter={(value) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(+value)}
+          />
           <Legend align="right" />
           <Line type="monotone" dataKey="PBI" stroke="#f8c4c0" strokeDasharray="4 2" />
           <Line type="monotone" dataKey="3-week Moving Average" stroke="#d88488" />
@@ -85,7 +87,9 @@ export const VelocityChart: React.FC<{ data: VelocityChartData }> = ({ data }) =
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" height={20} />
           <YAxis />
-          <Tooltip />
+          <Tooltip
+            formatter={(value) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(+value)}
+          />
           <Legend align="right" height={0} margin={{ bottom: 10 }} />
           <Line type="monotone" dataKey="Others" stroke="#c2cafd" strokeDasharray="4 2" />
           <Line type="monotone" dataKey="3-week Moving Average" stroke="#8288ed" />

@@ -3,13 +3,12 @@
   "version": "1.0.2",
   "private": true,
   "scripts": {
-    "build": "rm -rf build; mkdir -p build/code; NODE_ENV=production DST_DIR=$PWD/build/code webpack; cd build/code; zip ../backlog-sprinter.zip -r *; yarn secret",
+    "build": "rm -rf build; mkdir -p build/code; NODE_ENV=production DST_DIR=$PWD/build/code webpack; cd build/code; zip ../backlog-sprinter.zip -r *",
     "once": "webpack",
     "watch": "webpack --watch",
     "wsl": "DST_DIR=$(echo $PATH | grep -o '/mnt/c/Users/[a-zA-Z]*' | head -n 1)/dev/bnn/backlog-sprinter/dist yarn watch",
     "test": "jest",
-    "secret": "cp public/manifest.json ../backlog-sprinter-secret/; cp src/background/backlog-api-keys.ts ../backlog-sprinter-secret/",
-    "import-secret": "cp ../backlog-sprinter-secret/manifest.json public/manifest.json; cp ../backlog-sprinter-secret/backlog-api-keys.ts src/background/backlog-api-keys.ts",
+    "import-secret": "cp ../backlog-sprinter-secret/manifest_key.json dev/manifest_key.json; cp ../backlog-sprinter-secret/backlog-api-keys.ts src/background/backlog-api-keys.ts",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },

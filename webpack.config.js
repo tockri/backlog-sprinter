@@ -2,7 +2,9 @@ const path = require("path")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const ESLintPlugin = require("eslint-webpack-plugin")
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin")
+const GenerateManifestJsonPlugin = require("./dev/GenerateManifestJsonPlugin")
 
+const devDir = path.join(__dirname, "dev")
 const srcDir = path.join(__dirname, "src")
 const dstDir = process.env.DST_DIR || path.join(__dirname, "dist")
 
@@ -51,7 +53,12 @@ module.exports = {
     }),
     new ESLintPlugin({
       extensions: ["ts", "tsx"]
-    })
+    }),
+    new GenerateManifestJsonPlugin(
+      "manifest.json",
+      path.join(devDir, "manifest_template.json"),
+      path.join(devDir, "manifest_key.json")
+    )
   ],
   devtool: process.env.NODE_ENV === "development" ? "#inline-source-map" : false,
   watchOptions: {
