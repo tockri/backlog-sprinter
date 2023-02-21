@@ -1,0 +1,3 @@
+[submodule "backlog-sprinter-secret"]
+	path = backlog-sprinter-secret
+	url = git@github.com:tockri/backlog-sprinter-secret

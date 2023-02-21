@@ -4,6 +4,7 @@ module.exports = {
   testEnvironment: "node",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
-    "^@test/(.*)$": "<rootDir>/test/$1"
+    "^@test/(.*)$": "<rootDir>/test/$1",
+    "^@secret/(.*)$": "<rootDir>/backlog-sprinter-secret/$1"
   }
 }

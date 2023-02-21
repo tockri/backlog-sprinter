@@ -1,4 +1,4 @@
-import { BacklogOAuthKeys } from "./backlog-api-keys"
+import { BacklogOAuthKeys } from "@secret/backlog-api-keys"
 
 type BacklogOAuthConfig = {
   readonly hostname: string

@@ -8,7 +8,6 @@
     "watch": "webpack --watch",
     "wsl": "DST_DIR=$(echo $PATH | grep -o '/mnt/c/Users/[a-zA-Z]*' | head -n 1)/dev/bnn/backlog-sprinter/dist yarn watch",
     "test": "jest",
-    "import-secret": "cp ../backlog-sprinter-secret/manifest_key.json dev/manifest_key.json; cp ../backlog-sprinter-secret/backlog-api-keys.ts src/background/backlog-api-keys.ts",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
