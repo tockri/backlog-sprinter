@@ -17,6 +17,7 @@ export type EditableFieldProps = Immutable<{
   editStyle?: React.CSSProperties
   viewStyle?: React.CSSProperties
   errorMessage?: (value: string) => string | null
+  onStart?: (value: string, setValue: (newValue: string) => void) => void
   onFix?: (value: string) => void
   onCancel?: () => void
   defaultEditing?: boolean
@@ -44,6 +45,17 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
   const [editing, setEditing] = React.useState(defaultEditing)
   const [error, setError] = React.useState<string | null>(null)
   const editor = React.useRef<(HTMLInputElement & HTMLTextAreaElement) | null>(null)
+
+  const onStart = React.useCallback(() => {
+    props.onStart &&
+      editor.current &&
+      props.onStart(editor.current.value, (newValue) => {
+        if (editor.current) {
+          editor.current.value = newValue
+        }
+      })
+  }, [props])
+
   const endEdit = () => {
     editor.current = null
     setEditing(false)
@@ -90,6 +102,7 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
       }
     }
   }
+
   React.useEffect(() => {
     if (editor.current) {
       if (editing) {
@@ -97,12 +110,15 @@ export const EditableField: React.FC<EditableFieldProps> = (props) => {
           editor.current.value = defaultValue
         }
         editor.current.focus()
+        onStart()
       } else {
         editor.current = null
       }
     }
-  }, [editing, defaultValue])
+  }, [editing, defaultValue, onStart])
+
   const id = React.useRef(`editable-${Math.random()}`)
+
   const onChange = errorMessage
     ? (e: { target: { value: string } }) => {
         setError(errorMessage(e.target.value))

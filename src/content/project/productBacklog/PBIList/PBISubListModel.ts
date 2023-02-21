@@ -1,3 +1,5 @@
+import { IssueType } from "@/content/backlog/ProjectInfoApi"
+import { IssueTypesState } from "@/content/state/ProjectInfoState"
 import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
@@ -19,6 +21,7 @@ type PBISubListModel = Immutable<{
   isSelected: boolean
   releaseDate: string
   dataForTest: PBISubList
+  pbiIssueType: IssueType | null
 }>
 
 type PBISubList = PBIList["subLists"][number]
@@ -38,6 +41,7 @@ export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
   const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
   const isSelected = sel.type === "Milestone" && sel.milestoneId === milestoneId
   const milestoneName = milestone?.name || "(No milestone)"
+  const pbiIssueType = useAtomValue(IssueTypesState.pbiIssueTypeAtom)
 
   return {
     lang,
@@ -76,6 +80,7 @@ export const usePBISubListModel = (subList: PBISubList): PBISubListModel => {
     },
     milestoneName,
     isSelected,
-    releaseDate
+    releaseDate,
+    pbiIssueType
   }
 }

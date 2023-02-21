@@ -174,6 +174,7 @@ export type AddIssueInput = Immutable<{
   projectId: number
   issueTypeId: number
   summary: string
+  description: string
   parentIssueId?: number
   milestoneId?: number | null
   customField?: {
@@ -188,6 +189,7 @@ const add = async (input: AddIssueInput): Promise<Issue> => {
   params["issueTypeId"] = String(input.issueTypeId)
   params["priorityId"] = "3"
   params["summary"] = input.summary
+  params["description"] = input.description
   const { parentIssueId, milestoneId, customField } = input
   if (parentIssueId !== undefined) {
     params["parentIssueId"] = String(parentIssueId)

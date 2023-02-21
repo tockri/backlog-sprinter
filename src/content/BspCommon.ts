@@ -1,4 +1,4 @@
-import { RealBacklogApi } from "@/content/backlog/BacklogApiForReact"
+import { RealBacklogApi } from "@/content/backlog/BacklogApi"
 import { ApiState } from "@/content/state/ApiState"
 import { BspEnv, BspEnvState, UserLang } from "@/content/state/BspEnvState"
 import { createStore } from "jotai/index"

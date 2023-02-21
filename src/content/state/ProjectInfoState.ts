@@ -164,6 +164,19 @@ const issueTypesAtom = JotaiUtil.asyncAtomWithAction(
   }
 )
 
+const pbiIssueTypeAtom = atom(async (get) => {
+  const env = get(BspEnvState.atom)
+  if (env.projectKey) {
+    const conf = get(BspConfState.atom(env.projectKey))
+    const issueTypeId = conf.pbiIssueTypeId
+    if (issueTypeId) {
+      const issueTypes = await get(issueTypesAtom)
+      return issueTypes.find((it) => it.id === issueTypeId) || null
+    }
+  }
+  return null
+})
+
 export const ProjectState = {
   atom: projectAtom
 } as const
@@ -205,6 +218,7 @@ export const CustomFieldsState = {
 
 export const IssueTypesState = {
   atom: issueTypesAtom,
+  pbiIssueTypeAtom,
   Action: {
     Create: (name: string, color: IssueTypeColor): IssueTypeCreate => ({
       type: "Create",

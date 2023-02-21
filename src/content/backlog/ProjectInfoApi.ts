@@ -1,5 +1,5 @@
+import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
-import { DateUtil } from "../../util/DateUtil"
 import { BacklogApiRequest, ParamsType } from "./BacklogApiRequest"
 
 export type Status = Immutable<{
@@ -30,12 +30,6 @@ export type Project = Immutable<{
   useDevAttributes: boolean
 }>
 
-export type ProjectInfoWithMilestones = Immutable<{
-  project: Project
-  milestones: ReadonlyArray<Version>
-  statuses: ReadonlyArray<Status>
-}>
-
 const getProject = (projectKey: string): Promise<Project> =>
   BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
 
@@ -50,19 +44,6 @@ const getCustomFields = (projectKey: string): Promise<ReadonlyArray<CustomField>
 
 const getIssueTypes = (projectKey: string): Promise<ReadonlyArray<IssueType>> =>
   BacklogApiRequest.get<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
-//
-// const getProjectInfoWithMilestones = async (projectKey: string): Promise<ProjectInfoWithMilestones> => {
-//   console.log("getProjectInfoWithMilestones", { projectKey })
-//   const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
-//   const versionsP = BacklogApiRequest.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
-//   const statusesP = BacklogApiRequest.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
-//   const [milestones, statuses] = await Promise.all([versionsP, statusesP])
-//   return {
-//     project,
-//     milestones,
-//     statuses
-//   }
-// }
 
 // noinspection JSUnusedGlobalSymbols
 export enum IssueTypeColor {
@@ -164,28 +145,6 @@ export type ProjectInfoWithCustomFields = Immutable<{
   milestones: Version[]
   statuses: Status[]
 }>
-//
-// const getProjectInfoWithCustomFields = async (projectKey: string): Promise<ProjectInfoWithCustomFields> => {
-//   console.log("getProjectInfoWithCustomFields", { projectKey })
-//   const project = await BacklogApiRequest.get<Project>(`/api/v2/projects/${projectKey}`)
-//   const customFieldsP = BacklogApiRequest.get<ReadonlyArray<CustomField>>(`/api/v2/projects/${projectKey}/customFields`)
-//   const statusesP = BacklogApiRequest.get<Status[]>(`/api/v2/projects/${projectKey}/statuses`)
-//   const milestonesP = BacklogApiRequest.get<Version[]>(`/api/v2/projects/${projectKey}/versions`)
-//   const issueTypesP = BacklogApiRequest.get<IssueType[]>(`/api/v2/projects/${projectKey}/issueTypes`)
-//   const [customFields, statuses, milestones, issueTypes] = await Promise.all([
-//     customFieldsP,
-//     statusesP,
-//     milestonesP,
-//     issueTypesP
-//   ])
-//   return {
-//     project,
-//     issueTypes,
-//     customFields,
-//     milestones,
-//     statuses
-//   }
-// }
 
 export type AddCustomFieldInput = Immutable<{
   typeId: CustomFieldTypes
@@ -278,8 +237,6 @@ const addIssueType = async (input: IssueTypeInput): Promise<IssueType> => {
 }
 
 export const RealProjectInfoApi = {
-  // getProjectInfoWithMilestones,
-  // getProjectInfoWithCustomFields,
   getProject,
   getMilestones,
   getStatuses,

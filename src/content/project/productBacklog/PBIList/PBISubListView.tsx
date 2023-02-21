@@ -106,6 +106,11 @@ export const PBISubListView: React.FC<PBISubListProps> = (props) => {
                 }}
                 blurAction="cancel"
                 lang={model.lang}
+                onStart={(value, setValue) => {
+                  if (!value) {
+                    setValue(model.pbiIssueType?.templateSummary || "")
+                  }
+                }}
               />
             </VBox>
           </DropArea>

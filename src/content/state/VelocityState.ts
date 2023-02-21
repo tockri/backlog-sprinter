@@ -1,4 +1,4 @@
-import { BacklogApi } from "@/content/backlog/BacklogApiForReact"
+import { BacklogApi } from "@/content/backlog/BacklogApi"
 import { Issue } from "@/content/backlog/IssueApi"
 import { Version } from "@/content/backlog/ProjectInfoApi"
 import { Wiki } from "@/content/backlog/WikiApi"

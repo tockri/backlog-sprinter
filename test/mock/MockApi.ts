@@ -1,4 +1,4 @@
-import { BacklogApi, FakeBacklogApi } from "@/content/backlog/BacklogApiForReact"
+import { BacklogApi, FakeBacklogApi } from "@/content/backlog/BacklogApi"
 import { AddIssueInput, EditIssueInput, Issue, IssueApi, IssueUtil } from "@/content/backlog/IssueApi"
 import { ProjectInfoApi } from "@/content/backlog/ProjectInfoApi"
 import produce from "immer"
@@ -56,15 +56,19 @@ const editIssue: IssueApi["edit"] = async (issueId: number, input: EditIssueInpu
 }
 
 export const MockApi: BacklogApi = produce(FakeBacklogApi, (draft) => {
-  draft.projectInfo.getProject = () => Promise.resolve(MockData.projectInfoBT.project)
-  draft.projectInfo.getMilestones = () => Promise.resolve(MockData.projectInfoBT.milestones)
-  draft.projectInfo.getStatuses = () => Promise.resolve(MockData.projectInfoBT.statuses)
-  draft.projectInfo.getIssueTypes = () => Promise.resolve(MockData.projectInfoBT.issueTypes)
-  draft.projectInfo.getCustomFields = () => Promise.resolve(MockData.projectInfoBT.customFields)
-  draft.projectInfo.addIssueType = createIssueType
-  draft.issue.searchInIssueTypeAndMilestones = () => Promise.resolve(MockData.productBacklogBT)
-  draft.issue.changeMilestoneAndCustomFieldValue = changeMilestoneAndCustomFieldValue
-  draft.issue.add = addIssue
-  draft.issue.edit = editIssue
-  draft.issue.searchChildren = () => Promise.resolve(MockData.childIssuesBT)
+  draft.projectInfo = produce(draft.projectInfo, (pi) => {
+    pi.getProject = () => Promise.resolve(MockData.projectInfoBT.project)
+    pi.getMilestones = () => Promise.resolve(MockData.projectInfoBT.milestones)
+    pi.getStatuses = () => Promise.resolve(MockData.projectInfoBT.statuses)
+    pi.getIssueTypes = () => Promise.resolve(MockData.projectInfoBT.issueTypes)
+    pi.getCustomFields = () => Promise.resolve(MockData.projectInfoBT.customFields)
+    pi.addIssueType = createIssueType
+  })
+  draft.issue = produce(draft.issue, (iss) => {
+    iss.searchInIssueTypeAndMilestones = () => Promise.resolve(MockData.productBacklogBT)
+    iss.changeMilestoneAndCustomFieldValue = changeMilestoneAndCustomFieldValue
+    iss.add = addIssue
+    iss.edit = editIssue
+    iss.searchChildren = () => Promise.resolve(MockData.childIssuesBT)
+  })
 })

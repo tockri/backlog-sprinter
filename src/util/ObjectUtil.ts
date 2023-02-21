@@ -44,9 +44,22 @@ const copyContent = (src: unknown, dst: unknown) => {
   }
 }
 
+const convert = <T>(obj: T, callback: (key: keyof T, orig: unknown) => unknown): T => {
+  const ret: Record<string, unknown> = {}
+  if (isRecord(obj)) {
+    Object.keys(obj).forEach((key) => {
+      ret[key] = callback(key as keyof T, obj[key])
+    })
+    return ret as T
+  } else {
+    throw new Error(`cannot convert ${obj}:${typeof obj}`)
+  }
+}
+
 export const ObjectUtil = {
   purify,
   isRecord,
   isStrictEqual,
-  copyContent
+  copyContent,
+  convert
 }
