@@ -75,7 +75,7 @@ const parse = (line: string): SprintVelocity | null => {
 const parseAll = (data: string): VelocityRecords => {
   const ret: Array<SprintVelocity> = []
   data.split("\n").forEach((line) => {
-    const s = VelocityUtil.parse(line)
+    const s = VelocityFunc.parse(line)
     if (s) {
       ret.push(s)
     }
@@ -87,9 +87,9 @@ const toString = (s: SprintVelocity): string => {
   return `|${s.id}|${DateUtil.dateString(s.endDate)}|${s.pbiVelocity}|${s.otherVelocity}| ${s.issueIds.join(",")} |`
 }
 
-const toStringAll = (sprints: VelocityRecords): string => sprints.map(VelocityUtil.toString).join("\n")
+const toStringAll = (sprints: VelocityRecords): string => sprints.map(VelocityFunc.toString).join("\n")
 
-export const VelocityUtil = {
+export const VelocityFunc = {
   appendRecord,
   parseAll,
   parse,

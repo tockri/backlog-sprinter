@@ -5,7 +5,7 @@ import { Wiki } from "@/content/backlog/WikiApi"
 import { ApiState } from "@/content/state/ApiState"
 import { BspConfState } from "@/content/state/BspConfState"
 import { ProjectState } from "@/content/state/ProjectInfoState"
-import { VelocityRecords, VelocityUtil } from "@/content/state/SprintVelocity"
+import { VelocityFunc, VelocityRecords } from "@/content/state/SprintVelocity"
 import { JotaiUtil } from "@/content/util/JotaiUtil"
 import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
@@ -57,7 +57,7 @@ mainAtom.onMount = (setAtom) => {
 const loadVelocity = async (api: BacklogApi, projectId: number): Promise<WikiVelocity> => {
   const pages = await api.wiki.search(projectId, "(backlog-sprinter-velocity-record)")
   return pages.length > 0
-    ? { wiki: pages[0], velocity: VelocityUtil.parseAll(pages[0].content) }
+    ? { wiki: pages[0], velocity: VelocityFunc.parseAll(pages[0].content) }
     : { wiki: null, velocity: [] }
 }
 
@@ -70,14 +70,14 @@ const saveVelocity = async (
   milestone: Version
 ): Promise<WikiVelocity> => {
   const { wiki: existingWiki, velocity: existingRecords } = existing
-  const velocity = VelocityUtil.appendRecord(milestone, issues, pbiIssueTypeId, existingRecords)
+  const velocity = VelocityFunc.appendRecord(milestone, issues, pbiIssueTypeId, existingRecords)
   const content = `# Velocity
 
 (You can change title as you like)
   
 |ID|Date|PBI|Others|Issue Ids|
 |--|--|--|--|--|
-${VelocityUtil.toStringAll(velocity)}
+${VelocityFunc.toStringAll(velocity)}
 
 !!DO NOT EDIT (backlog-sprinter-velocity-record) DO NOT EDIT!!
 `

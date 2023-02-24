@@ -1,6 +1,8 @@
-import { SprintVelocity, VelocityUtil } from "./SprintVelocity"
+import { Version } from "@/content/backlog/ProjectInfoApi"
+import { MockData } from "@test/mock/MockApi-data"
+import { SprintVelocity, VelocityFunc } from "./SprintVelocity"
 
-describe("SprintUtil", () => {
+describe("SprintVelocity", () => {
   test("toString one", () => {
     const s: SprintVelocity = {
       id: 1293,
@@ -9,11 +11,11 @@ describe("SprintUtil", () => {
       otherVelocity: 12.5,
       issueIds: [100, 200, 300]
     }
-    expect(VelocityUtil.toString(s)).toBe("|1293|2023-02-04|1.5|12.5| 100,200,300 |")
+    expect(VelocityFunc.toString(s)).toBe("|1293|2023-02-04|1.5|12.5| 100,200,300 |")
   })
 
   test("parse one", () => {
-    expect(VelocityUtil.parse("|1293|2023-02-04|1.5|12.5| 100,200,300 |")).toStrictEqual({
+    expect(VelocityFunc.parse("|1293|2023-02-04|1.5|12.5| 100,200,300 |")).toStrictEqual({
       id: 1293,
       endDate: new Date("2023-02-04 00:00:00"),
       pbiVelocity: 1.5,
@@ -46,7 +48,7 @@ describe("SprintUtil", () => {
         issueIds: [102, 202, 302]
       }
     ]
-    expect(VelocityUtil.toStringAll(data)).toBe(`|1293|2023-02-04|1.5|12.5| 100,200,300 |
+    expect(VelocityFunc.toStringAll(data)).toBe(`|1293|2023-02-04|1.5|12.5| 100,200,300 |
 |1295|2023-02-11|3|11.5|  |
 |1301|2023-02-18|5|20.5| 102,202,302 |`)
   })
@@ -60,7 +62,7 @@ describe("SprintUtil", () => {
 |1301|2023-02-18|5|20.5|  |
 
 (backlog-sprinter-velocity)(DO NOT DELETE THIS LINE)`
-    expect(VelocityUtil.parseAll(loaded)).toStrictEqual([
+    expect(VelocityFunc.parseAll(loaded)).toStrictEqual([
       {
         id: 1293,
         endDate: new Date("2023-02-04 00:00:00"),
@@ -83,5 +85,39 @@ describe("SprintUtil", () => {
         issueIds: []
       }
     ])
+  })
+
+  test("appendRecord", () => {
+    const existing = VelocityFunc.parseAll(`# Velocity
+|ID|Date|PBI|Others|Issue Ids|
+|--|--|--|--|--|
+|1293|2023-02-04|1.5|12.5|100,200,300|
+|1295|2023-02-11|3|11.5|101,201,301|
+|1301|2023-02-18|5|20.5|  |
+
+(backlog-sprinter-velocity)(DO NOT DELETE THIS LINE)`)
+    const version: Version = {
+      id: 100,
+      startDate: "2023-02-19",
+      projectId: 1,
+      name: "",
+      description: "",
+      displayOrder: 0,
+      archived: false,
+      releaseDueDate: "2023-02-25"
+    }
+
+    const issues = [
+      ...MockData.productBacklogBT.filter((i) => i.status.id === 4),
+      ...MockData.childIssuesBT.filter((i) => i.status.id === 4)
+    ]
+    const updated = VelocityFunc.appendRecord(version, issues, 389286, existing)
+    expect(updated[3]).toStrictEqual({
+      id: 100,
+      endDate: new Date("2023-02-24T15:00:00Z"),
+      pbiVelocity: 27,
+      otherVelocity: 3,
+      issueIds: [12323242, 12322955, 7177962, 7177959, 7177956, 20641035, 20640945, 12323249]
+    })
   })
 })

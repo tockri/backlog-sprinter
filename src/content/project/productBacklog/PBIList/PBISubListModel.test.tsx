@@ -87,6 +87,7 @@ describe("PBISubListModel", () => {
       milestoneId: milestoneId,
       issueTypeId: 389286,
       summary: "issue adding test",
+      description: "",
       customField: {
         id: 71491,
         value: -665
