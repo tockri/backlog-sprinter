@@ -3,6 +3,7 @@ import { Issue } from "@/content/backlog/IssueApi"
 import { Version } from "@/content/backlog/ProjectInfoApi"
 import { Wiki } from "@/content/backlog/WikiApi"
 import { ApiState } from "@/content/state/ApiState"
+import { BspConfState } from "@/content/state/BspConfState"
 import { ProjectState } from "@/content/state/ProjectInfoState"
 import { VelocityRecords, VelocityUtil } from "@/content/state/SprintVelocity"
 import { JotaiUtil } from "@/content/util/JotaiUtil"
@@ -39,7 +40,8 @@ const mainAtom = JotaiUtil.asyncAtomWithAction(
         const api = get(ApiState.atom)
         const project = await get(ProjectState.atom)
         const issues = await api.issue.searchClosed(project.id, startDate, DateUtil.addDays(endDate, 1))
-        const updated = await saveVelocity(api, project.id, curr, issues, milestone)
+        const conf = get(BspConfState.atom(project.projectKey))
+        const updated = await saveVelocity(api, project.id, conf.pbiIssueTypeId, curr, issues, milestone)
         action.onSuccess && action.onSuccess(updated)
         return updated
       }
@@ -62,12 +64,13 @@ const loadVelocity = async (api: BacklogApi, projectId: number): Promise<WikiVel
 const saveVelocity = async (
   api: BacklogApi,
   projectId: number,
+  pbiIssueTypeId: number,
   existing: WikiVelocity,
   issues: ReadonlyArray<Issue>,
   milestone: Version
 ): Promise<WikiVelocity> => {
   const { wiki: existingWiki, velocity: existingRecords } = existing
-  const velocity = VelocityUtil.appendRecord(milestone, issues, 0, existingRecords)
+  const velocity = VelocityUtil.appendRecord(milestone, issues, pbiIssueTypeId, existingRecords)
   const content = `# Velocity
 
 (You can change title as you like)
