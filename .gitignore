@@ -1,7 +1,4 @@
 /node_modules
-/src/background/backlog-api-keys.ts
 /dist
-/backlog-sprinter.zip
-/dev/manifest_key.json
 /.idea
 /build
