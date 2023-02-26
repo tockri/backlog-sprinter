@@ -1,5 +1,4 @@
 import { BacklogApi } from "@/content/backlog/BacklogApi"
-import { Issue } from "@/content/backlog/IssueApi"
 import { Version } from "@/content/backlog/ProjectInfoApi"
 import { Wiki } from "@/content/backlog/WikiApi"
 import { ApiState } from "@/content/state/ApiState"
@@ -27,24 +26,16 @@ const mainAtom = JotaiUtil.asyncAtomWithAction(
   async (get) => {
     const api = get(ApiState.atom)
     const project = await get(ProjectState.atom)
-    return await loadVelocity(api, project.id)
+    return loadVelocity(api, project.id)
   },
   () => async (curr, get, set, action: Record | Init) => {
     if (action.type === "Init") {
       return curr
     } else if (action.type === "Record") {
-      const milestone = action.milestone
-      const startDate = DateUtil.parseDate(milestone.startDate)
-      const endDate = DateUtil.parseDate(milestone.releaseDueDate)
-      if (startDate && endDate) {
-        const api = get(ApiState.atom)
-        const project = await get(ProjectState.atom)
-        const issues = await api.issue.searchClosed(project.id, startDate, DateUtil.addDays(endDate, 1))
-        const conf = get(BspConfState.atom(project.projectKey))
-        const updated = await saveVelocity(api, project.id, conf.pbiIssueTypeId, curr, issues, milestone)
-        action.onSuccess && action.onSuccess(updated)
-        return updated
-      }
+      const api = get(ApiState.atom)
+      const project = await get(ProjectState.atom)
+      const conf = get(BspConfState.atom(project.projectKey))
+      return recordVelocity(api, project.id, conf.pbiIssueTypeId, curr, action)
     }
     return curr
   }
@@ -61,30 +52,40 @@ const loadVelocity = async (api: BacklogApi, projectId: number): Promise<WikiVel
     : { wiki: null, velocity: [] }
 }
 
-const saveVelocity = async (
+const recordVelocity = async (
   api: BacklogApi,
   projectId: number,
   pbiIssueTypeId: number,
   existing: WikiVelocity,
-  issues: ReadonlyArray<Issue>,
-  milestone: Version
+  action: Record
 ): Promise<WikiVelocity> => {
-  const { wiki: existingWiki, velocity: existingRecords } = existing
-  const velocity = VelocityFunc.appendRecord(milestone, issues, pbiIssueTypeId, existingRecords)
-  const content = `# Velocity
+  console.log("recordVelocity")
+  const { milestone, onSuccess } = action
+  const startDate = DateUtil.parseDate(milestone.startDate)
+  const endDate = DateUtil.parseDate(milestone.releaseDueDate)
+  if (startDate && endDate) {
+    const issues = await api.issue.searchClosed(projectId, startDate, DateUtil.addDays(endDate, 1))
+    const { wiki: existingWiki, velocity: existingRecords } = existing
+    const velocity = VelocityFunc.appendRecord(milestone, issues, pbiIssueTypeId, existingRecords)
+    const content = `# Velocity
 
 (You can change title as you like)
   
-|ID|Date|PBI|Others|Issue Ids|
+|ID|Date|PBI|Others|IssueKeyIds|
 |--|--|--|--|--|
 ${VelocityFunc.toStringAll(velocity)}
 
 !!DO NOT EDIT (backlog-sprinter-velocity-record) DO NOT EDIT!!
 `
-  const wiki = existingWiki
-    ? await api.wiki.edit(existingWiki, existingWiki.name, content)
-    : await api.wiki.add(projectId, "backlog-sprinter-velocity", content)
-  return { wiki, velocity }
+    const wiki = existingWiki
+      ? await api.wiki.edit(existingWiki, existingWiki.name, content)
+      : await api.wiki.add(projectId, "backlog-sprinter-velocity", content)
+    const updated = { wiki, velocity }
+    onSuccess && onSuccess(updated)
+    return updated
+  } else {
+    return existing
+  }
 }
 
 export const VelocityState = {

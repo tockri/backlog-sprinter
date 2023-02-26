@@ -1,5 +1,5 @@
 import { BspConfState } from "@/content/state/BspConfState"
-import { Immutable, produce } from "immer"
+import { Immutable } from "immer"
 import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { ErrorData } from "../../backlog/BacklogApiRequest"
@@ -36,11 +36,7 @@ export const useSettingModel = (): SettingModel => {
     pbiIssueTypeId: conf.pbiIssueTypeId,
     issueTypes,
     selectIssueType: (issueTypeId: number) => {
-      setConf((curr) =>
-        produce(curr, (c) => {
-          c.pbiIssueTypeId = issueTypeId
-        })
-      )
+      setConf({ pbiIssueTypeId: issueTypeId })
     },
     orderCustomField,
     addCustomField: createCustomField(lang, orderCustomFieldsDispatch, setErrorMessage),

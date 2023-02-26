@@ -14,6 +14,7 @@ export type CustomFieldValue = Immutable<{
 export type Issue = Immutable<{
   id: number
   issueKey: string
+  keyId: number
   issueType: Omit<IssueType, "templateSummary" | "templateDescription">
   summary: string
   status: Status

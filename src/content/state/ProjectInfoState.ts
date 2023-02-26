@@ -150,11 +150,7 @@ const issueTypesAtom = JotaiUtil.asyncAtomWithAction(
         name: action.name,
         color: action.color
       })
-      set(BspConfState.atom(project.projectKey), (conf) =>
-        produce(conf, (c) => {
-          c.pbiIssueTypeId = created.id
-        })
-      )
+      set(BspConfState.atom(project.projectKey), { pbiIssueTypeId: created.id })
 
       return produce(curr, (draft) => {
         draft.splice(0, 0, created as WritableDraft<IssueType>)
