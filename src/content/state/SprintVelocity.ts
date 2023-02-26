@@ -8,7 +8,7 @@ export type SprintVelocity = Immutable<{
   endDate: Date
   pbiVelocity: number
   otherVelocity: number
-  issueIds: number[]
+  keyIds: number[]
 }>
 
 export type VelocityRecords = ReadonlyArray<SprintVelocity>
@@ -26,13 +26,13 @@ const appendRecord = (
     console.error("releaseDueDate is null", milestone)
     return existing
   }
-  const existingIssueIds = new Set(existing.reduce<number[]>((acc, sprint) => acc.concat(sprint.issueIds), []))
+  const existingKeyIds = new Set(existing.reduce<number[]>((acc, sprint) => acc.concat(sprint.keyIds), []))
   let pbiVelocity = 0
   let otherVelocity = 0
-  const issueIds: number[] = []
+  const keyIds: number[] = []
   issues.forEach((issue) => {
-    if (!existingIssueIds.has(issue.id)) {
-      issueIds.push(issue.id)
+    if (!existingKeyIds.has(issue.id) && !existingKeyIds.has(issue.keyId)) {
+      keyIds.push(issue.keyId)
       const point = calcPoint(issue)
       if (issue.issueType.id === pbiIssueTypeId) {
         pbiVelocity += point
@@ -48,7 +48,7 @@ const appendRecord = (
       endDate: DateUtil.parseDate(milestone.releaseDueDate) || new Date(),
       pbiVelocity,
       otherVelocity,
-      issueIds
+      keyIds: keyIds
     }
   ]
 }
@@ -66,7 +66,7 @@ const parse = (line: string): SprintVelocity | null => {
     const otherVelocity = elems[4].match(F) ? parseFloat(elems[4]) : null
     const issueIds = elems[5].match(IDs) ? elems[5].split(",").map((e) => parseInt(e)) : []
     return id !== null && endDate !== null && pbiVelocity !== null && otherVelocity !== null && issueIds !== null
-      ? { id, endDate, pbiVelocity, otherVelocity, issueIds }
+      ? { id, endDate, pbiVelocity, otherVelocity, keyIds: issueIds }
       : null
   }
   return null
@@ -84,7 +84,7 @@ const parseAll = (data: string): VelocityRecords => {
 }
 
 const toString = (s: SprintVelocity): string => {
-  return `|${s.id}|${DateUtil.dateString(s.endDate)}|${s.pbiVelocity}|${s.otherVelocity}| ${s.issueIds.join(",")} |`
+  return `|${s.id}|${DateUtil.dateString(s.endDate)}|${s.pbiVelocity}|${s.otherVelocity}| ${s.keyIds.join(",")} |`
 }
 
 const toStringAll = (sprints: VelocityRecords): string => sprints.map(VelocityFunc.toString).join("\n")
