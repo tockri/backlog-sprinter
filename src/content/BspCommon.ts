@@ -1,10 +1,12 @@
 import { RealBacklogApi } from "@/content/backlog/BacklogApi"
 import { ApiState } from "@/content/state/ApiState"
 import { BspEnv, BspEnvState, UserLang } from "@/content/state/BspEnvState"
+import { ModalState } from "@/content/state/ModalState"
 import { createStore } from "jotai/index"
 
 const start = (env?: BspEnv) => {
   jotaiStore.set(BspEnvState.atom, env || buildEnv())
+  jotaiStore.set(ModalState.atom, true)
 }
 
 const buildEnv = (): BspEnv => {

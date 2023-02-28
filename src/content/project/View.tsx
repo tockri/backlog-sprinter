@@ -11,7 +11,7 @@ import { StatView } from "./stat/View"
 export const ProjectApp: React.FC = () => {
   const model = useAppModel()
   const env = model.env
-  if (env.projectKey) {
+  if (env.projectKey && model.modalOpen) {
     const t = i18n(env.lang)
     return (
       <Modal onClose={model.clear} size="large" title={t.formTitle} height="calc(100vh - 200px)">

@@ -2,7 +2,7 @@ import { BoardConf } from "@/content/board/state/BoardConfState"
 import { ProjectConf } from "@/content/project/state/ProjectConfState"
 import { BspConf } from "@/content/state/BspConfState"
 
-export const MockConf: ProjectConf = {
+export const MockProjectConf: ProjectConf = {
   selectedTab: 0
 }
 

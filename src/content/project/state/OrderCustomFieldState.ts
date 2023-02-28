@@ -21,7 +21,7 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
     if (!env.projectKey) {
       return null
     }
-    const conf = get(BspConfState.atom(env.projectKey))
+    const conf = get(BspConfState.atom)
     const customFields = await get(CustomFieldsState.atom)
     const issueTypes = await get(IssueTypesState.atom)
     const issueType = issueTypes.find((it) => it.id === conf.pbiIssueTypeId)
@@ -40,8 +40,7 @@ const mainAtom = atom<Promise<CustomNumberField | null>, [OrderCustomFieldAction
   },
   async (get, set, action) => {
     if (action.type === "OCCreate") {
-      const env = get(BspEnvState.atom)
-      const issueTypeId = get(BspConfState.atom(env.projectKey)).pbiIssueTypeId
+      const issueTypeId = get(BspConfState.atom).pbiIssueTypeId
       if (issueTypeId) {
         await set(
           CustomFieldsState.atom,

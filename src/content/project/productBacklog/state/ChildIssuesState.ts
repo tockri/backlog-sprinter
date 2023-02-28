@@ -21,7 +21,7 @@ const mainAtom = JotaiUtil.asyncAtomFamilyWithAction(
   (parentIssueId: number) => async (get) => {
     const api = get(ApiState.atom)
     const project = await get(ProjectState.atom)
-    return await api.issue.searchChildren(project, parentIssueId)
+    return await api.issue.searchChildren(project.id, parentIssueId)
   },
   (parentIssueId, storeAtom) => async (curr, get, set, action: ChildIssuesAction) => {
     if (action.type === "Move") {

@@ -2,7 +2,7 @@ import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
 import { WritableDraft } from "immer/dist/internal"
 import { BacklogApiRequest } from "./BacklogApiRequest"
-import { CustomNumberField, IssueType, Project, Status, Version } from "./ProjectInfoApi"
+import { CustomNumberField, IssueType, Status, Version } from "./ProjectInfoApi"
 
 export type CustomFieldValue = Immutable<{
   id: number
@@ -42,13 +42,13 @@ const searchUnclosedInMilestone = async (
 }
 
 const searchInIssueTypeAndMilestones = async (
-  project: Project,
+  projectId: number,
   issueTypeId: number,
   milestones: ReadonlyArray<Version>
 ): Promise<ReadonlyArray<Issue>> => {
   return await BacklogApiRequest.get<ReadonlyArray<Issue>>("/api/v2/issues", [
     {
-      "projectId[]": "" + project.id,
+      "projectId[]": "" + projectId,
       "issueTypeId[]": "" + issueTypeId,
       count: "100"
     },
@@ -56,10 +56,10 @@ const searchInIssueTypeAndMilestones = async (
   ])
 }
 
-const searchChildren = async (project: Project, parentIssueId: number): Promise<ReadonlyArray<Issue>> => {
+const searchChildren = async (projectId: number, parentIssueId: number): Promise<ReadonlyArray<Issue>> => {
   return await BacklogApiRequest.get<ReadonlyArray<Issue>>("/api/v2/issues", [
     {
-      "projectId[]": "" + project.id,
+      "projectId[]": "" + projectId,
       "parentIssueId[]": "" + parentIssueId,
       count: "100"
     }

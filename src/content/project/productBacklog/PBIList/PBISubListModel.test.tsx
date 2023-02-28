@@ -9,7 +9,7 @@ import { ProjectConfState } from "@/content/project/state/ProjectConfState"
 import { ApiState } from "@/content/state/ApiState"
 import { BspConfState } from "@/content/state/BspConfState"
 import { BspEnvState } from "@/content/state/BspEnvState"
-import { MockBspConf, MockConf } from "@test/mock/MockConf"
+import { MockBspConf, MockProjectConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
 import { TestMockApi } from "@test/mock/TestMockApi"
 import { CustomHookTester } from "@test/util/CustomHookTester"
@@ -31,15 +31,14 @@ describe("PBISubListModel", () => {
     const tester = CustomHookTester.create(usePBISubListModel)
     await tester.renderComponent(
       (set) => {
-        set(ProjectConfState.atom, MockConf)
-        set(BspConfState.atom(MockEnv.projectKey), MockBspConf)
         set(BspEnvState.atom, MockEnv)
+        set(ProjectConfState.atom, MockProjectConf)
+        set(BspConfState.atom, MockBspConf)
         set(ApiState.atom, TestMockApi)
         set(AddIssueTypeFormState.atom, (curr) => ({ ...curr, creating: true }))
       },
       () => <TestView tester={tester} />
     )
-    await tester.wait()
     return tester
   }
 
