@@ -61,8 +61,7 @@ export type AsyncHandler<Value, Action> = (
 
 const asyncAtomWithAction = <Value, Action>(
   read: AsyncRead<Value>,
-  handler: (storeAtom: StoreAtom<Value>) => AsyncHandler<Value, Action>,
-  name?: string
+  handler: (storeAtom: StoreAtom<Value>) => AsyncHandler<Value, Action>
 ): AsyncActionAtom<Value, Action> => {
   const store = atom<Value | null>(null)
 
@@ -92,20 +91,16 @@ const asyncAtomFamilyWithAction = <Param, Value, Action>(
   // noinspection JSUnusedLocalSymbols
   const store = atomFamily((param: Param) => atom<Value | null>(null))
 
-  const counter = atom(1)
-
-  const main = atomFamily((param: Param) =>
-    atom<Promise<Value>, [Action], Promise<void>>(
-      async (get) => (get(counter) >= 1 && get(store(param))) || (await read(param)(get)),
+  const main = atomFamily((param: Param) => {
+    return atom<Promise<Value>, [Action], Promise<void>>(
+      async (get) => get(store(param)) || (await read(param)(get)),
       async (get, set, action: Action) => {
         const newValue = await handler(param, store)(await get(main(param)), get, set, action)
-        if (newValue === null) {
-          set(counter, (c) => c + 1)
-        }
         set(store(param), newValue)
       }
     )
-  )
+  })
+
   return main
 }
 
