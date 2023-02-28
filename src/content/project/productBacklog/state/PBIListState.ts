@@ -39,21 +39,31 @@ type EditIssueAction = {
   input: EditIssueInput
 }
 
-export type PBIListAction = NLMoveAction | AddIssueAction | AddMilestoneAction | EditIssueAction | EditMilestoneAction
+type ReloadAction = {
+  type: "Reload"
+}
+
+export type PBIListAction =
+  | NLMoveAction
+  | AddIssueAction
+  | AddMilestoneAction
+  | EditIssueAction
+  | EditMilestoneAction
+  | ReloadAction
 
 const pbRead: AsyncRead<PBIList> = async (get) => {
   const orderCustomField = await get(OrderCustomFieldState.atom)
   if (orderCustomField) {
     const project = await get(ProjectState.atom)
     const api = get(ApiState.atom)
-    const bspConf = get(BspConfState.atom(project.projectKey))
+    const bspConf = get(BspConfState.atom)
     const milestones = await get(MilestonesState.atom)
     const today = new Date()
     const milestoneFilter = milestones.filter(
       (ms) =>
         !ms.archived && ms.startDate && ms.releaseDueDate && DateUtil.diffDays(today, new Date(ms.releaseDueDate)) > -3
     )
-    const list = await api.issue.searchInIssueTypeAndMilestones(project, bspConf.pbiIssueTypeId, milestoneFilter)
+    const list = await api.issue.searchInIssueTypeAndMilestones(project.id, bspConf.pbiIssueTypeId, milestoneFilter)
     return PBIListFunc.nestIssues(list, orderCustomField)
   } else {
     throw new Error("orderCustomField is not set.")
@@ -170,21 +180,33 @@ const pbEditIssue: AsyncHandler<PBIList, EditIssueAction> = async (prev, get, se
   })
 }
 
-const mainAtom = JotaiUtil.asyncAtomWithAction<PBIList, PBIListAction>(pbRead, () => (prev, get, set, action) => {
-  if (action.type === "NLMove") {
-    return pbMove(prev, get, set, action)
-  } else if (action.type === "AddIssue") {
-    return pbAddIssue(prev, get, set, action)
-  } else if (action.type === "AddMilestone") {
-    return pbAddMilestone(prev, get, set, action)
-  } else if (action.type === "EditMilestone") {
-    return pbEditMilestone(prev, get, set, action)
-  } else if (action.type === "EditIssue") {
-    return pbEditIssue(prev, get, set, action)
-  } else {
-    throw new Error(`unknown type : ${action}`)
+const mainAtom = JotaiUtil.asyncAtomWithAction<PBIList, PBIListAction>(
+  pbRead,
+  () => (prev, get, set, action) => {
+    if (action.type === "NLMove") {
+      return pbMove(prev, get, set, action)
+    } else if (action.type === "AddIssue") {
+      return pbAddIssue(prev, get, set, action)
+    } else if (action.type === "AddMilestone") {
+      return pbAddMilestone(prev, get, set, action)
+    } else if (action.type === "EditMilestone") {
+      return pbEditMilestone(prev, get, set, action)
+    } else if (action.type === "EditIssue") {
+      return pbEditIssue(prev, get, set, action)
+    } else if (action.type === "Reload") {
+      return null
+    } else {
+      throw new Error(`unknown type : ${action}`)
+    }
+  },
+  "PBIListState"
+)
+
+mainAtom.onMount = (setAtom) => {
+  return async () => {
+    await setAtom({ type: "Reload" })
   }
-})
+}
 
 export const PBIListState = {
   atom: mainAtom,

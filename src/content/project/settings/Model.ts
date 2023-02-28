@@ -24,8 +24,8 @@ type SettingModel = Immutable<{
 }>
 
 export const useSettingModel = (): SettingModel => {
-  const { projectKey, lang } = useAtomValue(BspEnvState.atom)
-  const [conf, setConf] = useAtom(BspConfState.atom(projectKey))
+  const { lang } = useAtomValue(BspEnvState.atom)
+  const [conf, setConf] = useAtom(BspConfState.atom)
   const issueTypes = useAtomValue(IssueTypesState.atom)
   const [orderCustomField, orderCustomFieldsDispatch] = useAtom(OrderCustomFieldState.atom)
   const [errorMessage, setErrorMessage] = React.useState("")

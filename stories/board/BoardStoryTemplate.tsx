@@ -24,7 +24,7 @@ export const BoardStoryTemplate: React.FC<BoardStoryTemplateProps> = ({ initialV
   const store = createStore()
   store.set(BspEnvState.atom, MockEnv)
   store.set(BoardConfState.atom, MockBoardConf)
-  store.set(BspConfState.atom(MockEnv.projectKey), MockBspConf)
+  store.set(BspConfState.atom, MockBspConf)
   store.set(ApiState.atom, MockApi)
   initialValues && initialValues(store.set)
   return (

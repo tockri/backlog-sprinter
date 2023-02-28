@@ -5,7 +5,7 @@ import { BspEnvState } from "@/content/state/BspEnvState"
 import { Loading } from "@/content/ui/Loading"
 import styled from "@emotion/styled"
 import { MockApi } from "@test/mock/MockApi"
-import { MockBspConf, MockConf } from "@test/mock/MockConf"
+import { MockBspConf, MockProjectConf } from "@test/mock/MockConf"
 import { MockEnv } from "@test/mock/MockEnv"
 import { Immutable } from "immer"
 import { createStore, Provider } from "jotai"
@@ -21,8 +21,8 @@ export type ProjectStoryTemplateProps = Immutable<{
 
 export const ProjectStoryTemplate: React.FC<ProjectStoryTemplateProps> = ({ initialValues, children }) => {
   const store = createStore()
-  store.set(ProjectConfState.atom, MockConf)
-  store.set(BspConfState.atom(MockEnv.projectKey), MockBspConf)
+  store.set(ProjectConfState.atom, MockProjectConf)
+  store.set(BspConfState.atom, MockBspConf)
   store.set(BspEnvState.atom, MockEnv)
   store.set(ApiState.atom, MockApi)
   initialValues && initialValues(store.set)

@@ -28,7 +28,7 @@ const asyncAtomFromParent = <T, U>(
   return main
 }
 
-export type Handler<Value, Action> = (curr: Value, get: Getter, set: Setter, action: Action) => Value
+export type Handler<Value, Action> = (curr: Value, get: Getter, set: Setter, action: Action) => Value | null
 
 const atomWithAction = <Value, Action>(
   read: Read<Value>,
@@ -57,17 +57,25 @@ export type AsyncHandler<Value, Action> = (
   get: Getter,
   set: Setter,
   action: Action
-) => Promise<Value> | Value
+) => Promise<Value | null> | Value | null
 
 const asyncAtomWithAction = <Value, Action>(
   read: AsyncRead<Value>,
-  handler: (storeAtom: StoreAtom<Value>) => AsyncHandler<Value, Action>
+  handler: (storeAtom: StoreAtom<Value>) => AsyncHandler<Value, Action>,
+  name?: string
 ): AsyncActionAtom<Value, Action> => {
   const store = atom<Value | null>(null)
+
+  const counter = atom(1)
+
   const main = atom<Promise<Value>, [Action], Promise<void>>(
-    async (get) => get(store) || (await read(get)),
+    async (get) => (get(counter) >= 1 && get(store)) || (await read(get)),
     async (get, set, action: Action) => {
-      set(store, await handler(store)(await get(main), get, set, action))
+      const newValue = await handler(store)(await get(main), get, set, action)
+      if (newValue === null) {
+        set(counter, (c) => c + 1)
+      }
+      set(store, newValue)
     }
   )
   return main
@@ -83,11 +91,18 @@ const asyncAtomFamilyWithAction = <Param, Value, Action>(
   /* eslint @typescript-eslint/no-unused-vars: 0 */
   // noinspection JSUnusedLocalSymbols
   const store = atomFamily((param: Param) => atom<Value | null>(null))
+
+  const counter = atom(1)
+
   const main = atomFamily((param: Param) =>
     atom<Promise<Value>, [Action], Promise<void>>(
-      async (get) => get(store(param)) || (await read(param)(get)),
+      async (get) => (get(counter) >= 1 && get(store(param))) || (await read(param)(get)),
       async (get, set, action: Action) => {
-        set(store(param), await handler(param, store)(await get(main(param)), get, set, action))
+        const newValue = await handler(param, store)(await get(main(param)), get, set, action)
+        if (newValue === null) {
+          set(counter, (c) => c + 1)
+        }
+        set(store(param), newValue)
       }
     )
   )

@@ -34,7 +34,7 @@ const mainAtom = JotaiUtil.asyncAtomWithAction(
     } else if (action.type === "Record") {
       const api = get(ApiState.atom)
       const project = await get(ProjectState.atom)
-      const conf = get(BspConfState.atom(project.projectKey))
+      const conf = get(BspConfState.atom)
       return recordVelocity(api, project.id, conf.pbiIssueTypeId, curr, action)
     }
     return curr

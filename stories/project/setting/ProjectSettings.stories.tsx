@@ -6,7 +6,6 @@ import { ProjectSettings } from "@/content/project/settings/View"
 import { ProjectConfState } from "@/content/project/state/ProjectConfState"
 import { BspConfState } from "@/content/state/BspConfState"
 import { ComponentMeta, ComponentStoryObj } from "@storybook/react"
-import { MockEnv } from "@test/mock/MockEnv"
 import React from "react"
 import { ProjectStoryTemplate, ProjectStoryTemplateProps } from "../ProjectStoryTemplate"
 
@@ -23,7 +22,7 @@ type Story = ComponentStoryObj<typeof Template>
 export const Default: Story = {
   args: {
     initialValues: (set) => {
-      set(BspConfState.atom(MockEnv.projectKey), {
+      set(BspConfState.atom, {
         pbiIssueTypeId: 0
       })
       set(ProjectConfState.atom, {
