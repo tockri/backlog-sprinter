@@ -19,7 +19,7 @@ export const MilestoneView: React.FC = () => {
             defaultValue={milestone.name}
             viewStyle={nameViewStyle}
             editStyle={nameEditStyle}
-            blurAction="cancel"
+            blurAction="submit"
             onFix={(value) => {
               model.editMilestone("name", value).then()
             }}
@@ -31,7 +31,7 @@ export const MilestoneView: React.FC = () => {
           <EditableField
             inputType="date"
             inputMax={DateUtil.dateString(DateUtil.parseDate(milestone.releaseDueDate)) || ""}
-            blurAction="cancel"
+            blurAction="submit"
             defaultValue={DateUtil.dateString(DateUtil.parseDate(milestone.startDate)) || ""}
             onFix={(value) => {
               const date = DateUtil.parseDate(value)
@@ -45,7 +45,7 @@ export const MilestoneView: React.FC = () => {
           <EditableField
             inputType="date"
             inputMin={DateUtil.dateString(DateUtil.parseDate(milestone.startDate)) || ""}
-            blurAction="cancel"
+            blurAction="submit"
             defaultValue={DateUtil.dateString(DateUtil.parseDate(milestone.releaseDueDate)) || ""}
             onFix={(value) => {
               const date = DateUtil.parseDate(value)
@@ -60,7 +60,7 @@ export const MilestoneView: React.FC = () => {
         <EditableField
           defaultValue={milestone.description || ""}
           multiline={true}
-          blurAction="cancel"
+          blurAction="submit"
           viewStyle={descriptionViewStyle}
           editStyle={descriptionEditStyle}
           onFix={(value) => {

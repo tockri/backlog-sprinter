@@ -34,7 +34,7 @@ export const IssueAreaView: React.FC = () => {
               <EditableField
                 defaultValue={issue.summary}
                 onFix={(value) => model.changeIssue("summary", value)}
-                blurAction="cancel"
+                blurAction="submit"
                 editStyle={{
                   flexGrow: 1
                 }}
@@ -65,7 +65,7 @@ export const IssueAreaView: React.FC = () => {
               borderRadius: 4
             }}
             onFix={(value) => model.changeIssue("description", value)}
-            blurAction="cancel"
+            blurAction="submit"
             lang={lang}
           />
         </Description>

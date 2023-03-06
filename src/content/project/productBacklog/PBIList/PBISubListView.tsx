@@ -104,7 +104,7 @@ export const PBISubListView: React.FC<PBISubListProps> = (props) => {
                 editStyle={{
                   flexGrow: 1
                 }}
-                blurAction="cancel"
+                blurAction="submit"
                 lang={model.lang}
                 onStart={(value, setValue) => {
                   if (!value) {

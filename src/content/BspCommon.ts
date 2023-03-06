@@ -9,10 +9,23 @@ const start = (env?: BspEnv) => {
   jotaiStore.set(ModalState.atom, true)
 }
 
+const getProjectKey = (path: string): string => {
+  const elem = path.split("/")[2]
+  if (elem) {
+    const m = elem.match(/^([A-Z]+)-\d+$/)
+    if (m) {
+      return m[1]
+    } else {
+      return elem
+    }
+  }
+  return ""
+}
+
 const buildEnv = (): BspEnv => {
   const url = new URL(location.href)
   const selectedMilestoneId = parseInt(url.searchParams.get("milestone") || "0")
-  const projectKey = url.pathname.split("/")[2] || ""
+  const projectKey = getProjectKey(url.pathname)
   const lang: UserLang = document.documentElement.lang === "ja" ? "ja" : "en"
   return {
     projectKey,
