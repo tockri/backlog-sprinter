@@ -33,7 +33,16 @@ const milestoneAtom = atom(async (get) => {
   const item = get(store)
   if (item.type === "Milestone") {
     const milestones = await get(MilestonesState.atom)
-    return milestones.find((m) => m.id === item.milestoneId) || null
+    const milestone = milestones.find((m) => m.id === item.milestoneId) || null
+    if (milestone) {
+      const pbi = await get(PBIListState.atom)
+      const issues = PBIListFunc.findIssuesInMilestone(pbi, milestone.id)
+      const disallowArchive = !!issues.find((i) => i.status.id !== 4)
+      return {
+        milestone,
+        disallowArchive
+      }
+    }
   }
   return null
 })

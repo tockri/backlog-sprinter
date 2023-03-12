@@ -41,7 +41,8 @@ type AddMilestone = Immutable<{
 
 type ArchiveMilestone = Immutable<{
   type: "ArchiveMilestone"
-  id: number
+  milestone: Version
+  onSuccess: (archived: Version) => void
 }>
 
 type EditMilestone = Immutable<{
@@ -80,7 +81,15 @@ const milestonesAtom = JotaiUtil.asyncAtomWithAction(
         }
       })
     } else if (action.type === "ArchiveMilestone") {
-      console.error("Not impl")
+      const api = get(ApiState.atom)
+      const archived = await api.projectInfo.archiveMilestone(action.milestone.projectId, action.milestone)
+      action.onSuccess(archived)
+      return produce(curr, (d) => {
+        const idx = d.findIndex((ms) => ms.id === archived.id)
+        if (idx >= 0) {
+          d.splice(idx, 1, archived as WritableDraft<Version>)
+        }
+      })
     }
     return curr
   }
@@ -193,6 +202,11 @@ export const MilestonesState = {
       type: "EditMilestone",
       id,
       input,
+      onSuccess
+    }),
+    Archive: (milestone: Version, onSuccess: (archived: Version) => void): ArchiveMilestone => ({
+      type: "ArchiveMilestone",
+      milestone,
       onSuccess
     })
   }

@@ -39,6 +39,11 @@ type EditIssueAction = {
   input: EditIssueInput
 }
 
+type ArchiveMilestoneAction = {
+  type: "ArchiveMilestone"
+  milestone: Version
+}
+
 type ReloadAction = {
   type: "Reload"
 }
@@ -49,6 +54,7 @@ export type PBIListAction =
   | AddMilestoneAction
   | EditIssueAction
   | EditMilestoneAction
+  | ArchiveMilestoneAction
   | ReloadAction
 
 const pbRead: AsyncRead<PBIList> = async (get) => {
@@ -73,7 +79,7 @@ const pbRead: AsyncRead<PBIList> = async (get) => {
 const pbMove: AsyncHandler<PBIList, NLMoveAction> = async (prev, get, set, action) => {
   const events: PBIListMovedEvent[] = []
   const updated = produce(prev, (draft) => {
-    events.push(...PBIListFunc.mutateByMovingAction(draft, action))
+    events.push(...PBIListFunc.mutateByMove(draft, action))
   })
   if (events.length) {
     const api = get(ApiState.atom)
@@ -132,7 +138,7 @@ const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set,
       }
     })
     return produce(prev, (draft) => {
-      PBIListFunc.mutateByAddingIssue(draft, created, orderCustomField)
+      PBIListFunc.mutateByAddIssue(draft, created, orderCustomField)
     })
   } else {
     return prev
@@ -150,7 +156,7 @@ const pbAddMilestone: AsyncHandler<PBIList, AddMilestoneAction> = async (prev, g
 
   return produce(prev, (draft) => {
     if (created) {
-      PBIListFunc.mutateByAddingMilestone(draft, created)
+      PBIListFunc.mutateByAddMilestone(draft, created)
     }
   })
 }
@@ -165,7 +171,22 @@ const pbEditMilestone: AsyncHandler<PBIList, EditMilestoneAction> = async (prev,
   )
   return produce(prev, (draft) => {
     if (updated) {
-      PBIListFunc.mutateByEditingMilestone(draft, updated)
+      PBIListFunc.mutateByEditMilestone(draft, updated)
+    }
+  })
+}
+
+const pbArchiveMilestone: AsyncHandler<PBIList, ArchiveMilestoneAction> = async (prev, get, set, action) => {
+  let archived: Version | null = null
+  await set(
+    MilestonesState.atom,
+    MilestonesState.Action.Archive(action.milestone, (ms) => {
+      archived = ms
+    })
+  )
+  return produce(prev, (draft) => {
+    if (archived) {
+      PBIListFunc.mutateByArchiveMilestone(draft, archived)
     }
   })
 }
@@ -176,7 +197,7 @@ const pbEditIssue: AsyncHandler<PBIList, EditIssueAction> = async (prev, get, se
   await api.issue.edit(issueId, input)
   const statuses = await get(StatusesState.atom)
   return produce(prev, (draft) => {
-    PBIListFunc.mutateByEditingIssue(draft, statuses, issueId, input)
+    PBIListFunc.mutateByEditIssue(draft, statuses, issueId, input)
   })
 }
 
@@ -189,6 +210,8 @@ const mainAtom = JotaiUtil.asyncAtomWithAction<PBIList, PBIListAction>(pbRead, (
     return pbAddMilestone(prev, get, set, action)
   } else if (action.type === "EditMilestone") {
     return pbEditMilestone(prev, get, set, action)
+  } else if (action.type === "ArchiveMilestone") {
+    return pbArchiveMilestone(prev, get, set, action)
   } else if (action.type === "EditIssue") {
     return pbEditIssue(prev, get, set, action)
   } else if (action.type === "Reload") {
@@ -226,6 +249,10 @@ export const PBIListState = {
       projectId,
       milestoneId,
       input
+    }),
+    ArchiveMilestone: (milestone: Version): ArchiveMilestoneAction => ({
+      type: "ArchiveMilestone",
+      milestone
     }),
     ListMove: (src: NLLocation, dst: NLLocation): NLMoveAction => ({
       type: "NLMove",
