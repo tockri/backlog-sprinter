@@ -13,7 +13,7 @@ export type SprintVelocity = Immutable<{
 
 export type VelocityRecords = ReadonlyArray<SprintVelocity>
 
-const calcPoint = (issue: Issue): number => issue.actualHours || issue.estimatedHours || 1
+const calcPoint = (issue: Issue): number => issue.estimatedHours || 1
 
 const appendRecord = (
   milestone: Version,

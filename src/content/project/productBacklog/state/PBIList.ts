@@ -183,6 +183,13 @@ const mutateByEditMilestone = (data: WritableDraft<PBIList>, updated: Version) =
   data.subLists.sort((sl1, sl2) => pbiNestMethods.headComparator(sl1.head, sl2.head))
 }
 
+const mutateByArchiveMilestone = (data: WritableDraft<PBIList>, archived: Version) => {
+  const sIdx = data.subLists.findIndex((sl) => sl.head?.id === archived.id)
+  if (sIdx >= 0) {
+    data.subLists.splice(sIdx, 1)
+  }
+}
+
 const getNewOrder = (data: PBIList, milestone: Version | null): number => {
   const subList = data.subLists.find((sl) => sl.head?.id === milestone?.id)
   if (subList && subList.items.length > 0) {
@@ -218,14 +225,21 @@ const findIssue = <T extends PBIList | WritableDraft<PBIList>>(
   return null
 }
 
+const findIssuesInMilestone = (data: PBIList, milestoneId: number): ReadonlyArray<Issue> => {
+  const sub = data.subLists.find((sl) => sl.head?.id === milestoneId)
+  return sub ? sub.items : []
+}
+
 export const PBIListFunc = {
-  mutateByEditingIssue: mutateByEditIssue,
-  mutateByMovingAction: mutateByMove,
-  mutateByAddingIssue: mutateByAddIssue,
-  mutateByAddingMilestone: mutateByAddMilestone,
-  mutateByEditingMilestone: mutateByEditMilestone,
+  mutateByEditIssue,
+  mutateByMove,
+  mutateByAddIssue,
+  mutateByAddMilestone,
+  mutateByEditMilestone,
+  mutateByArchiveMilestone,
   getNewOrder,
   findIssue,
+  findIssuesInMilestone,
   nest,
   nestIssues
 }

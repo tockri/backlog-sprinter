@@ -1,3 +1,4 @@
+import { Button } from "@/content/ui/Button"
 import { DateUtil } from "@/util/DateUtil"
 import styled from "@emotion/styled"
 import React from "react"
@@ -8,7 +9,7 @@ import { useMilestoneModel } from "./MilestoneModel"
 
 export const MilestoneView: React.FC = () => {
   const model = useMilestoneModel()
-  const { milestone, lang } = model
+  const { milestone, lang, disallowArchive } = model
   const t = i18n(lang)
   return (
     milestone && (
@@ -55,6 +56,18 @@ export const MilestoneView: React.FC = () => {
             }}
             lang={lang}
           />
+          <ArchiveButtonWrapper>
+            <Button
+              disabled={disallowArchive}
+              onClick={() => {
+                if (confirm(t.confirmArchive)) {
+                  model.archiveMilestone().then()
+                }
+              }}
+            >
+              {t.archive}
+            </Button>
+          </ArchiveButtonWrapper>
         </Period>
 
         <EditableField
@@ -92,6 +105,11 @@ const Period = styled(HBox)({
   gap: 8,
   height: 24,
   alignItems: "center"
+})
+
+const ArchiveButtonWrapper = styled.div({
+  flexGrow: 1,
+  textAlign: "right"
 })
 
 type Style = React.CSSProperties

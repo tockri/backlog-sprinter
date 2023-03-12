@@ -46,6 +46,9 @@ const searchInIssueTypeAndMilestones = async (
   issueTypeId: number,
   milestones: ReadonlyArray<Version>
 ): Promise<ReadonlyArray<Issue>> => {
+  if (milestones.length == 0) {
+    return []
+  }
   return await BacklogApiRequest.get<ReadonlyArray<Issue>>("/api/v2/issues", [
     {
       "projectId[]": "" + projectId,

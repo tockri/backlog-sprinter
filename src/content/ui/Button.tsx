@@ -10,7 +10,7 @@ const StyledButton = styled.button({
   "&[disabled]": {
     color: "#999999"
   },
-  "&:active": {
+  "&:active&:not([disabled])": {
     boxShadow: "inset 1px 1px 2px #aaaaaa"
   }
 })

@@ -151,7 +151,7 @@ const EditOption = styled.option({
 })
 
 const Overlapping = styled.div({
-  width: 44,
+  width: 38,
   height: 30,
   position: "relative"
 })
@@ -162,16 +162,17 @@ const ViewerPane = styled.div({
   borderRadius: 15,
   "&.below": {
     position: "absolute",
-    width: 26,
-    height: 26,
-    top: 2,
-    zIndex: 1,
-    opacity: 0.4
+    zIndex: 1
   },
   "&.above": {
     position: "absolute",
-    left: 14,
-    zIndex: 2
+    width: 20,
+    height: 20,
+    left: 18,
+    top: 14,
+    zIndex: 2,
+    opacity: 0.8,
+    fontSize: "80%"
   },
   ...commonStyles
 })
