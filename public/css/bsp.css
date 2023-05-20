@@ -1,0 +1,15 @@
+.icon-button.-with-text > img.icon {
+  position: relative;
+}
+.bsp-project-button-wrapper {
+  margin-left: 80px;
+}
+div.bsp_milestone-field {
+  width: 238px;
+}
+div.bsp_milestone-field > .bsp_milestone-update {
+  position: absolute;
+  right: 0;
+  top: calc(50% - 16px);
+  font-size: inherit;
+}
