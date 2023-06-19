@@ -20,5 +20,5 @@ yarn
 ### 2. Run builder
 
 ```
-yarn watch
+yarn dev
 ```

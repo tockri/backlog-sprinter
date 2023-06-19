@@ -1,16 +1,20 @@
 import styled from "@emotion/styled"
+import { useAtom, useAtomValue } from "jotai/index"
 import React from "react"
 import { IssueTypeColor, issueTypeColorClass } from "../../backlog/ProjectInfoApi"
+import { BspEnvState } from "../../state/BspEnvState"
+import { IssueTypesState } from "../../state/ProjectInfoState"
 import { HBox, VBox } from "../../ui/Box"
 import { Button } from "../../ui/Button"
 import { cnu } from "../../ui/cnu"
 import { TextInput } from "../../ui/TextInput"
-import { useAddIssueTypeModel } from "./AddIssueTypeModel"
 import { i18n } from "./i18n"
+import { AddIssueTypeFormState } from "./state/State"
 
 export const AddIssueTypeView: React.FC = () => {
-  const model = React.useCallback(useAddIssueTypeModel, [])()
-  const { lang, issueTypes, values } = model
+  const [values, setValues] = useAtom(AddIssueTypeFormState.atom)
+  const { lang } = useAtomValue(BspEnvState.atom)
+  const [issueTypes, dispatch] = useAtom(IssueTypesState.atom)
   const t = i18n(lang)
 
   return (
@@ -18,7 +22,10 @@ export const AddIssueTypeView: React.FC = () => {
       <form
         onSubmit={async (e) => {
           e.preventDefault()
-          await model.onSubmit()
+          await dispatch(IssueTypesState.Action.Create(values.name, values.color))
+          setValues((c) => {
+            c.creating = false
+          })
         }}
       >
         <div>{t.creatingIssueType}</div>
@@ -28,7 +35,9 @@ export const AddIssueTypeView: React.FC = () => {
             id="create-issue-type-name"
             type="text"
             onChange={(e) => {
-              model.onChangeName(e.target.value)
+              setValues((c) => {
+                c.color = e.target.value as IssueTypeColor
+              })
             }}
             maxLength={20}
             size={15}
@@ -48,7 +57,9 @@ export const AddIssueTypeView: React.FC = () => {
                   checked={color === values.color}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      model.onChangeColor(e.target.value)
+                      setValues((c) => {
+                        c.name = e.target.value
+                      })
                     }
                   }}
                 />
@@ -70,7 +81,14 @@ export const AddIssueTypeView: React.FC = () => {
           </ExistingPane>
         </Row>
         <ButtonBox>
-          <Button type="button" onClick={() => model.cancel()}>
+          <Button
+            type="button"
+            onClick={() =>
+              setValues((c) => {
+                c.creating = false
+              })
+            }
+          >
             {t.cancelLabel}
           </Button>
           <Button type="submit">{t.createLabel}</Button>

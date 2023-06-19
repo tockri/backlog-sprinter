@@ -1,17 +1,15 @@
-import produce from "immer"
-
-import { BacklogApi } from "@/content/backlog/BacklogApi"
-import { ArrayUtil } from "@/util/ArrayUtil"
-import { DateUtil } from "@/util/DateUtil"
-import { NLLocation, NLMoveAction } from "@/util/NestedList"
-import { Waiter } from "@/util/Waiter"
+import { produce } from "immer"
+import { ArrayUtil } from "../../../../util/ArrayUtil"
+import { DateUtil } from "../../../../util/DateUtil"
+import { NLLocation, NLMoveAction } from "../../../../util/NestedList"
+import { Waiter } from "../../../../util/Waiter"
+import { BacklogApi } from "../../../backlog/BacklogApi"
 import { EditIssueInput, Issue } from "../../../backlog/IssueApi"
 import { AddMilestoneInput, CustomNumberField, EditMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
-import { AsyncHandler, AsyncRead, JotaiUtil } from "../../../util/JotaiUtil"
-
-import { ApiState } from "@/content/state/ApiState"
-import { BspConfState } from "@/content/state/BspConfState"
+import { ApiState } from "../../../state/ApiState"
+import { BspConfState } from "../../../state/BspConfState"
 import { IssueTypesState, MilestonesState, ProjectState, StatusesState } from "../../../state/ProjectInfoState"
+import { AsyncHandler, AsyncRead, JotaiUtil } from "../../../util/JotaiUtil"
 import { OrderCustomFieldState } from "../../state/OrderCustomFieldState"
 import { PBIList, PBIListFunc, PBIListMovedEvent } from "./PBIList"
 
@@ -60,9 +58,9 @@ export type PBIListAction =
 const pbRead: AsyncRead<PBIList> = async (get) => {
   const orderCustomField = await get(OrderCustomFieldState.atom)
   if (orderCustomField) {
+    const bspConf = get(BspConfState.atom)
     const project = await get(ProjectState.atom)
     const api = get(ApiState.atom)
-    const bspConf = get(BspConfState.atom)
     const milestones = await get(MilestonesState.atom)
     const today = new Date()
     const milestoneFilter = milestones.filter(
@@ -70,13 +68,22 @@ const pbRead: AsyncRead<PBIList> = async (get) => {
         !ms.archived && ms.startDate && ms.releaseDueDate && DateUtil.diffDays(today, new Date(ms.releaseDueDate)) > -3
     )
     const list = await api.issue.searchInIssueTypeAndMilestones(project.id, bspConf.pbiIssueTypeId, milestoneFilter)
-    return PBIListFunc.nestIssues(list, orderCustomField)
+    return PBIListFunc.nestIssues(
+      list.filter((i) => {
+        if (bspConf.hideCompletedPbi) {
+          return i.status.id !== 4
+        }
+        return true
+      }),
+      orderCustomField
+    )
   } else {
     throw new Error("orderCustomField is not set.")
   }
 }
 
-const pbMove: AsyncHandler<PBIList, NLMoveAction> = async (prev, get, set, action) => {
+const pbMove: AsyncHandler<PBIList, PBIListAction> = async (prev, get, set, _action) => {
+  const action = _action as NLMoveAction
   const events: PBIListMovedEvent[] = []
   const updated = produce(prev, (draft) => {
     events.push(...PBIListFunc.mutateByMove(draft, action))
@@ -119,7 +126,8 @@ const updateIssues = async (
   return updated
 }
 
-const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set, action) => {
+const pbAddIssue: AsyncHandler<PBIList, PBIListAction> = async (prev, get, set, _action) => {
+  const action = _action as AddIssueAction
   const issueType = await get(IssueTypesState.pbiIssueTypeAtom)
   const orderCustomField = await get(OrderCustomFieldState.atom)
   if (issueType && orderCustomField) {
@@ -145,7 +153,8 @@ const pbAddIssue: AsyncHandler<PBIList, AddIssueAction> = async (prev, get, set,
   }
 }
 
-const pbAddMilestone: AsyncHandler<PBIList, AddMilestoneAction> = async (prev, get, set, action) => {
+const pbAddMilestone: AsyncHandler<PBIList, PBIListAction> = async (prev, get, set, _action) => {
+  const action = _action as AddMilestoneAction
   let created: Version | null = null
   await set(
     MilestonesState.atom,
@@ -161,7 +170,8 @@ const pbAddMilestone: AsyncHandler<PBIList, AddMilestoneAction> = async (prev, g
   })
 }
 
-const pbEditMilestone: AsyncHandler<PBIList, EditMilestoneAction> = async (prev, get, set, action) => {
+const pbEditMilestone: AsyncHandler<PBIList, PBIListAction> = async (prev, get, set, _action) => {
+  const action = _action as EditMilestoneAction
   let updated: Version | null = null
   await set(
     MilestonesState.atom,
@@ -176,7 +186,8 @@ const pbEditMilestone: AsyncHandler<PBIList, EditMilestoneAction> = async (prev,
   })
 }
 
-const pbArchiveMilestone: AsyncHandler<PBIList, ArchiveMilestoneAction> = async (prev, get, set, action) => {
+const pbArchiveMilestone: AsyncHandler<PBIList, PBIListAction> = async (prev, get, set, _action) => {
+  const action = _action as ArchiveMilestoneAction
   let archived: Version | null = null
   await set(
     MilestonesState.atom,
@@ -191,7 +202,8 @@ const pbArchiveMilestone: AsyncHandler<PBIList, ArchiveMilestoneAction> = async 
   })
 }
 
-const pbEditIssue: AsyncHandler<PBIList, EditIssueAction> = async (prev, get, set, action) => {
+const pbEditIssue: AsyncHandler<PBIList, PBIListAction> = async (prev, get, set, _action) => {
+  const action = _action as EditIssueAction
   const api = get(ApiState.atom)
   const { issueId, input } = action
   await api.issue.edit(issueId, input)
@@ -201,29 +213,21 @@ const pbEditIssue: AsyncHandler<PBIList, EditIssueAction> = async (prev, get, se
   })
 }
 
-const mainAtom = JotaiUtil.asyncAtomWithAction<PBIList, PBIListAction>(pbRead, () => (prev, get, set, action) => {
-  if (action.type === "NLMove") {
-    return pbMove(prev, get, set, action)
-  } else if (action.type === "AddIssue") {
-    return pbAddIssue(prev, get, set, action)
-  } else if (action.type === "AddMilestone") {
-    return pbAddMilestone(prev, get, set, action)
-  } else if (action.type === "EditMilestone") {
-    return pbEditMilestone(prev, get, set, action)
-  } else if (action.type === "ArchiveMilestone") {
-    return pbArchiveMilestone(prev, get, set, action)
-  } else if (action.type === "EditIssue") {
-    return pbEditIssue(prev, get, set, action)
-  } else if (action.type === "Reload") {
-    return null
-  } else {
-    throw new Error(`unknown type : ${action}`)
-  }
-})
-
+const mainAtom = JotaiUtil.asyncAtomWithAction<PBIList, PBIListAction>(
+  pbRead,
+  JotaiUtil.composeAsyncHandlers({
+    NLMove: pbMove,
+    AddIssue: pbAddIssue,
+    AddMilestone: pbAddMilestone,
+    EditMilestone: pbEditMilestone,
+    ArchiveMilestone: pbArchiveMilestone,
+    EditIssue: pbEditIssue,
+    Reload: () => null
+  })
+)
 mainAtom.onMount = (setAtom) => {
-  return async () => {
-    await setAtom({ type: "Reload" })
+  return () => {
+    setAtom({ type: "Reload" }).then()
   }
 }
 
@@ -258,6 +262,9 @@ export const PBIListState = {
       type: "NLMove",
       src,
       dst
+    }),
+    Reload: (): ReloadAction => ({
+      type: "Reload"
     })
   }
 } as const

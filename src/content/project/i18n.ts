@@ -1,7 +1,8 @@
-import { UserLang } from "@/content/state/BspEnvState"
+import { UserLang } from "../state/BspEnvState"
 
 const ja = {
   productBacklog: "プロダクト\nバックログ",
+  sprint: "スプリント",
   setting: "設定",
   buttonLabel: "スプリント開発",
   formTitle: "スプリント開発",
@@ -17,6 +18,7 @@ const ja = {
 
 const en: typeof ja = {
   productBacklog: "Product\nBacklog",
+  sprint: "Sprint",
   setting: "Settings",
   buttonLabel: "Sprint Development",
   formTitle: "Sprint Development",

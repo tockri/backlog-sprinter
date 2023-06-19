@@ -1,21 +1,38 @@
 import styled from "@emotion/styled"
+import { useAtom, useAtomValue } from "jotai/index"
 import React from "react"
+import { BspConfState } from "../../state/BspConfState"
+import { BspEnvState } from "../../state/BspEnvState"
+import { IssueTypesState } from "../../state/ProjectInfoState"
 import { HBox } from "../../ui/Box"
 import { Button } from "../../ui/Button"
+import { H2 } from "../../ui/H2"
+import { Section } from "../../ui/Section"
 import { Select } from "../../ui/Select"
+import { OrderCustomFieldState } from "../state/OrderCustomFieldState"
 import { AddIssueTypeView } from "./AddIssueTypeView"
 import { i18n } from "./i18n"
-import { useSettingModel } from "./Model"
+import { AddIssueTypeFormState } from "./state/State"
 
 export const ProjectSettings: React.FC = () => {
-  const model = React.useCallback(useSettingModel, [])()
-  const t = i18n(model.lang)
+  const { lang } = useAtomValue(BspEnvState.atom)
+  const [conf, setConf] = useAtom(BspConfState.atom)
+  const issueTypes = useAtomValue(IssueTypesState.atom)
+  const [orderCustomField, orderCustomFieldsDispatch] = useAtom(OrderCustomFieldState.atom)
+  const errorMessageOnCustomField = useAtomValue(OrderCustomFieldState.errorAtom)
+  const [form, setForm] = useAtom(AddIssueTypeFormState.atom)
+  const t = i18n(lang)
   const id = (key: string) => `project.settingsForm.${key}`
+
+  const selectIssueType = (issueTypeId: number) => {
+    setConf({ ...conf, pbiIssueTypeId: issueTypeId })
+  }
+
   return (
     <Root>
       <H2>{t.issueTypeLabel}</H2>
-      <div>
-        {model.isCreatingIssueType ? (
+      <Section>
+        {form.creating ? (
           <AddIssueTypeView />
         ) : (
           <HBox style={{ gap: 4 }}>
@@ -24,35 +41,45 @@ export const ProjectSettings: React.FC = () => {
               onChange={(e) => {
                 const elem = e.currentTarget
                 if (elem.selectedIndex > 0) {
-                  const issueType = model.issueTypes[elem.selectedIndex - 1]
-                  model.selectIssueType(issueType.id)
+                  const issueType = issueTypes[elem.selectedIndex - 1]
+                  selectIssueType(issueType.id)
                 } else {
-                  model.selectIssueType(0)
+                  selectIssueType(0)
                 }
               }}
-              value={model.pbiIssueTypeId || ""}
+              value={conf.pbiIssueTypeId || ""}
             >
               <option value=""></option>
-              {model.issueTypes.map((it) => (
+              {issueTypes.map((it) => (
                 <option key={it.id} value={it.id}>
                   {it.name}
                 </option>
               ))}
             </Select>
-            {!model.pbiIssueTypeId && <Button onClick={() => model.startCreatingIssueType()}>{t.createLabel}</Button>}
+            {!conf.pbiIssueTypeId && (
+              <Button
+                onClick={() =>
+                  setForm((c) => {
+                    c.creating = true
+                  })
+                }
+              >
+                {t.createLabel}
+              </Button>
+            )}
           </HBox>
         )}
-      </div>
+      </Section>
       <H2>{t.customFieldTitle}</H2>
-      <div>
-        {model.pbiIssueTypeId ? (
-          model.orderCustomField ? (
+      <Section>
+        {conf.pbiIssueTypeId ? (
+          orderCustomField ? (
             <div>
-              {t.storeOrderOn(model.orderCustomField.name)}
+              {t.storeOrderOn(orderCustomField.name)}
               <Button
                 onClick={() => {
                   if (window.confirm(t.confirmDelete)) {
-                    model.deleteCustomField()
+                    orderCustomFieldsDispatch(OrderCustomFieldState.Action.Delete(t)).then()
                   }
                 }}
               >
@@ -62,24 +89,41 @@ export const ProjectSettings: React.FC = () => {
           ) : (
             <div>
               {t.customFieldNotExist}
-              <Button onClick={() => model.addCustomField()}>{t.createLabel}</Button>
-              <div>{model.errorMessageOnCustomField}</div>
+              <Button
+                onClick={() => {
+                  orderCustomFieldsDispatch(OrderCustomFieldState.Action.Create(t)).then()
+                }}
+              >
+                {t.createLabel}
+              </Button>
+              <div>{errorMessageOnCustomField}</div>
             </div>
           )
         ) : (
           <div>{t.setIssueType}</div>
         )}
-      </div>
+      </Section>
+      <H2>{t.viewOption}</H2>
+      <Section>
+        <input
+          className="input-checkbox"
+          type="checkbox"
+          id="hide-completed-pbi"
+          checked={conf.hideCompletedPbi}
+          onChange={(e) => {
+            setConf({ ...conf, hideCompletedPbi: e.target.checked })
+          }}
+        />
+        <label className="checkbox-label" htmlFor="hide-completed-pbi">
+          {t.hideCompletedPBI}
+        </label>
+      </Section>
     </Root>
   )
 }
 
 const Root = styled.div({
-  padding: 12
-})
-
-const H2 = styled.h2({
-  fontSize: 16,
-  padding: "4px 0",
-  fontWeight: "normal"
+  padding: 16,
+  height: "100%",
+  overflowY: "auto"
 })

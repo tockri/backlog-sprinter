@@ -1,8 +1,8 @@
-import { RealBacklogApi } from "@/content/backlog/BacklogApi"
-import { ApiState } from "@/content/state/ApiState"
-import { BspEnv, BspEnvState, UserLang } from "@/content/state/BspEnvState"
-import { ModalState } from "@/content/state/ModalState"
 import { createStore } from "jotai"
+import { RealBacklogApi } from "./backlog/BacklogApi"
+import { ApiState } from "./state/ApiState"
+import { BspEnv, BspEnvState, UserLang } from "./state/BspEnvState"
+import { ModalState } from "./state/ModalState"
 
 const start = (env?: BspEnv) => {
   jotaiStore.set(BspEnvState.atom, env || buildEnv())
@@ -22,13 +22,11 @@ const getProjectKey = (path: string): string => {
 
 const buildEnv = (): BspEnv => {
   const url = new URL(location.href)
-  const selectedMilestoneId = parseInt(url.searchParams.get("milestone") || "0")
   const projectKey = getProjectKey(url.pathname)
   const lang: UserLang = document.documentElement.lang === "ja" ? "ja" : "en"
   return {
     projectKey,
-    lang,
-    selectedMilestoneId
+    lang
   }
 }
 

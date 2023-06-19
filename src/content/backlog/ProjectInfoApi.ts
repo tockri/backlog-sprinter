@@ -1,5 +1,5 @@
-import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
+import { DateUtil } from "../../util/DateUtil"
 import { BacklogApiRequest, ParamsType } from "./BacklogApiRequest"
 
 export type Status = Immutable<{

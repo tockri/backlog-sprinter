@@ -1,5 +1,5 @@
-import { ApiKeyEntries } from "@/background/ApiKeyEntries"
-import { BacklogOAuth } from "@secret/authLogic/BacklogOAuth"
+import { BacklogOAuth } from "../../backlog-sprinter-secret/authLogic/BacklogOAuth"
+import { ApiKeyEntries } from "./ApiKeyEntries"
 import { BackgroundMessage } from "./types"
 import MessageSender = chrome.runtime.MessageSender
 

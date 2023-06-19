@@ -1,33 +1,34 @@
 import styled from "@emotion/styled"
+import { useAtomValue } from "jotai/index"
 import React from "react"
+import { ItemSelectionState } from "../state/ItemSelectionState"
 import { AddMilestoneFormView } from "./AddMilestoneFormView"
-import { useInfoAreaModel } from "./IssueAreaModel"
 import { IssueAreaView } from "./IssueAreaView"
 import { MilestoneView } from "./MilestoneView"
 
 export const InfoAreaView: React.FC = () => {
-  const model = useInfoAreaModel()
-  const { type } = model
-  if (type === "Issue") {
-    return (
-      <Area>
-        <IssueAreaView />
-      </Area>
-    )
-  } else if (type === "Milestone") {
-    return (
-      <Area>
-        <MilestoneView />
-      </Area>
-    )
-  } else if (type === "MilestoneAdding") {
-    return (
-      <Area>
-        <AddMilestoneFormView />
-      </Area>
-    )
-  } else {
-    return null
+  const item = useAtomValue(ItemSelectionState.atom)
+  switch (item.type) {
+    case "Issue":
+      return (
+        <Area>
+          <IssueAreaView />
+        </Area>
+      )
+    case "Milestone":
+      return (
+        <Area>
+          <MilestoneView />
+        </Area>
+      )
+    case "MilestoneAdding":
+      return (
+        <Area>
+          <AddMilestoneFormView />
+        </Area>
+      )
+    default:
+      return <></>
   }
 }
 

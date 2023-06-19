@@ -1,14 +1,20 @@
-import { Issue } from "@/content/backlog/IssueApi"
-import { VBox } from "@/content/ui/Box"
-import { cnu } from "@/content/ui/cnu"
-import { Droppable } from "@/content/ui/DragAndDrop"
-import { EditableField } from "@/content/ui/EditableField"
-import { NLLocation } from "@/util/NestedList"
 import styled from "@emotion/styled"
+import { Immutable } from "immer"
+import { useAtom, useAtomValue, useSetAtom } from "jotai/index"
 import React from "react"
+import { DateUtil } from "../../../../util/DateUtil"
+import { NLLocation } from "../../../../util/NestedList"
+import { Issue } from "../../../backlog/IssueApi"
+import { BspEnvState } from "../../../state/BspEnvState"
+import { IssueTypesState } from "../../../state/ProjectInfoState"
+import { HBox, VBox } from "../../../ui/Box"
+import { cnu } from "../../../ui/cnu"
+import { Droppable } from "../../../ui/DragAndDrop"
+import { EditableField } from "../../../ui/EditableField"
 import { i18n } from "../i18n"
+import { ItemSelectionState } from "../state/ItemSelectionState"
 import { PBISubList } from "../state/PBIList"
-import { usePBISubListModel } from "./PBISubListModel"
+import { PBIListState } from "../state/PBIListState"
 import { PBItemView } from "./PBItemView"
 
 type PBISubListProps = {
@@ -38,22 +44,90 @@ const canMove =
     return dragging.parentIssueId !== issue.id
   }
 
+type Sum = {
+  total: number
+  closed: number
+}
+const calcSum = (subList: PBISubList): Sum => {
+  let total = 0
+  let closed = 0
+  subList.items.forEach((i) => {
+    const size = i.actualHours || i.estimatedHours || 1
+    total += size
+    if (i.status.id === 4) {
+      closed += size
+    }
+  })
+  return { total, closed }
+}
+
+type HoverState = Immutable<{
+  issueId: number
+  type: "move" | "arrange"
+}>
+
 export const PBISubListView: React.FC<PBISubListProps> = (props) => {
   const { subList } = props
-  const model = React.useCallback(usePBISubListModel, [])(subList)
+  const [hover, setHover] = React.useState<HoverState | null>(null)
+  const dispatch = useSetAtom(PBIListState.atom)
+  const { lang } = useAtomValue(BspEnvState.atom)
+  const [sel, select] = useAtom(ItemSelectionState.atom)
+  const milestone = subList.head
+  const milestoneId = milestone?.id || 0
+  const releaseDate = milestone?.releaseDueDate ? DateUtil.shortDateString(new Date(milestone.releaseDueDate)) : ""
+  const isSelected = sel.type === "Milestone" && sel.milestoneId === milestoneId
+  const milestoneName = milestone?.name || "(No milestone)"
+  const pbiIssueType = useAtomValue(IssueTypesState.pbiIssueTypeAtom)
   const lastIdx = subList.items.length
-  const t = i18n(model.lang)
+  const sum = calcSum(subList)
+  const t = i18n(lang)
+
+  const setArrangeHovered = (issueId: number, _hover: boolean) => {
+    if (_hover) {
+      setHover({
+        issueId,
+        type: "arrange"
+      })
+    } else {
+      setHover((curr) => (curr?.issueId === issueId ? null : curr))
+    }
+  }
+
+  const isArrangeHovered = (issueId: number) => hover?.issueId === issueId && hover.type === "arrange"
+
+  const setMoveHovered = (issueId: number, hover: boolean) => {
+    if (hover) {
+      setHover({
+        issueId,
+        type: "move"
+      })
+    } else {
+      setHover((curr) => (curr?.issueId === issueId ? null : curr))
+    }
+  }
+
+  const isMoveHovered = (issueId: number) => hover?.issueId === issueId && hover.type === "move"
+
+  const addNewIssue = (summary: string) => {
+    dispatch(PBIListState.Action.AddIssue(summary, milestone)).then()
+  }
+
+  const selectMilestone = () => {
+    if (sel.type === "Milestone" && sel.milestoneId === milestoneId) {
+      select(ItemSelectionState.Action.Deselect)
+    } else {
+      select(ItemSelectionState.Action.SelectMilestone(milestoneId))
+    }
+  }
+
   return (
     <SL>
-      <SLTitle
-        tabIndex={0}
-        onClick={() => {
-          model.selectMilestone()
-        }}
-        className={cnu({ selected: model.isSelected })}
-      >
-        <MilestoneName>🏁{model.milestoneName}</MilestoneName>
-        <ReleaseDate>{model.releaseDate}</ReleaseDate>
+      <SLTitle tabIndex={0} onClick={() => selectMilestone()} className={cnu({ selected: isSelected })}>
+        <MilestoneName>🏁{milestoneName}</MilestoneName>
+        <ReleaseDate>{releaseDate}</ReleaseDate>
+        <Sum>
+          {sum.closed} / {sum.total}
+        </Sum>
       </SLTitle>
       <SLBody>
         {subList.items.map((issue, index) => (
@@ -62,22 +136,18 @@ export const PBISubListView: React.FC<PBISubListProps> = (props) => {
             type="moveParent"
             item={issue}
             canDrop={canMove(issue)}
-            hoverStateChanged={(h) => {
-              model.setMoveHovered(issue.id, h)
-            }}
+            hoverStateChanged={(h) => setMoveHovered(issue.id, h)}
           >
             <Droppable<NLLocation>
               type="arrange"
               item={{ index, subListId: subList.id }}
               canDrop={canArrange(index, subList.id)}
-              hoverStateChanged={(h) => {
-                model.setArrangeHovered(issue.id, h)
-              }}
+              hoverStateChanged={(h) => setArrangeHovered(issue.id, h)}
             >
               <DropArea
                 className={cnu({
-                  arrangeHover: model.isArrangeHovered(issue.id),
-                  moveHover: model.isMoveHovered(issue.id)
+                  arrangeHover: isArrangeHovered(issue.id),
+                  moveHover: isMoveHovered(issue.id)
                 })}
               >
                 <PBItemView issue={issue} key={index} index={index} subListId={subList.id} />
@@ -89,15 +159,13 @@ export const PBISubListView: React.FC<PBISubListProps> = (props) => {
           type="arrange"
           item={{ index: lastIdx, subListId: subList.id }}
           canDrop={canArrange(lastIdx, subList.id)}
-          hoverStateChanged={(h) => model.setArrangeHovered(-1, h)}
+          hoverStateChanged={(h) => setArrangeHovered(-1, h)}
         >
-          <DropArea className={cnu("empty", { arrangeHover: model.isArrangeHovered(-1) })}>
+          <DropArea className={cnu("empty", { arrangeHover: isArrangeHovered(-1) })}>
             <VBox>
               <EditableField
                 placeholder={t.addNewItem}
-                onFix={(summary) => {
-                  model.addNewIssue(summary)
-                }}
+                onFix={(summary) => addNewIssue(summary)}
                 viewStyle={{
                   padding: 4
                 }}
@@ -105,10 +173,10 @@ export const PBISubListView: React.FC<PBISubListProps> = (props) => {
                   flexGrow: 1
                 }}
                 blurAction="submit"
-                lang={model.lang}
+                lang={lang}
                 onStart={(value, setValue) => {
                   if (!value) {
-                    setValue(model.pbiIssueType?.templateSummary || "")
+                    setValue(pbiIssueType?.templateSummary || "")
                   }
                 }}
               />
@@ -138,20 +206,30 @@ const SL = styled.div({
   padding: 8
 })
 
-const SLTitle = styled.div({
-  paddingBottom: 4,
+const SLTitle = styled(HBox)({
+  marginBottom: 4,
+  padding: 4,
+  alignItems: "center",
   "&.selected": {
     border: "2px solid #e0c0c0"
   }
 })
 
-const MilestoneName = styled.span({
-  fontWeight: "bold"
+const MilestoneName = styled.div({
+  fontWeight: "bold",
+  fontSize: "1.3rem"
 })
 
-const ReleaseDate = styled.span({
-  display: "inline-block",
+const ReleaseDate = styled.div({
   marginLeft: "2em"
+})
+
+const Sum = styled.div({
+  marginLeft: "auto",
+  backgroundColor: "#e0e0e0",
+  borderRadius: 4,
+  textAlign: "center",
+  padding: "4px 8px"
 })
 
 const SLBody = styled.div({

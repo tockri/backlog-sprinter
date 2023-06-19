@@ -1,12 +1,14 @@
 import styled from "@emotion/styled"
+import { useAtom, useSetAtom } from "jotai/index"
 import React from "react"
 import { NLLocation } from "../../../../util/NestedList"
 import { cnu } from "../../../ui/cnu"
 import { Draggable } from "../../../ui/DragAndDrop"
+import { ItemSelectionState } from "../state/ItemSelectionState"
 import { IssueDataWithOrder } from "../state/PBIList"
+import { PBIListState } from "../state/PBIListState"
 import { StatusView } from "../StatusView"
 import { StoryPointView } from "../StoryPointView"
-import { usePBItemModel } from "./PBItemModel"
 
 type PBIItemViewProps = {
   subListId: string
@@ -16,9 +18,20 @@ type PBIItemViewProps = {
 
 export const PBItemView: React.FC<PBIItemViewProps> = (props) => {
   const { issue, subListId, index } = props
-  const model = usePBItemModel()
+  const [selected, selectDispatch] = useAtom(ItemSelectionState.atom)
+  const pbDispatch = useSetAtom(PBIListState.atom)
+  const selectedIssueId = selected?.type === "Issue" ? selected.issueId : null
   const item = { subListId, index }
   const [dragging, setDragging] = React.useState(false)
+
+  const selectItem = (issueId: number) => {
+    if (issueId === selectedIssueId) {
+      selectDispatch(ItemSelectionState.Action.Deselect)
+    } else {
+      selectDispatch(ItemSelectionState.Action.SelectIssue(issueId))
+    }
+  }
+  const isSelected = selectedIssueId === issue.id
 
   return (
     <Draggable<NLLocation>
@@ -26,16 +39,13 @@ export const PBItemView: React.FC<PBIItemViewProps> = (props) => {
       item={item}
       onDragEnd={(where) => {
         if (where) {
-          model.move(item, where)
+          pbDispatch(PBIListState.Action.ListMove(item, where)).then()
         }
         setDragging(false)
       }}
       onDragStart={() => setDragging(true)}
     >
-      <Cell
-        onClick={() => model.selectItem(issue.id)}
-        className={cnu({ selected: model.isSelected(issue.id), dragging: dragging })}
-      >
+      <Cell onClick={() => selectItem(issue.id)} className={cnu({ selected: isSelected, dragging: dragging })}>
         <Body>
           <CellHeader>
             <IssueKey>

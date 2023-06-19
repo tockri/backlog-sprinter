@@ -1,9 +1,9 @@
-import { VelocityRecords } from "@/content/state/SprintVelocity"
-import { VelocityState } from "@/content/state/VelocityState"
 import { useAtomValue } from "jotai"
 import { DateUtil } from "../../../util/DateUtil"
 import { Version } from "../../backlog/ProjectInfoApi"
 import { MilestonesState } from "../../state/ProjectInfoState"
+import { VelocityRecords } from "../../state/SprintVelocity"
+import { VelocityState } from "../../state/VelocityState"
 
 export type VelocityChartData = { name: string; PBI: number; Others: number }[]
 

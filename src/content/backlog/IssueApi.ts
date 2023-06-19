@@ -1,6 +1,5 @@
-import { DateUtil } from "@/util/DateUtil"
-import { Immutable } from "immer"
-import { WritableDraft } from "immer/dist/internal"
+import { Draft, Immutable } from "immer"
+import { DateUtil } from "../../util/DateUtil"
 import { BacklogApiRequest } from "./BacklogApiRequest"
 import { CustomNumberField, IssueType, Status, Version } from "./ProjectInfoApi"
 
@@ -13,6 +12,7 @@ export type CustomFieldValue = Immutable<{
 
 export type Issue = Immutable<{
   id: number
+  projectId: number
   issueKey: string
   keyId: number
   issueType: Omit<IssueType, "templateSummary" | "templateDescription">
@@ -150,7 +150,7 @@ const edit = async (issueId: number, input: EditIssueInput): Promise<Issue> => {
   return await BacklogApiRequest.patch(`/api/v2/issues/${issueId}`, params)
 }
 
-const mutateByIssueInput = (issue: WritableDraft<Issue>, input: EditIssueInput, statuses: ReadonlyArray<Status>) => {
+const mutateByIssueInput = (issue: Draft<Issue>, input: EditIssueInput, statuses: ReadonlyArray<Status>) => {
   if (input.summary !== undefined) {
     issue.summary = input.summary
   }

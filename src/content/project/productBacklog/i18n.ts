@@ -1,19 +1,21 @@
-import { UserLang } from "@/content/state/BspEnvState"
+import { UserLang } from "../../state/BspEnvState"
 
 const ja = {
   estimatedHours: "予定",
   actualHours: "実績",
-  addNewItem: "アイテムを追加する",
+  addNewItem: "プロダクトバックログアイテムを追加",
   milestonePeriod: "期間",
-  milestoneName: "マイルストーン名"
+  milestoneName: "マイルストーン名",
+  addMilestone: "マイルストーンを追加"
 }
 
 const en: typeof ja = {
   estimatedHours: "Estimation",
   actualHours: "Result",
-  addNewItem: "Add a new item",
+  addNewItem: "Add product backlog item",
   milestonePeriod: "Period",
-  milestoneName: "Milestone Name"
+  milestoneName: "Milestone name",
+  addMilestone: "Add milestone"
 }
 
 const resources = { ja, en }

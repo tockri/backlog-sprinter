@@ -1,13 +1,13 @@
-import { BacklogApi } from "@/content/backlog/BacklogApi"
-import { Version } from "@/content/backlog/ProjectInfoApi"
-import { Wiki } from "@/content/backlog/WikiApi"
-import { ApiState } from "@/content/state/ApiState"
-import { BspConfState } from "@/content/state/BspConfState"
-import { ProjectState } from "@/content/state/ProjectInfoState"
-import { VelocityFunc, VelocityRecords } from "@/content/state/SprintVelocity"
-import { JotaiUtil } from "@/content/util/JotaiUtil"
-import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
+import { DateUtil } from "../../util/DateUtil"
+import { BacklogApi } from "../backlog/BacklogApi"
+import { Version } from "../backlog/ProjectInfoApi"
+import { Wiki } from "../backlog/WikiApi"
+import { JotaiUtil } from "../util/JotaiUtil"
+import { ApiState } from "./ApiState"
+import { BspConfState } from "./BspConfState"
+import { ProjectState } from "./ProjectInfoState"
+import { VelocityFunc, VelocityRecords } from "./SprintVelocity"
 
 export type WikiVelocity = {
   wiki: Wiki | null
@@ -22,13 +22,16 @@ type Record = Immutable<{
 
 type Init = Immutable<{ type: "Init" }>
 
-const mainAtom = JotaiUtil.asyncAtomWithAction(
+type Action = Record | Init
+
+const mainAtom = JotaiUtil.asyncAtomWithAction<WikiVelocity, Action>(
   async (get) => {
     const api = get(ApiState.atom)
     const project = await get(ProjectState.atom)
-    return loadVelocity(api, project.id)
+    const conf = get(BspConfState.atom)
+    return loadVelocity(api, project.id, conf.pbiIssueTypeId)
   },
-  () => async (curr, get, set, action: Record | Init) => {
+  async (curr, get, set, action) => {
     if (action.type === "Init") {
       return curr
     } else if (action.type === "Record") {
@@ -45,11 +48,24 @@ mainAtom.onMount = (setAtom) => {
   setAtom({ type: "Init" }).then()
 }
 
-const loadVelocity = async (api: BacklogApi, projectId: number): Promise<WikiVelocity> => {
-  const pages = await api.wiki.search(projectId, "(backlog-sprinter-velocity-record)")
-  return pages.length > 0
-    ? { wiki: pages[0], velocity: VelocityFunc.parseAll(pages[0].content) }
-    : { wiki: null, velocity: [] }
+const loadVelocity = async (api: BacklogApi, projectId: number, pbiIssueTypeId: number): Promise<WikiVelocity> => {
+  const find = async (): Promise<Wiki | undefined> => {
+    const keyword = "(backlog-sprinter-velocity-record)"
+    const strictKeyword = `${keyword}(${pbiIssueTypeId})`
+    const pages = await api.wiki.search(projectId, keyword)
+    if (pages.length === 1) {
+      return pages[0]
+    } else {
+      return pages.find((wiki) => wiki.content.includes(strictKeyword))
+    }
+  }
+
+  const wiki = await find()
+  if (wiki) {
+    return { wiki, velocity: VelocityFunc.parseAll(wiki.content) }
+  } else {
+    return { wiki: null, velocity: [] }
+  }
 }
 
 const recordVelocity = async (
@@ -75,7 +91,7 @@ const recordVelocity = async (
 |--|--|--|--|--|--|
 ${VelocityFunc.toStringAll(velocity)}
 
-!!DO NOT EDIT (backlog-sprinter-velocity-record) DO NOT EDIT!!
+!!DO NOT EDIT (backlog-sprinter-velocity-record)(${pbiIssueTypeId}) DO NOT EDIT!!
 `
     const wiki = existingWiki
       ? await api.wiki.edit(existingWiki, existingWiki.name, content)

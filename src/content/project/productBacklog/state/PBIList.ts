@@ -1,4 +1,4 @@
-import { WritableDraft } from "immer/dist/internal"
+import { Draft } from "immer"
 import { NestedList, NestedListData, NestMethods, NLMoveAction } from "../../../../util/NestedList"
 import { EditIssueInput, Issue, IssueUtil } from "../../../backlog/IssueApi"
 import { CustomNumberField, Status, Version } from "../../../backlog/ProjectInfoApi"
@@ -130,7 +130,7 @@ const indexAfterMove = (action: NLMoveAction): number => {
   }
 }
 
-const mutateByMove = (data: WritableDraft<PBIList>, action: NLMoveAction): PBIListMovedEvent[] => {
+const mutateByMove = (data: Draft<PBIList>, action: NLMoveAction): PBIListMovedEvent[] => {
   NestedList.mutateMove(data, action)
   const eventStore = new EventStore()
   const subList = data.subLists.find((sl) => sl.id === action.dst.subListId)
@@ -159,31 +159,31 @@ const mutateByMove = (data: WritableDraft<PBIList>, action: NLMoveAction): PBILi
   return eventStore.values()
 }
 
-const mutateByAddIssue = (data: WritableDraft<PBIList>, created: Issue, orderCustomField: CustomNumberField) => {
+const mutateByAddIssue = (data: Draft<PBIList>, created: Issue, orderCustomField: CustomNumberField) => {
   const subList = data.subLists.find((sl) => sl.head?.id === created.milestone[0]?.id)
   if (subList) {
-    subList.items.push(withOrder(orderCustomField)(created) as WritableDraft<IssueDataWithOrder>)
+    subList.items.push(withOrder(orderCustomField)(created) as Draft<IssueDataWithOrder>)
   }
 }
 
-const mutateByAddMilestone = (data: WritableDraft<PBIList>, created: Version) => {
+const mutateByAddMilestone = (data: Draft<PBIList>, created: Version) => {
   data.subLists.push({
-    head: created as WritableDraft<Version>,
+    head: created as Draft<Version>,
     items: [],
     id: pbiNestMethods.headId(created)
   })
   data.subLists.sort((sl1, sl2) => pbiNestMethods.headComparator(sl1.head, sl2.head))
 }
 
-const mutateByEditMilestone = (data: WritableDraft<PBIList>, updated: Version) => {
+const mutateByEditMilestone = (data: Draft<PBIList>, updated: Version) => {
   const sIdx = data.subLists.findIndex((sl) => sl.head?.id === updated.id)
   if (sIdx >= 0) {
-    data.subLists[sIdx].head = updated as WritableDraft<Version>
+    data.subLists[sIdx].head = updated as Draft<Version>
   }
   data.subLists.sort((sl1, sl2) => pbiNestMethods.headComparator(sl1.head, sl2.head))
 }
 
-const mutateByArchiveMilestone = (data: WritableDraft<PBIList>, archived: Version) => {
+const mutateByArchiveMilestone = (data: Draft<PBIList>, archived: Version) => {
   const sIdx = data.subLists.findIndex((sl) => sl.head?.id === archived.id)
   if (sIdx >= 0) {
     data.subLists.splice(sIdx, 1)
@@ -200,7 +200,7 @@ const getNewOrder = (data: PBIList, milestone: Version | null): number => {
 }
 
 const mutateByEditIssue = (
-  data: WritableDraft<PBIList>,
+  data: Draft<PBIList>,
   statuses: ReadonlyArray<Status>,
   issueId: number,
   input: EditIssueInput
@@ -211,7 +211,7 @@ const mutateByEditIssue = (
   }
 }
 
-const findIssue = <T extends PBIList | WritableDraft<PBIList>>(
+const findIssue = <T extends PBIList | Draft<PBIList>>(
   data: T,
   issueId: number
 ): T["subLists"][number]["items"][number] | null => {

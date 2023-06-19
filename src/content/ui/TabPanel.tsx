@@ -4,7 +4,7 @@ import { Loading } from "./Loading"
 
 export type TabPanelTabInfo = {
   label: string
-  component: () => React.ReactNode
+  component: React.FC
 }
 
 export type TabPanelProps = {
@@ -18,6 +18,7 @@ export const TabPanel: React.FC<TabPanelProps> = (props) => {
   const { tabs, initialIndex, selectedIndex, onTabClicked } = props
   const [stateIndex, select] = React.useState<number>(initialIndex || 0)
   const index = selectedIndex || stateIndex
+  const BodyComponent = tabs[index].component
   return (
     <Panel>
       <TabBar>
@@ -32,7 +33,9 @@ export const TabPanel: React.FC<TabPanelProps> = (props) => {
         ))}
       </TabBar>
       <Body>
-        <React.Suspense fallback={<Loading />}>{tabs[index].component()}</React.Suspense>
+        <React.Suspense fallback={<Loading />}>
+          <BodyComponent />
+        </React.Suspense>
       </Body>
     </Panel>
   )

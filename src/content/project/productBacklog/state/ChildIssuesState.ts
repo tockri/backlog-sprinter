@@ -1,12 +1,12 @@
-import { JotaiUtil } from "@/content/util/JotaiUtil"
-import produce from "immer"
-import { WritableDraft } from "immer/dist/types/types-external"
+import { Draft, produce } from "immer"
+import { JotaiUtil } from "../../../util/JotaiUtil"
+
 import { AddIssueInput, Issue } from "../../../backlog/IssueApi"
 
-import { PBIListFunc } from "@/content/project/productBacklog/state/PBIList"
-import { PBIListState } from "@/content/project/productBacklog/state/PBIListState"
-import { ApiState } from "@/content/state/ApiState"
+import { ApiState } from "../../../state/ApiState"
 import { ProjectState } from "../../../state/ProjectInfoState"
+import { PBIListFunc } from "./PBIList"
+import { PBIListState } from "./PBIListState"
 
 type CreateAction = {
   type: "Create"
@@ -40,7 +40,7 @@ const mainAtom = JotaiUtil.asyncAtomFamilyWithAction(
       set(
         storeAtom(destinationIssueId),
         produce(currDst, (draft) => {
-          draft.push(updated as WritableDraft<Issue>)
+          draft.push(updated as Draft<Issue>)
         })
       )
 

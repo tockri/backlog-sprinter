@@ -1,12 +1,11 @@
-import { BackgroundClient } from "@/background/BackgroundClient"
 import { Provider } from "jotai"
-import React from "react"
 import { createRoot } from "react-dom/client"
+import { BackgroundClient } from "../background/BackgroundClient"
 import { BspCommon } from "./BspCommon"
-import SprintIcon from "./images/sprint.svg"
 import { i18n } from "./project/i18n"
 import { ProjectApp } from "./project/View"
 import { JsxUtil } from "./ui/JsxUtil"
+import { ResourceImg } from "./ui/ResourceImg"
 
 const getButtonPlace = () => document.querySelector(".project-header__summary")
 
@@ -32,7 +31,7 @@ const makePortalButton = () => {
     const buttonWrapper = JsxUtil.jsxToElement(
       <div className="bsp-project-button-wrapper">
         <button type="button" className="icon-button icon-button--default -with-text bsp-project-button">
-          <SprintIcon width={24} height={24} viewBox="0 0 114 128" />
+          <ResourceImg path="images/sprint.svg" style={{ width: 22, height: 22 }} />
           <span className="_assistive-text">{t.buttonLabel}</span>
         </button>
       </div>

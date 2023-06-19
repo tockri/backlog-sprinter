@@ -1,9 +1,9 @@
-import { i18n } from "@/content/project/i18n"
-import { BspEnvState } from "@/content/state/BspEnvState"
 import styled from "@emotion/styled"
 import { useAtomValue } from "jotai"
 import React from "react"
 import { CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts"
+import { BspEnvState } from "../../state/BspEnvState"
+import { i18n } from "../i18n"
 import { useStatModel, VelocityChartData } from "./Model"
 
 export const StatView: React.FC = () => {

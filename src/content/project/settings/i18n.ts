@@ -1,4 +1,4 @@
-import { UserLang } from "@/content/state/BspEnvState"
+import { UserLang } from "../../state/BspEnvState"
 
 const ja = {
   issueTypeLabel: "プロダクトバックログを表す課題種別",
@@ -19,7 +19,9 @@ const ja = {
   velocityTitle: "ベロシティを記録するWikiページ",
   recordVelocityOn: (name: string) => `Wikiページ「${name}」に記録します。`,
   wikiNotSelected: "Wikiページが指定されていません。",
-  selectLabel: "選択する"
+  selectLabel: "選択する",
+  viewOption: "表示オプション",
+  hideCompletedPBI: "完了したプロダクトバックログアイテムを非表示にする"
 }
 
 const en: typeof ja = {
@@ -41,7 +43,9 @@ const en: typeof ja = {
   velocityTitle: "Wiki to record velocity data",
   recordVelocityOn: (name: string) => `Record data on the wiki page "${name}"`,
   wikiNotSelected: "Wiki page is not selected.",
-  selectLabel: "Select"
+  selectLabel: "Select",
+  viewOption: "View Option",
+  hideCompletedPBI: "Hide completed product backlog items"
 }
 
 const resources = { ja, en }

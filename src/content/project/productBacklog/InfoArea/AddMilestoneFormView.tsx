@@ -1,17 +1,40 @@
-import { DateUtil } from "@/util/DateUtil"
 import styled from "@emotion/styled"
+import { useAtomValue, useSetAtom } from "jotai/index"
 import React from "react"
 import { Tooltip } from "react-tooltip"
+import { DateUtil } from "../../../../util/DateUtil"
+import { AddMilestoneInput, Version } from "../../../backlog/ProjectInfoApi"
+import { BspEnvState } from "../../../state/BspEnvState"
+import { MilestonesState } from "../../../state/ProjectInfoState"
 import { HBox, VBox } from "../../../ui/Box"
 import { Button } from "../../../ui/Button"
 import { cnu } from "../../../ui/cnu"
 import { TextArea, TextInput } from "../../../ui/TextInput"
-import { useMilestoneFormModel } from "./AddMilestoneFormModel"
+import { ItemSelectionState } from "../state/ItemSelectionState"
+import { PBIListState } from "../state/PBIListState"
 import { i18n } from "./i18n"
 
 export const AddMilestoneFormView: React.FC = () => {
-  const model = React.useCallback(useMilestoneFormModel, [])()
-  const { lang, values, submittable, isNameDup } = model
+  const { lang } = useAtomValue(BspEnvState.atom)
+  const [values, setValues] = React.useState<AddMilestoneInput>({
+    name: "",
+    description: "",
+    startDate: null,
+    releaseDueDate: null
+  })
+  const milestones = useAtomValue(MilestonesState.atom)
+  const selDispatch = useSetAtom(ItemSelectionState.atom)
+  const pbDispatch = useSetAtom(PBIListState.atom)
+  const submittable = isSubmittable(values, milestones)
+  const isNameDup = !!values.name && !!milestones.find((ms) => ms.name === values.name)
+  const cancel = () => {
+    selDispatch(ItemSelectionState.Action.Deselect)
+  }
+  const submit = async () => {
+    await pbDispatch(PBIListState.Action.AddMilestone(values))
+    selDispatch(ItemSelectionState.Action.Deselect)
+  }
+
   const t = i18n(lang)
   return (
     <Root>
@@ -20,9 +43,7 @@ export const AddMilestoneFormView: React.FC = () => {
         id="add-milestone-name"
         data-tooltip-content={isNameDup ? t.isNameDup : ""}
         value={values.name}
-        onChange={(e) => {
-          model.setName(e.target.value)
-        }}
+        onChange={(e) => setValues((curr) => ({ ...curr, name: e.target.value }))}
         placeholder={t.milestoneName}
         required={true}
         className={cnu({ error: isNameDup })}
@@ -32,39 +53,44 @@ export const AddMilestoneFormView: React.FC = () => {
         <TextInput
           type="date"
           value={DateUtil.dateString(values.startDate)}
-          onChange={(e) => {
-            model.setStartDate(e.target.value)
-          }}
+          onChange={(e) => setValues((curr) => ({ ...curr, startDate: DateUtil.parseDate(e.target.value) }))}
           required={true}
         />
         ～
         <TextInput
           type="date"
           value={DateUtil.dateString(values.releaseDueDate)}
-          onChange={(e) => {
-            model.setReleaseDueDate(e.target.value)
-          }}
+          onChange={(e) => setValues((curr) => ({ ...curr, releaseDueDate: DateUtil.parseDate(e.target.value) }))}
           min={values.startDate ? DateUtil.dateString(values.startDate) : ""}
           required={true}
         />
       </Period>
       <TextArea
         value={values.description}
-        onChange={(e) => {
-          model.setDescription(e.target.value)
-        }}
+        onChange={(e) => setValues((curr) => ({ ...curr, description: e.target.value }))}
         style={{
           flexGrow: 1
         }}
         placeholder={t.milestoneDescription}
       />
       <Buttons>
-        <Button onClick={model.cancel}>{t.cancel}</Button>
-        <Button onClick={model.submit} disabled={!submittable}>
+        <Button onClick={cancel}>{t.cancel}</Button>
+        <Button onClick={submit} disabled={!submittable}>
           {t.submitForm}
         </Button>
       </Buttons>
     </Root>
+  )
+}
+
+const isSubmittable = (values: AddMilestoneInput, milestones: ReadonlyArray<Version>): boolean => {
+  const { name, startDate, releaseDueDate } = values
+  return !!(
+    name &&
+    startDate &&
+    releaseDueDate &&
+    startDate.getTime() <= releaseDueDate.getTime() &&
+    !milestones.find((ms) => ms.name === name)
   )
 }
 

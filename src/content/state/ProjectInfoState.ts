@@ -1,7 +1,5 @@
-import { Immutable, produce } from "immer"
-import { WritableDraft } from "immer/dist/types/types-external"
+import { Draft, Immutable, produce } from "immer"
 import { atom } from "jotai"
-
 import {
   AddCustomFieldInput,
   AddMilestoneInput,
@@ -11,9 +9,8 @@ import {
   Version
 } from "../backlog/ProjectInfoApi"
 import { JotaiUtil } from "../util/JotaiUtil"
-
-import { ApiState } from "@/content/state/ApiState"
-import { BspConfState } from "@/content/state/BspConfState"
+import { ApiState } from "./ApiState"
+import { BspConfState } from "./BspConfState"
 import { BspEnvState } from "./BspEnvState"
 
 const projectAtom = atom(async (get) => {
@@ -60,14 +57,14 @@ const milestonesAtom = JotaiUtil.asyncAtomWithAction(
     const api = get(ApiState.atom)
     return env.projectKey ? await api.projectInfo.getMilestones(env.projectKey) : []
   },
-  () => async (curr, get, set, action: MilestoneAction) => {
+  async (curr, get, set, action: MilestoneAction) => {
     if (action.type === "AddMilestone") {
       const api = get(ApiState.atom)
       const project = await get(ProjectState.atom)
       const created = await api.projectInfo.addMilestone(project.id, action.input)
       action.onSuccess(created)
       return produce(curr, (d) => {
-        d.push(created as WritableDraft<Version>)
+        d.push(created as Draft<Version>)
       })
     } else if (action.type === "EditMilestone") {
       const api = get(ApiState.atom)
@@ -77,7 +74,7 @@ const milestonesAtom = JotaiUtil.asyncAtomWithAction(
       return produce(curr, (d) => {
         const idx = d.findIndex((ms) => ms.id === updated.id)
         if (idx >= 0) {
-          d.splice(idx, 1, updated as WritableDraft<Version>)
+          d.splice(idx, 1, updated as Draft<Version>)
         }
       })
     } else if (action.type === "ArchiveMilestone") {
@@ -87,7 +84,7 @@ const milestonesAtom = JotaiUtil.asyncAtomWithAction(
       return produce(curr, (d) => {
         const idx = d.findIndex((ms) => ms.id === archived.id)
         if (idx >= 0) {
-          d.splice(idx, 1, archived as WritableDraft<Version>)
+          d.splice(idx, 1, archived as Draft<Version>)
         }
       })
     }
@@ -113,7 +110,7 @@ const customFieldsAtom = JotaiUtil.asyncAtomWithAction(
     const api = get(ApiState.atom)
     return env.projectKey ? await api.projectInfo.getCustomFields(env.projectKey) : []
   },
-  () => async (curr, get, set, action: CustomFieldAction) => {
+  async (curr, get, set, action: CustomFieldAction) => {
     if (action.type === "AddCustomField") {
       const api = get(ApiState.atom)
       const env = get(BspEnvState.atom)
@@ -150,7 +147,7 @@ const issueTypesAtom = JotaiUtil.asyncAtomWithAction(
     const api = get(ApiState.atom)
     return env.projectKey ? await api.projectInfo.getIssueTypes(env.projectKey) : []
   },
-  () => async (curr, get, set, action: IssueTypesAction) => {
+  async (curr, get, set, action: IssueTypesAction) => {
     if (action.type === "Create") {
       const api = get(ApiState.atom)
       const project = await get(projectAtom)
@@ -162,7 +159,7 @@ const issueTypesAtom = JotaiUtil.asyncAtomWithAction(
       set(BspConfState.atom, { pbiIssueTypeId: created.id })
 
       return produce(curr, (draft) => {
-        draft.splice(0, 0, created as WritableDraft<IssueType>)
+        draft.splice(0, 0, created as Draft<IssueType>)
       })
     }
     return curr

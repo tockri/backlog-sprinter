@@ -1,5 +1,5 @@
-import { Version } from "@/content/backlog/ProjectInfoApi"
-import { MockData } from "@test/mock/MockApi-data"
+import { MockData } from "../../test/mock/MockApi-data"
+import { Version } from "../backlog/ProjectInfoApi"
 import { SprintVelocity, VelocityFunc } from "./SprintVelocity"
 
 describe("SprintVelocity", () => {

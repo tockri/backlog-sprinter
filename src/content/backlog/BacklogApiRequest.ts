@@ -1,6 +1,6 @@
-import { BackgroundClient } from "@/background/BackgroundClient"
-import { Either, EitherT } from "@/util/Either"
 import { Immutable } from "immer"
+import { BackgroundClient } from "../../background/BackgroundClient"
+import { Either, EitherT } from "../../util/Either"
 
 export type ErrorData = Immutable<{
   errors: {

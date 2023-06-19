@@ -1,7 +1,7 @@
-import { Issue } from "@/content/backlog/IssueApi"
-import { Version } from "@/content/backlog/ProjectInfoApi"
-import { DateUtil } from "@/util/DateUtil"
 import { Immutable } from "immer"
+import { DateUtil } from "../../util/DateUtil"
+import { Issue } from "../backlog/IssueApi"
+import { Version } from "../backlog/ProjectInfoApi"
 
 type KeyOrId = string | number
 

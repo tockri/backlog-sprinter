@@ -1,5 +1,5 @@
-import { ApiKeyEntry } from "@/background/types"
-import { ObjectUtil } from "@/util/ObjectUtil"
+import { ObjectUtil } from "../util/ObjectUtil"
+import { ApiKeyEntry } from "./types"
 
 const isApiKeyEntry = (o: unknown): o is ApiKeyEntry =>
   ObjectUtil.matchType<ApiKeyEntry>(o, {

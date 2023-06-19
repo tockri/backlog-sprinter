@@ -1,5 +1,5 @@
-import { BacklogApiRequest } from "@/content/backlog/BacklogApiRequest"
 import { Immutable } from "immer"
+import { BacklogApiRequest } from "./BacklogApiRequest"
 
 export type WikiTag = Immutable<{
   id: number

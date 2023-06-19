@@ -1,6 +1,6 @@
-import { ArrayUtil } from "@/util/ArrayUtil"
-import { NestedList, NLLocation, NLMoveAction } from "@/util/NestedList"
-import produce from "immer"
+import { produce } from "immer"
+import { ArrayUtil } from "../../../../util/ArrayUtil"
+import { NestedList, NLLocation, NLMoveAction } from "../../../../util/NestedList"
 import { IssueTypeColor, Version } from "../../../backlog/ProjectInfoApi"
 import { IssueDataWithOrder, PBIList, PBIListFunc, PBIListMovedEvent } from "./PBIList"
 
@@ -22,6 +22,7 @@ const versions: Record<number, Version> = [1, 2, 3].reduce((acc, id) => {
 }, {} as Record<number, Version>)
 const fakeIssue = (id: number, versionId: number | null, order: number | null): IssueDataWithOrder => ({
   id,
+  projectId: 1,
   issueKey: `FAKE-${id}`,
   keyId: id,
   summary: `Issue ${id}`,

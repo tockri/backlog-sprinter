@@ -1,5 +1,5 @@
-import { ObjectUtil } from "@/util/ObjectUtil"
 import { Immutable } from "immer"
+import { ObjectUtil } from "../util/ObjectUtil"
 
 const isMessage =
   <T>(method: string) =>

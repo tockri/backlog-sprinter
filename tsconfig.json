@@ -1,20 +1,22 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
-    "module": "commonjs",
-    "target": "es6",
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "rootDirs": ["src", "stories"],
-    "outDir": "dist/out",
-    "noEmitOnError": true,
-    "jsx": "react",
-    "typeRoots": ["node_modules/@types"],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@test/*": ["./test/*"],
-      "@secret/*": ["./backlog-sprinter-secret/*"]
-    }
-  }
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["node", "vite-plugin-svgr/client", "vitest/globals", "chrome"]
+  },
+  "include": ["src", "backlog-sprinter-secret", ".ladle"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

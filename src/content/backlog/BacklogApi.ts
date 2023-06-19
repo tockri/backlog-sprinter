@@ -1,7 +1,7 @@
-import { RealWikiApi } from "@/content/backlog/WikiApi"
-import { ObjectUtil } from "@/util/ObjectUtil"
+import { ObjectUtil } from "../../util/ObjectUtil"
 import { RealIssueApi } from "./IssueApi"
 import { RealProjectInfoApi } from "./ProjectInfoApi"
+import { RealWikiApi } from "./WikiApi"
 
 export const RealBacklogApi = {
   issue: RealIssueApi,

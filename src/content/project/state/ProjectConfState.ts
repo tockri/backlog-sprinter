@@ -4,9 +4,9 @@ import { atomWithStorage } from "jotai/utils"
 // noinspection JSUnusedGlobalSymbols
 export enum Tabs {
   Backlog = 0,
-  //  Velocity = 1,
-  Stat = 1,
-  Settings = 2
+  Sprint = 1,
+  Stat = 2,
+  Settings = 3
 }
 
 export type ProjectConf = Immutable<{

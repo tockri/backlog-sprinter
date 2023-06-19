@@ -1,39 +1,25 @@
-import { BspEnvState } from "@/content/state/BspEnvState"
 import { Immutable } from "immer"
 import { atom } from "jotai"
+import { atomFamily, atomWithStorage } from "jotai/utils"
+import { BspEnvState } from "./BspEnvState"
 
 export type BspConf = Immutable<{
   pbiIssueTypeId: number
+  hideCompletedPbi?: boolean
 }>
 
 const InitialBspConf: BspConf = { pbiIssueTypeId: 0 }
 
-const store = atom<BspConf | null>(null)
+const store = atomFamily((projectKey: string) => atomWithStorage(`bsp.BspConf.${projectKey}`, InitialBspConf))
 
 const mainAtom = atom(
   (get) => {
     const env = get(BspEnvState.atom)
-    const stored = get(store)
-    if (env.projectKey) {
-      if (stored) {
-        return stored
-      } else {
-        const sKey = `bsp.BspConf.${env.projectKey}`
-        const record = localStorage.getItem(sKey)
-        if (record) {
-          return JSON.parse(record) as BspConf
-        }
-      }
-    }
-    return InitialBspConf
+    return get(store(env.projectKey))
   },
   (get, set, newValue: BspConf) => {
     const env = get(BspEnvState.atom)
-    if (env.projectKey) {
-      const sKey = `bsp.BspConf.${env.projectKey}`
-      localStorage.setItem(sKey, JSON.stringify(newValue))
-      set(store, newValue)
-    }
+    set(store(env.projectKey), newValue)
   }
 )
 

@@ -1,17 +1,29 @@
 import styled from "@emotion/styled"
+import { useAtom, useAtomValue } from "jotai/index"
 import React from "react"
+import { EditIssueInput } from "../../../backlog/IssueApi"
+import { BspEnvState } from "../../../state/BspEnvState"
+import { ProjectState } from "../../../state/ProjectInfoState"
 import { HBox, VBox } from "../../../ui/Box"
 import { EditableField } from "../../../ui/EditableField"
 import { Loading } from "../../../ui/Loading"
+import { ItemSelectionState } from "../state/ItemSelectionState"
+import { PBIListFunc } from "../state/PBIList"
+import { PBIListState } from "../state/PBIListState"
 import { StatusView } from "../StatusView"
 import { StoryPointView } from "../StoryPointView"
 import { ChildIssueListView } from "./ChildIssueListView"
-import { useIssueAreaModel } from "./IssueAreaModel"
 
 export const IssueAreaView: React.FC = () => {
-  const model = useIssueAreaModel()
-  const { issue, lang } = model
+  const item = useAtomValue(ItemSelectionState.atom)
+  const project = useAtomValue(ProjectState.atom)
+  const markdown = project.textFormattingRule === "markdown"
+  const [pbiList, dispatch] = useAtom(PBIListState.atom)
+  const { lang } = useAtomValue(BspEnvState.atom)
+  const issue = item.type === "Issue" ? PBIListFunc.findIssue(pbiList, item.issueId) : null
+
   if (issue) {
+    const fix = (input: EditIssueInput) => dispatch(PBIListState.Action.EditIssue(issue.id, input))
     return (
       <Float>
         <Head>
@@ -23,17 +35,13 @@ export const IssueAreaView: React.FC = () => {
                 </a>
               </IssueKey>
               <div>
-                <StatusView
-                  status={issue.status}
-                  variant="edit"
-                  onFix={(value) => model.changeIssue("statusId", value)}
-                />
+                <StatusView status={issue.status} variant="edit" onFix={(value) => fix({ statusId: value })} />
               </div>
             </HBox>
             <Summary>
               <EditableField
                 defaultValue={issue.summary}
-                onFix={(value) => model.changeIssue("summary", value)}
+                onFix={(value) => fix({ summary: value })}
                 blurAction="submit"
                 editStyle={{
                   flexGrow: 1
@@ -46,15 +54,15 @@ export const IssueAreaView: React.FC = () => {
             <StoryPointView
               issue={issue}
               variant="edit"
-              onEstimateFix={(value) => model.changeIssue("estimatedHours", value)}
-              onActualFix={(value) => model.changeIssue("actualHours", value)}
+              onEstimateFix={(value) => fix({ estimatedHours: value })}
+              onActualFix={(value) => fix({ actualHours: value })}
             />
           </HeadSide>
         </Head>
         <Description>
           <EditableField
             defaultValue={issue.description}
-            markdown={model.markdown}
+            markdown={markdown}
             multiline={true}
             editStyle={{
               flexGrow: 1
@@ -64,7 +72,7 @@ export const IssueAreaView: React.FC = () => {
               backgroundColor: "#f0f0f0",
               borderRadius: 4
             }}
-            onFix={(value) => model.changeIssue("description", value)}
+            onFix={(value) => fix({ description: value })}
             blurAction="submit"
             lang={lang}
           />
@@ -116,5 +124,8 @@ const Description = styled(VBox)({
   },
   " h2,h3,h4": {
     fontSize: "1.3rem"
+  },
+  " ul,ol": {
+    paddingLeft: "2rem"
   }
 })

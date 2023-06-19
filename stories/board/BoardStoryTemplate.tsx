@@ -1,23 +1,22 @@
-import { BoardConfState } from "@/content/board/state/BoardConfState"
-
-import { ApiState } from "@/content/state/ApiState"
-import { BspConfState } from "@/content/state/BspConfState"
-import { BspEnvState } from "@/content/state/BspEnvState"
-import { Loading } from "@/content/ui/Loading"
 import styled from "@emotion/styled"
-import { MockApi } from "@test/mock/MockApi"
-import { MockBoardConf, MockBspConf } from "@test/mock/MockConf"
-import { MockEnv } from "@test/mock/MockEnv"
 import { Immutable } from "immer"
 import { createStore, Provider } from "jotai"
 import React from "react"
+import { BoardConfState } from "../../src/content/board/state/BoardConfState"
+import { ApiState } from "../../src/content/state/ApiState"
+import { BspConfState } from "../../src/content/state/BspConfState"
+import { BspEnvState } from "../../src/content/state/BspEnvState"
+import { Loading } from "../../src/content/ui/Loading"
+import { MockApi } from "../../src/test/mock/MockApi"
+import { MockBoardConf, MockBspConf } from "../../src/test/mock/MockConf"
+import { MockEnv } from "../../src/test/mock/MockEnv"
 
 type Store = ReturnType<typeof createStore>
 type SetStore = Store["set"]
 
 export type BoardStoryTemplateProps = Immutable<{
   initialValues?: (set: SetStore) => void
-  children: React.ReactNode
+  children?: React.ReactNode
 }>
 
 export const BoardStoryTemplate: React.FC<BoardStoryTemplateProps> = ({ initialValues, children }) => {

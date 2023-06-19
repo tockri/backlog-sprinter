@@ -1,5 +1,4 @@
-import { Immutable, produce } from "immer"
-import { WritableDraft } from "immer/dist/types/types-external"
+import { Draft, Immutable, produce } from "immer"
 
 type SubList<H, T> = {
   readonly id: string
@@ -64,7 +63,7 @@ const move = <H, T>(prev: List<H, T>, action: NLMoveAction): List<H, T> => {
   return produce(prev, (draft) => mutateMove(draft, action))
 }
 
-const mutateMove = <H, T>(draft: WritableDraft<List<H, T>>, action: NLMoveAction) => {
+const mutateMove = <H, T>(draft: Draft<List<H, T>>, action: NLMoveAction) => {
   const { src, dst } = action
   if (src.subListId === dst.subListId) {
     const subListId = src.subListId
