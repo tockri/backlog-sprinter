@@ -36,7 +36,7 @@ export const AddIssueTypeView: React.FC = () => {
             type="text"
             onChange={(e) => {
               setValues((c) => {
-                c.color = e.target.value as IssueTypeColor
+                c.name = e.target.value
               })
             }}
             maxLength={20}
@@ -58,7 +58,7 @@ export const AddIssueTypeView: React.FC = () => {
                   onChange={(e) => {
                     if (e.target.checked) {
                       setValues((c) => {
-                        c.name = e.target.value
+                        c.color = e.target.value as IssueTypeColor
                       })
                     }
                   }}
