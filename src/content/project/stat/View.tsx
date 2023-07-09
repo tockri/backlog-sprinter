@@ -22,7 +22,8 @@ export const StatView: React.FC = () => {
 
 const Root = styled.div({
   padding: 12,
-  height: "100%",
+  maxHeight: "100%",
+  rowGap: 32,
   overflow: "auto",
   display: "flex",
   flexFlow: "row wrap"
