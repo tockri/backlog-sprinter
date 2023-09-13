@@ -31,7 +31,7 @@ export type Handler<Value, Action> = (
   get: Getter,
   set: Setter,
   action: Action,
-  store: WritableAtom<Value | null, [Value], void>
+  store: WritableAtom<Value | null, [Value | null], void>
 ) => HandlerResult<Value>
 
 const atomWithAction = <Value, Action>(
@@ -43,7 +43,7 @@ const atomWithAction = <Value, Action>(
     (get) => get(store) || init(get),
     (get, set, action: Action) => {
       const resp = handler(get(main), get, set, action, store)
-      if (resp instanceof ValueWithCallback<Value>) {
+      if (resp instanceof ValueWithCallback) {
         set(store, resp.value)
         resp.callback(resp.value)
       } else {
@@ -76,7 +76,7 @@ export type AsyncHandler<Value, Action> = (
   get: Getter,
   set: Setter,
   action: Action,
-  store: WritableAtom<Value | null, [Value], void>
+  store: WritableAtom<Value | null, [Value | null], void>
 ) => Promise<HandlerResult<Value>> | HandlerResult<Value>
 
 const asyncAtomWithAction = <Value, Action>(
@@ -93,7 +93,7 @@ const asyncAtomWithAction = <Value, Action>(
       const result = await handler(await get(main), get, set, action, store)
       if (result === null) {
         set(counter, (c) => c + 1)
-      } else if (result instanceof ValueWithCallback<Value>) {
+      } else if (result instanceof ValueWithCallback) {
         set(store, result.value)
         result.callback(result.value)
       } else {
@@ -111,7 +111,7 @@ export type CacheOption = {
 
 export type AsyncFamilyHandler<Param, Value, Action> = (
   param: Param,
-  storeAtom: AtomFamily<Param, WritableAtom<Value | null, [Value], void>>
+  storeAtom: AtomFamily<Param, WritableAtom<Value | null, [Value | null], void>>
 ) => AsyncHandler<Value, Action>
 
 const asyncAtomFamilyWithAction = <Param, Value, Action>(
@@ -134,7 +134,7 @@ const asyncAtomFamilyWithAction = <Param, Value, Action>(
           action,
           store(param)
         )
-        if (result instanceof ValueWithCallback<Value>) {
+        if (result instanceof ValueWithCallback) {
           set(store(param), result.value)
           result.callback(result.value)
         } else {

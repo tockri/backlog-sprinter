@@ -1,4 +1,4 @@
-import { Draft, produce } from "immer"
+
 import { JotaiUtil } from "../../../util/JotaiUtil"
 
 import { AddIssueInput, Issue } from "../../../backlog/IssueApi"
@@ -35,21 +35,15 @@ const mainAtom = JotaiUtil.asyncAtomFamilyWithAction(
       const { issue, destinationIssueId } = action
       const api = get(ApiState.atom)
 
-      const updated = await api.issue.edit(issue.id, { parentIssueId: destinationIssueId })
-      const currDst = await get(mainAtom(destinationIssueId))
+      await api.issue.edit(issue.id, { parentIssueId: destinationIssueId })
+
       set(
         storeAtom(destinationIssueId),
-        produce(currDst, (draft) => {
-          draft.push(updated as Draft<Issue>)
-        })
+        null
       )
 
-      return produce(curr, (draft) => {
-        const idx = draft.findIndex((i) => i.id === issue.id)
-        if (idx >= 0) {
-          draft.splice(idx, 1)
-        }
-      })
+      const idx = curr.findIndex((i) => i.id === issue.id)
+      return idx >= 0 ? curr.toSpliced(idx, 1) : curr
     } else if (action.type === "Reload") {
       return null
     }

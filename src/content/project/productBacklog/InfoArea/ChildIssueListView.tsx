@@ -6,7 +6,7 @@ import { BspEnvState } from "../../../state/BspEnvState"
 import { HBox } from "../../../ui/Box"
 import { Draggable } from "../../../ui/DragAndDrop"
 
-import { ChildIssuesAction, ChildIssuesState } from "../state/ChildIssuesState"
+import { ChildIssuesState } from "../state/ChildIssuesState"
 import { StatusView } from "../StatusView"
 import { i18n } from "./i18n"
 
@@ -14,8 +14,7 @@ type ChildIssueListViewProps = {
   parentIssueId: number
 }
 
-export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => {
-  const { parentIssueId } = props
+export const ChildIssueListView: React.FC<ChildIssueListViewProps> = ({ parentIssueId }) => {
   const [children, dispatch] = useAtom(ChildIssuesState.atom(parentIssueId))
   const env = useAtomValue(BspEnvState.atom)
   const t = i18n(env.lang)
@@ -29,7 +28,9 @@ export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => 
         {t.childIssue}
       </Heading>
       {children.map((issue) => (
-        <ChildIssueView key={issue.id} issue={issue} dispatch={dispatch} />
+        <ChildIssueView key={issue.id} issue={issue} onDragEnd={(dst) => {
+          dispatch(ChildIssuesState.Action.Move(issue, dst)).then()
+        }} />
       ))}
     </div>
   )
@@ -37,18 +38,17 @@ export const ChildIssueListView: React.FC<ChildIssueListViewProps> = (props) => 
 
 type ChildIssueViewProps = {
   issue: Issue
-  dispatch: (action: ChildIssuesAction) => void
+  onDragEnd: (destinationIssueId: number) => void
 }
 
-const ChildIssueView: React.FC<ChildIssueViewProps> = (props) => {
-  const { issue, dispatch } = props
+const ChildIssueView: React.FC<ChildIssueViewProps> = ({ issue, onDragEnd }) => {
   return (
     <Draggable
       type="moveParent"
       item={issue}
       onDragEnd={(where) => {
         if (where) {
-          dispatch(ChildIssuesState.Action.Move(issue, where.id))
+          onDragEnd(where.id)
         }
       }}
     >
