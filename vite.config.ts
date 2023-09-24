@@ -1,5 +1,5 @@
 import { crx, defineManifest } from "@crxjs/vite-plugin"
-import react from "@vitejs/plugin-react"
+import react from "@vitejs/plugin-react-swc"
 import { defineConfig } from "vite"
 import { ManifestSecret } from "./backlog-sprinter-secret/ManifestSecret"
 
