@@ -13,12 +13,14 @@ git submodule update --init --recursive
 
 ### 1. Install dependencies
 
+use [bun](https://bun.sh/) instead of npm and node.
+
 ```
-yarn
+bun install
 ```
 
 ### 2. Run builder
 
 ```
-yarn dev
+bun run dev
 ```
