@@ -7,7 +7,7 @@ const manifest = defineManifest({
   manifest_version: 3,
   name: "Backlog Sprinter",
   key: ManifestSecret.key,
-  version: "2.0.5",
+  version: "2.0.6",
   default_locale: "en",
   description: "__MSG_appDesc__",
   background: {

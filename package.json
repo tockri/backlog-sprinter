@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && NODE_ENV=production vite build ; cd dist ; zip ../backlog-sprinter.zip -r *",
+    "build": "tsc && rm -rf dist ; NODE_ENV=production vite build ; cd dist ; zip ../backlog-sprinter.zip -r *",
     "test": "vitest",
     "ladle": "ladle serve"
   },
