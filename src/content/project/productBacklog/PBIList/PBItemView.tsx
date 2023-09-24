@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { useAtom, useSetAtom } from "jotai/index"
+import { useAtom, useSetAtom } from "jotai"
 import React from "react"
 import { NLLocation } from "../../../../util/NestedList"
 import { cnu } from "../../../ui/cnu"

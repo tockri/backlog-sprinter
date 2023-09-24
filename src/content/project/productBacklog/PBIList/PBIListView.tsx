@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import React from "react"
 import { cnu } from "../../../ui/cnu"
 
-import { useAtom, useAtomValue } from "jotai/index"
+import { useAtom, useAtomValue } from "jotai"
 import { BspEnvState } from "../../../state/BspEnvState"
 import { ResourceImg } from "../../../ui/ResourceImg"
 import { i18n } from "../i18n"

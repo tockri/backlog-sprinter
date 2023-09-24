@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { Immutable } from "immer"
-import { useAtom, useAtomValue, useSetAtom } from "jotai/index"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import React from "react"
 import { DateUtil } from "../../../../util/DateUtil"
 import { NLLocation } from "../../../../util/NestedList"

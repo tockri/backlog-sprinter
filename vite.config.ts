@@ -1,7 +1,6 @@
 import { crx, defineManifest } from "@crxjs/vite-plugin"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
-import svgr from "vite-plugin-svgr"
 import { ManifestSecret } from "./backlog-sprinter-secret/ManifestSecret"
 
 const manifest = defineManifest({
@@ -42,5 +41,5 @@ const manifest = defineManifest({
 })
 
 export default defineConfig({
-  plugins: [react(), crx({ manifest }), svgr()]
+  plugins: [react(), crx({ manifest })]
 })

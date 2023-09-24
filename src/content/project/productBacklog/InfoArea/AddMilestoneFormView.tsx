@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { useAtomValue, useSetAtom } from "jotai/index"
+import { useAtomValue, useSetAtom } from "jotai"
 import React from "react"
 import { Tooltip } from "react-tooltip"
 import { DateUtil } from "../../../../util/DateUtil"

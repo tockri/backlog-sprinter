@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { useAtom, useAtomValue } from "jotai/index"
+import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { IssueTypeColor, issueTypeColorClass } from "../../backlog/ProjectInfoApi"
 import { BspEnvState } from "../../state/BspEnvState"

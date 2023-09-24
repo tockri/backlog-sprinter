@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { useAtomValue } from "jotai/index"
+import { useAtomValue } from "jotai"
 import React from "react"
 import { ItemSelectionState } from "../state/ItemSelectionState"
 import { AddMilestoneFormView } from "./AddMilestoneFormView"

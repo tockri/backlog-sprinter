@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue } from "jotai/index"
+import { useAtom, useAtomValue } from "jotai"
 import React from "react"
 import { BspEnvState } from "../state/BspEnvState"
 import { ModalState } from "../state/ModalState"
